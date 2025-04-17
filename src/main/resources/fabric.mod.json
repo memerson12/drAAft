@@ -1,0 +1,31 @@
+{
+	"schemaVersion": 1,
+	"id": "aaeventmod",
+	"version": "${version}",
+	"name": "AAEventMod",
+	"description": "Mod for Pac's awesome AA Event",
+	"authors": [
+		"Memerson",
+		"PacManMVC"
+	],
+	"contact": {
+		"homepage": "https://fabricmc.net/",
+		"sources": "https://github.com/FabricMC/fabric-example-mod"
+	},
+	"license": "CC0-1.0",
+	"icon": "assets/aaeventmod/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"aaeventmod.AAEventMod"
+		]
+	},
+	"mixins": [
+		"aaeventmod.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.16.13",
+		"minecraft": "~1.16.1",
+		"java": ">=8"
+	}
+}
