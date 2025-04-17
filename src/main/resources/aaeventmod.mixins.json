@@ -3,7 +3,8 @@
   "package": "aaeventmod.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
-    "TridentEntityMixin"
+    "TridentEntityMixin",
+    "TridentItemMixin"
   ],
   "injectors": {
     "defaultRequire": 1
