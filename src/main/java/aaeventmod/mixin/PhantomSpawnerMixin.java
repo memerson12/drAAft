@@ -35,7 +35,7 @@ public abstract class PhantomSpawnerMixin implements Spawner {
     @Shadow private int ticksUntilNextSpawn;
     @Unique private static final int MINIMUM_COOLDOWN_TIME = 60; // Min time between spawns in seconds
     @Unique private static final int MAX_COOLDOWN_TIME = 350; // Max time between spawns in seconds
-    @Unique private static final int MIN_TIME_TO_FIRST_SPAWN = 24000; // Min time needed without sleep for phantoms to spawn
+    @Unique private static final int MIN_TIME_TO_FIRST_SPAWN = 24000; // Min time needed without sleep for phantoms to spawn in ticks
 
     /**
      * Overwrites the vanilla phantom spawning logic to customize spawn delay,
