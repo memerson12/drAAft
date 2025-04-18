@@ -33,9 +33,6 @@ import java.util.Random;
 public abstract class PhantomSpawnerMixin implements Spawner {
 
     @Shadow private int ticksUntilNextSpawn;
-    @Unique private static final int MINIMUM_COOLDOWN_TIME = 60; // Min time between spawns in seconds
-    @Unique private static final int MAX_COOLDOWN_TIME = 350; // Max time between spawns in seconds
-    @Unique private static final int MIN_TIME_TO_FIRST_SPAWN = 24000; // Min time needed without sleep for phantoms to spawn in ticks
 
     /**
      * Overwrites the vanilla phantom spawning logic to customize spawn delay,
@@ -69,10 +66,10 @@ public abstract class PhantomSpawnerMixin implements Spawner {
             return 0;
         }
 
-        // --- MODIFICATION: Cooldown changed to 15-60 seconds (300-1200 ticks) ---
+        // --- MODIFICATION: Cooldown changed to 15-60 seconds (300-1180 ticks) ---
         // Reset cooldown timer with the new range
-        // Original: this.ticksUntilNextSpawn += (60 + random.nextInt(60)) * 20; // 1200-2400 ticks
-        this.ticksUntilNextSpawn = (MINIMUM_COOLDOWN_TIME + random.nextInt(MAX_COOLDOWN_TIME+1)) * 20;
+        // Original: this.ticksUntilNextSpawn += (60 + random.nextInt(60)) * 20; // 1200-2380 ticks
+        this.ticksUntilNextSpawn = (15 + random.nextInt(45)) * 20;
 
         // Check world conditions (light level, dimension sky light) - Unchanged from vanilla
         if (serverWorld.getAmbientDarkness() < 5 && serverWorld.getDimension().hasSkyLight()) {
@@ -81,7 +78,7 @@ public abstract class PhantomSpawnerMixin implements Spawner {
 
         int totalSpawnedThisTick = 0;
         // Iterate through players to check spawn conditions near them
-        for(PlayerEntity playerEntity : serverWorld.getPlayers()) {
+        for (PlayerEntity playerEntity : serverWorld.getPlayers()) {
             // Skip spectators
             if (playerEntity.isSpectator()) {
                 continue;
@@ -100,14 +97,14 @@ public abstract class PhantomSpawnerMixin implements Spawner {
                 if (localDifficulty.isHarderThan(random.nextFloat())) { // Removed 3.0F multiplier
 
                     // Check player stats (time since last rest)
-                    ServerStatHandler serverStatHandler = ((ServerPlayerEntity)playerEntity).getStatHandler();
+                    ServerStatHandler serverStatHandler = ((ServerPlayerEntity) playerEntity).getStatHandler();
                     // Clamp timeSinceRest to avoid issues, minimum 1 tick.
                     int timeSinceRest = MathHelper.clamp(serverStatHandler.getStat(Stats.CUSTOM.getOrCreateStat(Stats.TIME_SINCE_REST)), 1, Integer.MAX_VALUE);
 
                     // --- MODIFICATION: Minimum time since rest reduced ---
                     // Check if the player has been awake long enough (random chance based on time)
                     // Original: if (random.nextInt(timeSinceRest) >= 72000) // 1 hour
-                    if (random.nextInt(timeSinceRest) >= MIN_TIME_TO_FIRST_SPAWN) {
+                    if (random.nextInt(timeSinceRest) >= 12_000) {
 
                         // Calculate potential spawn position relative to the player
                         BlockPos spawnPos = playerPos.up(20 + random.nextInt(15)).east(-10 + random.nextInt(21)).south(-10 + random.nextInt(21));
