@@ -12,6 +12,6 @@ public class ItemsMixin {
             slice = @Slice(from = @At(value = "CONSTANT", args = "stringValue=elytra")),
             at = @At(value = "INVOKE", target = "Lnet/minecraft/item/Item$Settings;maxDamage(I)Lnet/minecraft/item/Item$Settings;"))
     private static int elytra(int original) {
-        return 22428;
+        return 22824;
     }
 }
