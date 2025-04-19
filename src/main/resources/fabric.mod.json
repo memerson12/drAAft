@@ -2,7 +2,7 @@
 	"schemaVersion": 1,
 	"id": "draaft",
 	"version": "${version}",
-	"name": "drAAft",
+	"name": "draaft",
 	"description": "Mod for Pac's awesome AA Event",
 	"authors": [
 		"Memerson",
@@ -13,11 +13,11 @@
 		"sources": "https://github.com/FabricMC/fabric-example-mod"
 	},
 	"license": "CC0-1.0",
-	"icon": "assets/drAAft/icon.png",
+	"icon": "assets/draaft/icon.png",
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-          "drAAft.drAAft"
+          "draaft.draaft"
 		]
 	},
 	"mixins": [
