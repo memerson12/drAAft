@@ -11,7 +11,8 @@
     "ItemsMixin",
     "PhantomSpawnerMixin",
     "TridentEntityMixin",
-    "TridentItemMixin"
+    "TridentItemMixin",
+    "WanderingTraderManagerMixin"
   ],
   "injectors": {
     "defaultRequire": 1
