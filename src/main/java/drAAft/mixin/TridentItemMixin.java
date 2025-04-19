@@ -1,4 +1,4 @@
-package aaeventmod.mixin;
+package drAAft.mixin;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.TridentItem;

@@ -1,8 +1,8 @@
 {
 	"schemaVersion": 1,
-	"id": "aaeventmod",
+	"id": "draaft",
 	"version": "${version}",
-	"name": "AAEventMod",
+	"name": "drAAft",
 	"description": "Mod for Pac's awesome AA Event",
 	"authors": [
 		"Memerson",
@@ -13,15 +13,15 @@
 		"sources": "https://github.com/FabricMC/fabric-example-mod"
 	},
 	"license": "CC0-1.0",
-	"icon": "assets/aaeventmod/icon.png",
+	"icon": "assets/drAAft/icon.png",
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-			"aaeventmod.AAEventMod"
+          "drAAft.drAAft"
 		]
 	},
 	"mixins": [
-		"aaeventmod.mixins.json"
+		"drAAft.mixins.json"
 	],
 	"depends": {
 		"fabricloader": ">=0.16.13",

@@ -1,4 +1,4 @@
-package aaeventmod.mixin;
+package drAAft.mixin;
 
 import net.minecraft.block.Blocks;
 import net.minecraft.world.biome.Biome;

@@ -1,4 +1,4 @@
-package aaeventmod.mixin;
+package drAAft.mixin;
 
 import net.minecraft.item.Items;
 import org.spongepowered.asm.mixin.Mixin;

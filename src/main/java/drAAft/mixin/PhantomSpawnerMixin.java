@@ -1,4 +1,4 @@
-package aaeventmod.mixin;
+package drAAft.mixin;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.EntityData;
@@ -22,7 +22,6 @@ import net.minecraft.world.gen.Spawner;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
 
 import java.util.Random;
 

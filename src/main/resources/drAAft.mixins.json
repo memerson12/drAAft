@@ -1,8 +1,11 @@
 {
   "required": true,
-  "package": "aaeventmod.mixin",
+  "package": "drAAft.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
+    "AnimalEntityMixin",
+    "BambooJungleBiomeMixin",
+    "BambooJungleHillsBiomeMixin",
     "DefaultBiomeFeaturesMixin",
     "DrownedEntityMixin",
     "ItemsMixin",

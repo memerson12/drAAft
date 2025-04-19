@@ -1,4 +1,4 @@
-package aaeventmod.mixin;
+package drAAft.mixin;
 
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ai.RangedAttackMob;
@@ -26,6 +26,6 @@ public abstract class DrownedEntityMixin extends ZombieEntity implements RangedA
 
     @ModifyConstant(method = "initialize", constant = @Constant(floatValue = 0.03F))
     private float injected(float value) {
-        return 0.08F;
+        return 0.09F;
     }
 }

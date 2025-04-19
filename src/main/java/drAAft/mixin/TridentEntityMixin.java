@@ -1,4 +1,4 @@
-package aaeventmod.mixin;
+package drAAft.mixin;
 
 import net.minecraft.entity.projectile.TridentEntity;
 import net.minecraft.world.World;

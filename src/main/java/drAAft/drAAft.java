@@ -1,12 +1,12 @@
-package aaeventmod;
+package drAAft;
 
 import net.fabricmc.api.ModInitializer;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class AAEventMod implements ModInitializer {
-	public static final String MOD_ID = "aaeventmod";
+public class drAAft implements ModInitializer {
+	public static final String MOD_ID = "drAAft";
 	public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
 
 	@Override
