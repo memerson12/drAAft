@@ -1,4 +1,4 @@
-package drAAft.mixin;
+package draaft.mixin;
 
 import net.minecraft.world.WanderingTraderManager;
 import net.minecraft.world.gen.Spawner;

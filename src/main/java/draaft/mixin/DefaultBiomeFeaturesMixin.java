@@ -1,4 +1,4 @@
-package drAAft.mixin;
+package draaft.mixin;
 
 import net.minecraft.block.Blocks;
 import net.minecraft.world.biome.Biome;

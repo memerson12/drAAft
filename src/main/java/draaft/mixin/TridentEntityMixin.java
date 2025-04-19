@@ -1,4 +1,4 @@
-package drAAft.mixin;
+package draaft.mixin;
 
 import net.minecraft.entity.projectile.TridentEntity;
 import net.minecraft.world.World;

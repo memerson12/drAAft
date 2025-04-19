@@ -1,4 +1,4 @@
-package drAAft.mixin;
+package draaft.mixin;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.TridentItem;

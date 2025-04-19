@@ -1,6 +1,6 @@
 {
   "required": true,
-  "package": "drAAft.mixin",
+  "package": "draaft.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
     "AnimalEntityMixin",

@@ -1,4 +1,4 @@
-package drAAft.mixin;
+package draaft.mixin;
 
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ai.RangedAttackMob;
