@@ -13,8 +13,8 @@ public abstract class BambooJungleHillsBiomeMixin extends Biome {
         super(settings);
     }
 
-    @ModifyConstant(method = "<init>", constant = @Constant(intValue = 80))
-    private int injected(int value) {
-        return 8_000;
+    @Override
+    public float getMaxSpawnChance() {
+        return 0.3F;
     }
 }
