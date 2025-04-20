@@ -8,6 +8,7 @@
     "BambooJungleHillsBiomeMixin",
     "DefaultBiomeFeaturesMixin",
     "DrownedEntityMixin",
+    "EnderPearlEntityMixin",
     "HoldingPatternPhaseMixin",
     "IglooGeneratorMixin",
     "ItemsMixin",
