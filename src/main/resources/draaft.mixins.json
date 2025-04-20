@@ -8,9 +8,9 @@
     "BambooJungleHillsBiomeMixin",
     "DefaultBiomeFeaturesMixin",
     "DrownedEntityMixin",
+    "HoldingPatternPhaseMixin",
     "ItemsMixin",
     "PhantomSpawnerMixin",
-    "StrafePlayerPhaseMixin",
     "TridentEntityMixin",
     "TridentItemMixin",
     "WanderingTraderManagerMixin"
