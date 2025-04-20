@@ -13,8 +13,7 @@
     "IglooGeneratorMixin",
     "ItemsMixin",
     "PhantomSpawnerMixin",
-    "TridentEntityMixin",
-    "TridentItemMixin",
+    "ServerWorldMixin",
     "WanderingTraderManagerMixin"
   ],
   "injectors": {
