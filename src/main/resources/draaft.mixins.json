@@ -9,6 +9,7 @@
     "DefaultBiomeFeaturesMixin",
     "DrownedEntityMixin",
     "HoldingPatternPhaseMixin",
+    "IglooGeneratorMixin",
     "ItemsMixin",
     "PhantomSpawnerMixin",
     "TridentEntityMixin",
