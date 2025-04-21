@@ -30,7 +30,7 @@ speedrun. Ideal for competitive events
     - Spawn more frequently (15-60 second cooldown, down from 60-120 seconds)
     - Require less time without sleep to spawn (10 minutes, down from 60 minutes)
     - Always spawn at least 2 phantoms on Hard difficulty
-    - he local difficulty multiplier of 3.0F has been removed, so the spawn attempt should succeed 3x as often
+    - The local difficulty multiplier of 3.0F has been removed, so the spawn attempt should succeed 3x as often
 - Ender Dragon:
     - Fly-away height will always choose the lowest possible block. This means the dragon will not fly until it hits the
       height of the terrain + 20, which is usually around y-80.
