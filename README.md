@@ -26,6 +26,7 @@ speedrun. Ideal for competitive events
     - Chance of spawning with Trident 18.75% (was 6.25%)
     - Chance of spawning with Fishing Rod 11.25% (was 3.75%)
     - Chance of spawning with Nautilus Shell 9% (was 3%).
+    - Drowned equipment is standardized based on the world seed and block coordinates.
 - Phantoms:
     - Spawn more frequently (15-60 second cooldown, down from 60-120 seconds)
     - Require less time without sleep to spawn (10 minutes, down from 60 minutes)
@@ -37,6 +38,7 @@ speedrun. Ideal for competitive events
     - Dragon instant perch and straight node / diagonal node selection standardized based on the world seed.
 - Endermite spawn chance per thrown pearl is now 7% (was 5%).
     - This changes the amount of pearls needed for a 99% chance of getting an Endermite to 64 (was 90).
+    - Endermite spawns are standardized based on the world seed.
 
 ### Item Changes
 
