@@ -55,7 +55,31 @@ speedrun. Ideal for competitive events
 3. Place the JAR file in your mods folder
 4. Launch Minecraft with Fabric loader
 
-## Dependencies
+# drAAftpack
+
+The drAAft mod is meant to be used in combination with the drAAftpack datapack, which can be generated from https://disrespec.tech/draaft/
+
+## Features
+
+### Default Changes
+
+- Gamerule keepInventory is set to true
+- Cat nearest to the player on world load becomes Black variant
+- Beaconator advancement is granted
+- Wither Skeleton Skull drop chance is 7.5% (was 2.5%) + 3% per level of looting (was 1%)
+- Bastion chest loot tables buffed to those in 1.16.2
+- Stronghold Library loot table buffed
+- Desert Pyramid loot table buffed
+- Piglin bartering loot table buffed
+- End City loot table buffed
+
+### Drafted Changes
+
+In addition to the default changes present for all players, drafted items will be added to their respective player's datapack.
+They will be applied to the player through a combination of /advancement grant, /effect give, and /give commands.
+Any items left undrafted will be added to every player's datapack.
+
+## Mod Dependencies
 
 - Minecraft 1.16.1
 - Fabric Loader ≥0.16.13
