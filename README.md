@@ -8,8 +8,11 @@ speedrun. Ideal for competitive events
 ### World Generation
 
 - Increased Ancient Debris generation in the Nether
-    - Ancient Debris spawns are now 2 attempts with baseline 16, spread 8, one with size 5 and one with size 4.
-    - This does not change the optimal y-level for debris mining.
+  - Ancient Debris spawns are now 2 attempts with baseline 16, spread 8, one with size 5 and one with size 4.
+  - This does not change the optimal y-level for debris mining.
+- Increased Lapis Lazuli generation
+  - Lapis Lazuli spawns are now 4 attempts with baseline 16, spread 16, size 9 (was 7).
+  - This does not change Bolan Clay/Gravel to Lapis Lazuli.
 - Igloos always generate with basements (was 50%)
 - Thunder happens more often and is standardized per seed
     - Thunder will now occur every 10 - 45 minutes (was 10 - 150 minutes)
