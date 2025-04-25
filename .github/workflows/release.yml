@@ -1,17 +1,39 @@
 name: Create Release
 
 on:
-  workflow_dispatch:
-    inputs:
-      changelog:
-        description: 'Release changelog'
-        required: true
-      version:
-        description: 'Version number (e.g., v1.0.0)'
-        required: true
+  push:
+    branches:
+      - main
+    paths:
+      - 'gradle.properties'
 
 jobs:
+  check-version:
+    runs-on: ubuntu-24.04
+    outputs:
+      should_release: ${{ steps.check.outputs.should_release }}
+      version: ${{ steps.check.outputs.version }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Check if version changed
+        id: check
+        run: |
+          OLD_VERSION=$(git show HEAD^:gradle.properties | grep "mod_version" | cut -d'=' -f2 | tr -d ' ')
+          NEW_VERSION=$(grep "mod_version" gradle.properties | cut -d'=' -f2 | tr -d ' ')
+          if [ "$OLD_VERSION" != "$NEW_VERSION" ]; then
+            echo "should_release=true" >> $GITHUB_OUTPUT
+            echo "version=v$NEW_VERSION" >> $GITHUB_OUTPUT
+          else
+            echo "should_release=false" >> $GITHUB_OUTPUT
+          fi
+
   build:
+    needs: check-version
+    if: needs.check-version.outputs.should_release == 'true'
     runs-on: ubuntu-24.04
     permissions:
       contents: write
@@ -34,12 +56,21 @@ jobs:
       - name: Build
         run: ./gradlew build
 
+      - name: Get Changelog
+        id: changelog
+        run: |
+          if [ -f changelog.md ]; then
+            echo "changelog=$(cat changelog.md)" >> $GITHUB_OUTPUT
+          else
+            echo "changelog=No changelog provided" >> $GITHUB_OUTPUT
+          fi
+
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ github.event.inputs.version }}
-          name: Release ${{ github.event.inputs.version }}
-          body: ${{ github.event.inputs.changelog }}
+          tag_name: ${{ needs.check-version.outputs.version }}
+          name: Release ${{ needs.check-version.outputs.version }}
+          body: ${{ steps.changelog.outputs.changelog }}
           draft: false
           prerelease: false
           files: |
