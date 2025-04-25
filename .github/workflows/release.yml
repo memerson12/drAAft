@@ -60,12 +60,9 @@ jobs:
         id: changelog
         run: |
           if [ -f changelog.md ]; then
-            {
-              echo "changelog<<EOF"
-              cat changelog.md
-              echo "EOF"
-          
-            } >> "$GITHUB_OUTPUT"
+            echo 'changelog<<EOF' >> "$GITHUB_OUTPUT"
+            cat changelog.md >> "$GITHUB_OUTPUT"
+            echo 'EOF' >> "$GITHUB_OUTPUT"
           else
             echo "changelog=No changelog provided" >> "$GITHUB_OUTPUT"
           fi
