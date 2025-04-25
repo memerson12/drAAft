@@ -5,7 +5,7 @@ on:
     branches:
       - master
     paths:
-      - 'gradle.properties'
+      - "gradle.properties"
 
 jobs:
   check-version:
@@ -47,8 +47,8 @@ jobs:
       - name: Setup JDK
         uses: actions/setup-java@v4
         with:
-          java-version: '21'
-          distribution: 'microsoft'
+          java-version: "21"
+          distribution: "microsoft"
 
       - name: Make gradle wrapper executable
         run: chmod +x ./gradlew
@@ -62,9 +62,12 @@ jobs:
           if [ -f changelog.md ]; then
             echo 'changelog<<EOF' >> "$GITHUB_OUTPUT"
             cat changelog.md >> "$GITHUB_OUTPUT"
+            echo "" >> "$GITHUB_OUTPUT"
             echo 'EOF' >> "$GITHUB_OUTPUT"
           else
-            echo "changelog=No changelog provided" >> "$GITHUB_OUTPUT"
+            echo 'changelog<<EOF' >> "$GITHUB_OUTPUT"
+            echo "No changelog provided" >> "$GITHUB_OUTPUT"
+            echo 'EOF' >> "$GITHUB_OUTPUT"
           fi
 
       - name: Create Release
