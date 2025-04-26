@@ -12,6 +12,7 @@
     "HoldingPatternPhaseMixin",
     "IglooGeneratorMixin",
     "ItemsMixin",
+    "LavaLakeDecoratorMixin",
     "PhantomSpawnerMixin",
     "ServerWorldMixin",
     "WanderingTraderManagerMixin"

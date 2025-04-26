@@ -13,6 +13,9 @@ speedrun. Ideal for competitive events
 - Increased Lapis Lazuli generation
   - Lapis Lazuli spawns are now 4 attempts with baseline 16, spread 16, size 9 (was 7).
   - This does not change Bolan Clay/Gravel to Lapis Lazuli.
+- Increased Lava Pool generation
+  - Spawn attempt per chunk is 2x as likely
+  - Snapping to surface is 2.5x as likely
 - Igloos always generate with basements (was 50%)
 - Thunder happens more often and is standardized per seed
     - Thunder will now occur every 10 - 45 minutes (was 10 - 150 minutes)
@@ -36,8 +39,7 @@ speedrun. Ideal for competitive events
     - Always spawn at least 2 phantoms on Hard difficulty
     - The local difficulty multiplier of 3.0F has been removed, so the spawn attempt should succeed 3x as often
 - Ender Dragon:
-    - Fly-away height will always choose the lowest possible block. This means the dragon will not fly until it hits the
-      height of the terrain + 20, which is usually around y-80.
+    - Fly-away will happen less frequently.
     - Dragon instant perch and straight node / diagonal node selection standardized based on the world seed.
 - Endermite spawn chance per thrown pearl is now 7% (was 5%).
     - This changes the amount of pearls needed for a 99% chance of getting an Endermite to 64 (was 90).
@@ -66,6 +68,7 @@ The drAAft mod is meant to be used in combination with the drAAftpack datapack, 
 - Gamerule keepInventory is set to true
 - Cat nearest to the player on world load becomes Black variant
 - Beaconator advancement is granted
+- Iron Golem drops at least 4 iron
 - Wither Skeleton Skull drop chance is 7.5% (was 2.5%) + 3% per level of looting (was 1%)
 - Bastion chest loot tables buffed to those in 1.16.2
 - Stronghold Library loot table buffed
