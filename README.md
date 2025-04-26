@@ -1,6 +1,6 @@
 # drAAft
 
-A Minecraft 1.16.1 mod that makes various gameplay adjustments for a streamlined/ more consistent All Advancement
+A Minecraft 1.16.1 mod that makes various gameplay adjustments for a streamlined/more consistent All Advancement
 speedrun. Ideal for competitive events
 
 ## Features
