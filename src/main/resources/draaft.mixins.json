@@ -9,6 +9,7 @@
     "DefaultBiomeFeaturesMixin",
     "DrownedEntityMixin",
     "EnderPearlEntityMixin",
+    "EndGatewayDecoratorMixin",
     "HoldingPatternPhaseMixin",
     "IglooGeneratorMixin",
     "ItemsMixin",
