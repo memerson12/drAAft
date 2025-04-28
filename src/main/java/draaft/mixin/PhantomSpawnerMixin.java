@@ -65,10 +65,7 @@ public abstract class PhantomSpawnerMixin implements Spawner {
             return 0;
         }
 
-        // --- MODIFICATION: Cooldown changed to 15-60 seconds (300-1180 ticks) ---
-        // Reset cooldown timer with the new range
-        // Original: this.ticksUntilNextSpawn += (60 + random.nextInt(60)) * 20; // 1200-2380 ticks
-        this.ticksUntilNextSpawn = (15 + random.nextInt(45)) * 20;
+        this.ticksUntilNextSpawn = this.ticksUntilNextSpawn + (60 + random.nextInt(60)) * 20;
 
         // Check world conditions (light level, dimension sky light) - Unchanged from vanilla
         if (serverWorld.getAmbientDarkness() < 5 && serverWorld.getDimension().hasSkyLight()) {
