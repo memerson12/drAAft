@@ -1,5 +1,7 @@
 name: Release
 
+# Trigger the workflow on push events to the master branch
+# but only when the gradle.properties file has changed.
 on:
   push:
     branches:
@@ -8,29 +10,44 @@ on:
       - "gradle.properties"
 
 jobs:
+  # Job to check if the version in gradle.properties has changed
   check-version:
     runs-on: ubuntu-24.04
     outputs:
       should_release: ${{ steps.check.outputs.should_release }}
       version: ${{ steps.check.outputs.version }}
     steps:
+      # Step 1: Checkout the repository code
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 2
+          fetch-depth: 2 # Fetch history deep enough to compare the file between commits
 
+      # Step 2: Check if the mod_version in gradle.properties has changed
       - name: Check if version changed
         id: check
         run: |
+          echo "Checking for version change in gradle.properties..."
+          # Get the version from the previous commit's gradle.properties
           OLD_VERSION=$(git show HEAD^:gradle.properties | grep "mod_version" | cut -d'=' -f2 | tr -d ' ')
+          # Get the version from the current commit's gradle.properties
           NEW_VERSION=$(grep "mod_version" gradle.properties | cut -d'=' -f2 | tr -d ' ')
+
+          # Debug prints
+          echo "Previous version: $OLD_VERSION"
+          echo "Current version: $NEW_VERSION"
+
+          # Compare versions and set outputs
           if [ "$OLD_VERSION" != "$NEW_VERSION" ]; then
+            echo "Version changed. Proceeding with release."
             echo "should_release=true" >> $GITHUB_OUTPUT
-            echo "version=v$NEW_VERSION" >> $GITHUB_OUTPUT
+            echo "version=v$NEW_VERSION" >> $GITHUB_OUTPUT # Prepend 'v' for tag name
           else
+            echo "Version did not change. Skipping release."
             echo "should_release=false" >> $GITHUB_OUTPUT
           fi
 
+  # Job to build the project and create a GitHub release
   build:
     needs: check-version
     if: needs.check-version.outputs.should_release == 'true'
@@ -38,39 +55,46 @@ jobs:
     permissions:
       contents: write
     steps:
+      # Step 1: Checkout the repository code
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # Step 2: Validate the Gradle wrapper to ensure it's trustworthy
       - name: Validate gradle wrapper
         uses: gradle/actions/wrapper-validation@v4
 
+      # Step 3: Set up the Java Development Kit (JDK)
       - name: Setup JDK
         uses: actions/setup-java@v4
         with:
           java-version: "21"
           distribution: "microsoft"
 
+      # Step 4: Make the Gradle wrapper script executable
       - name: Make gradle wrapper executable
         run: chmod +x ./gradlew
 
+      # Step 5: Build the project using Gradle
       - name: Build
         run: ./gradlew build
 
+      # Step 6: Extract the changelog content from changelog.md
       - name: Get Changelog
         id: changelog
         run: |
+          CHANGELOG_CONTENT="No changelog provided" # Default message
           if [ -f changelog.md ]; then
-            echo 'changelog<<EOF' >> "$GITHUB_OUTPUT"
-            cat changelog.md >> "$GITHUB_OUTPUT"
-            echo "" >> "$GITHUB_OUTPUT"
-            echo 'EOF' >> "$GITHUB_OUTPUT"
-          else
-            echo 'changelog<<EOF' >> "$GITHUB_OUTPUT"
-            echo "No changelog provided" >> "$GITHUB_OUTPUT"
-            echo 'EOF' >> "$GITHUB_OUTPUT"
+            # Read the content of changelog.md, handling multiline content for the output
+            CHANGELOG_CONTENT=$(cat changelog.md)
           fi
+          # Use EOF markers to correctly handle multiline changelog content in the output
+          echo 'changelog<<EOF' >> "$GITHUB_OUTPUT"
+          echo "$CHANGELOG_CONTENT" >> "$GITHUB_OUTPUT"
+          echo 'EOF' >> "$GITHUB_OUTPUT"
 
+      # Step 7: Create a GitHub release with the new version and changelog
       - name: Create Release
+        id: create_release
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ needs.check-version.outputs.version }}
@@ -82,3 +106,19 @@ jobs:
             build/libs/*.jar
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Step 8: Send a notification to Discord
+      - name: Send Discord Notification
+        uses: tsickert/discord-webhook@v7.0.0
+        with:
+          webhook-url: ${{ secrets.DISCORD_WEBHOOK }}
+          username: "drAAft Release Bot"
+          avatar-url: "https://raw.githubusercontent.com/memerson12/drAAft/master/src/main/resources/assets/draaft/icon.png"
+          content: |
+            # New Release Published! 🎉
+            Version: `${{ needs.check-version.outputs.version }}`
+            Link: <https://github.com/${{ github.repository }}/releases/tag/${{ needs.check-version.outputs.version }}>
+
+            #${{ steps.changelog.outputs.changelog }}
+
+            <@&1366079997898395741>
