@@ -36,7 +36,6 @@ speedrun. Ideal for competitive events
     - Chance of spawning with Nautilus Shell 9% (was 3%)
     - Drowned equipment is standardized based on the world seed and block coordinates
 - Phantoms:
-    - Spawn more frequently (15-60 second cooldown, down from 60-120 seconds)
     - Require less time without sleep to spawn (10 minutes, down from 60 minutes)
     - Always spawn at least 2 phantoms on Hard difficulty
     - The local difficulty multiplier of 3.0F has been removed, so the spawn attempt should succeed 3x as often
