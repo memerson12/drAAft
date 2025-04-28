@@ -113,7 +113,7 @@ jobs:
         with:
           webhook-url: ${{ secrets.DISCORD_WEBHOOK }}
           username: "drAAft Release Bot"
-          avatar-url: "https://raw.githubusercontent.com/memerson12/drAAft/master/src/main/resources/assets/draaft/icon.png"
+          avatar-url: "https://raw.githubusercontent.com/memerson12/drAAft/master/src/main/resources/assets/draaft/drAAft_logo.png"
           content: |
             # New Release Published! 🎉
             Version: `${{ needs.check-version.outputs.version }}`
