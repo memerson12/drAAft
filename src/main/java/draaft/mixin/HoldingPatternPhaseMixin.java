@@ -20,10 +20,8 @@ public abstract class HoldingPatternPhaseMixin extends AbstractPhase {
     @Unique
     private Random random;
 
-    // Initialize the seeded random object once
     @Inject(method = "beginPhase", at = @At("RETURN"))
     private void onInit(CallbackInfo ci) {
-        // Optional: Log when the phase begins, referencing the dragon's RNG
         if (this.dragon instanceof EnderDragonEntityAccessor) {
             EnderDragonEntityAccessor dragonAccessor = (EnderDragonEntityAccessor) this.dragon;
             this.random = dragonAccessor.draaft$getRandom();
@@ -37,8 +35,6 @@ public abstract class HoldingPatternPhaseMixin extends AbstractPhase {
 
     @Redirect(method = "method_6841", at = @At(value = "INVOKE", target = "Ljava/util/Random;nextInt(I)I"))
     private int injectedInt(Random instance, int i) {
-        int nextInt = this.random.nextInt(i);
-        System.out.println("nextInt: " + nextInt);
-        return nextInt;
+        return this.random.nextInt(i);
     }
 }

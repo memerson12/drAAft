@@ -6,6 +6,7 @@
     "AnimalEntityMixin",
     "BambooJungleBiomeMixin",
     "BambooJungleHillsBiomeMixin",
+    "BeehiveTreeDecoratorMixin",
     "DefaultBiomeFeaturesMixin",
     "DrownedEntityMixin",
     "EnderDragonEntityMixin",

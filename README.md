@@ -19,6 +19,7 @@ speedrun. Ideal for competitive events
 - Increased End Gateway generation:
   - Spawn attempt per chunk is 7x as likely
 - Igloos always generate with basements (was 50%)
+- Beehives on trees generate twice as often
 - Thunder happens more often and is standardized per seed
     - Thunder will now occur every 10 - 45 minutes (was 10 - 150 minutes)
     - Rain will occur 1 - 7 minutes before thunder starts
