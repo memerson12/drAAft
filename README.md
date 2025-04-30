@@ -69,6 +69,7 @@ The drAAft mod is meant to be used in combination with the drAAftpack datapack, 
 
 - Gamerule keepInventory is set to true
 - Cat nearest to the player on world load becomes Black variant
+- Cat spawns in village centers are doubled
 - Beaconator advancement is granted
 - Iron Golem drops 4 iron
 - Wither Skeleton Skull drop chance is 7.5% (was 2.5%) + 3% per level of looting (was 1%)
