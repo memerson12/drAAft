@@ -16,8 +16,11 @@
     "IglooGeneratorMixin",
     "ItemsMixin",
     "LavaLakeDecoratorMixin",
+    "MobEntityMixin",
     "PhantomSpawnerMixin",
+    "PlainsBiomeMixin",
     "ServerWorldMixin",
+    "SunflowerPlainsBiomeMixin",
     "WanderingTraderManagerMixin"
   ],
   "injectors": {
