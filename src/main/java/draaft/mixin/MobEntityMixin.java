@@ -28,7 +28,7 @@ public abstract class MobEntityMixin extends LivingEntity {
     @Redirect(method = "dropEquipment", at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;setDamage(I)V"))
     private void minTridentDamage(ItemStack itemStack, int damage) {
         if (itemStack.getItem().equals(Items.TRIDENT)) {
-            itemStack.setDamage(Math.min(itemStack.getDamage() - 2, damage));
+            itemStack.setDamage(Math.min(itemStack.getMaxDamage() - 2, damage));
         } else {
             itemStack.setDamage(damage);
         }
