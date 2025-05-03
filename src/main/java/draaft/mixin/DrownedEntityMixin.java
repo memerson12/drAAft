@@ -47,7 +47,7 @@ public abstract class DrownedEntityMixin extends ZombieEntity implements RangedA
 
     @Redirect(method = "initialize", at = @At(value = "INVOKE", target = "Ljava/util/Random;nextFloat()F"))
     private float injectedShell(Random instance) {
-        instance.setSeed(getBlockSeed(instance, this.world.getServer().getSaveProperties().getGeneratorOptions().getSeed(), this.getBlockPos().getX(), this.getBlockPos().getZ()));
+        instance.setSeed(getBlockSeed(instance, this.world.getServer().getSaveProperties().getGeneratorOptions().getSeed(), this.getBlockPos().getZ(), this.getBlockPos().getX()));
         return 1.0F - instance.nextFloat();
     }
 

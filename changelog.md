@@ -1,3 +1,4 @@
 # Changelog
 
-- Fixed bug making Trident durability always be 250
+- Drowned with Shells are no longer always dual-wielders
+- Mod version visible on F3 menu
