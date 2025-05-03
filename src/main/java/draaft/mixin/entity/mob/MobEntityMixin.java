@@ -1,4 +1,4 @@
-package draaft.mixin;
+package draaft.mixin.entity.mob;
 
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;

@@ -3,30 +3,30 @@
   "package": "draaft.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
-    "AnimalEntityMixin",
-    "BambooJungleBiomeMixin",
-    "BambooJungleHillsBiomeMixin",
-    "BeehiveTreeDecoratorMixin",
-    "DefaultBiomeFeaturesMixin",
-    "DrownedEntityMixin",
-    "EnderDragonEntityMixin",
-    "EnderPearlEntityMixin",
-    "EndGatewayDecoratorMixin",
-    "HoldingPatternPhaseMixin",
-    "IglooGeneratorMixin",
-    "ItemsMixin",
-    "LavaLakeDecoratorMixin",
-    "MobEntityMixin",
-    "PhantomSpawnerMixin",
-    "PlainsBiomeMixin",
-    "ServerWorldMixin",
-    "SunflowerPlainsBiomeMixin",
-    "WanderingTraderManagerMixin"
+    "entity.passive.AnimalEntityMixin",
+    "world.biome.BambooJungleBiomeMixin",
+    "world.biome.BambooJungleHillsBiomeMixin",
+    "world.gen.decorator.BeehiveTreeDecoratorMixin",
+    "world.gen.feature.DefaultBiomeFeaturesMixin",
+    "entity.mob.DrownedEntityMixin",
+    "entity.boss.dragon.EnderDragonEntityMixin",
+    "entity.projectile.thrown.EnderPearlEntityMixin",
+    "world.gen.decorator.EndGatewayDecoratorMixin",
+    "entity.boss.dragon.phase.HoldingPatternPhaseMixin",
+    "structure.IglooGeneratorMixin",
+    "item.ItemsMixin",
+    "world.gen.decorator.LavaLakeDecoratorMixin",
+    "entity.mob.MobEntityMixin",
+    "world.gen.PhantomSpawnerMixin",
+    "world.biome.PlainsBiomeMixin",
+    "server.world.ServerWorldMixin",
+    "world.biome.SunflowerPlainsBiomeMixin",
+    "world.WanderingTraderManagerMixin"
   ],
   "injectors": {
     "defaultRequire": 1
   },
   "client": [
-    "DebugHudMixin"
+    "client.gui.DebugHudMixin"
   ]
 }

@@ -1,4 +1,4 @@
-package draaft.mixin;
+package draaft.mixin.entity.passive;
 
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.EntityType;

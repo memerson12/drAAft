@@ -1,4 +1,4 @@
-package draaft.mixin;
+package draaft.mixin.structure;
 
 import net.minecraft.structure.IglooGenerator;
 import org.spongepowered.asm.mixin.Mixin;

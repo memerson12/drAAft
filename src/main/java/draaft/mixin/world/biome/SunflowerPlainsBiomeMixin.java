@@ -1,4 +1,4 @@
-package draaft.mixin;
+package draaft.mixin.world.biome;
 
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;

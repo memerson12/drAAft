@@ -1,4 +1,4 @@
-package draaft.mixin;
+package draaft.mixin.world.gen.decorator;
 
 import net.minecraft.world.gen.decorator.BeehiveTreeDecorator;
 import net.minecraft.world.gen.decorator.TreeDecorator;

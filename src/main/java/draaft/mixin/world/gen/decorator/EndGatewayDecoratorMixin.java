@@ -1,4 +1,4 @@
-package draaft.mixin;
+package draaft.mixin.world.gen.decorator;
 
 import net.minecraft.world.gen.decorator.EndGatewayDecorator;
 import org.spongepowered.asm.mixin.Mixin;

@@ -1,4 +1,4 @@
-package draaft.mixin;
+package draaft.mixin.world.biome;
 
 import net.minecraft.world.biome.BambooJungleBiome;
 import net.minecraft.world.biome.Biome;

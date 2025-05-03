@@ -1,4 +1,4 @@
-package draaft.mixin;
+package draaft.mixin.item;
 
 import net.minecraft.item.Items;
 import org.spongepowered.asm.mixin.Mixin;

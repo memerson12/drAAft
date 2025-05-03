@@ -1,4 +1,4 @@
-package draaft.mixin;
+package draaft.mixin.entity.projectile.thrown;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;

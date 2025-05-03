@@ -1,4 +1,4 @@
-package draaft.mixin;
+package draaft.mixin.world.gen.decorator;
 
 import com.mojang.serialization.Codec;
 import net.minecraft.util.math.BlockPos;

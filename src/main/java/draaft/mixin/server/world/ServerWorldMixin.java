@@ -1,4 +1,4 @@
-package draaft.mixin;
+package draaft.mixin.server.world;
 
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.world.ServerWorld;

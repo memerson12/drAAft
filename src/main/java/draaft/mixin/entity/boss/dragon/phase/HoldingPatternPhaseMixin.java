@@ -1,4 +1,4 @@
-package draaft.mixin;
+package draaft.mixin.entity.boss.dragon.phase;
 
 import draaft.api.EnderDragonEntityAccessor;
 import net.minecraft.entity.boss.dragon.EnderDragonEntity;
