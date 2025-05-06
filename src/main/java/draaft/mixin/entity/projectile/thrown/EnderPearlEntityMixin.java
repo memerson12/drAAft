@@ -1,5 +1,6 @@
 package draaft.mixin.entity.projectile.thrown;
 
+import draaft.api.PlayerEntityAccessor;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -36,16 +37,10 @@ public abstract class EnderPearlEntityMixin extends ThrownItemEntity {
     @Redirect(method = "onCollision", at = @At(value = "INVOKE", target = "Ljava/util/Random;nextFloat()F"))
     private float injected(Random instance) {
         Entity entity = this.getOwner();
-        int pearlsUsed = 0;
-        if (entity instanceof ServerPlayerEntity) {
-            ServerPlayerEntity serverPlayerEntity = (ServerPlayerEntity) entity;
-            pearlsUsed = serverPlayerEntity.getStatHandler().getStat(Stats.USED.getOrCreateStat(Items.ENDER_PEARL));
-        }
-        long seed = this.world.getServer().getSaveProperties().getGeneratorOptions().getSeed();
-        instance.setSeed(seed);
-        long l = random.nextLong() | 1L;
-        long m = random.nextLong() | 1L;
-        instance.setSeed((long) pearlsUsed * l + (long) pearlsUsed * m ^ seed);
-        return instance.nextFloat();
+        if (!(entity instanceof PlayerEntityAccessor)) return instance.nextFloat();
+        PlayerEntityAccessor playerAccessor = (PlayerEntityAccessor) entity;
+        Random draaftPearlRandom = playerAccessor.draaft$getPearlRandom();
+
+        return draaftPearlRandom.nextFloat();
     }
 }
