@@ -1,5 +1,6 @@
 package draaft.persistent;
 
+import draaft.draaft;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.PersistentState;
@@ -62,7 +63,13 @@ public class WorldState extends PersistentState {
         return nbt;
     }
 
-    public Random getPearlRng() {
+    public Random getOrCreatePearlRng(ServerWorld world) {
+        if (this.pearlRng == null) {
+            draaft.LOGGER.info("Is Client: {}", world.isClient);
+            long seed = world.getSeed();
+            this.pearlRng = new Random(seed);
+        }
+        this.markDirty();
         return this.pearlRng;
     }
 

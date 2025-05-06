@@ -8,7 +8,6 @@
     "entity.mob.DrownedEntityMixin",
     "entity.mob.MobEntityMixin",
     "entity.passive.AnimalEntityMixin",
-    "entity.player.PlayerEntityMixin",
     "entity.projectile.thrown.EnderPearlEntityMixin",
     "item.ItemsMixin",
     "server.world.ServerWorldMixin",
