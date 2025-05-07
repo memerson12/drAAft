@@ -17,7 +17,6 @@ import java.util.Random;
 
 @Mixin(EnderPearlEntity.class)
 public abstract class EnderPearlEntityMixin extends ThrownItemEntity {
-
     @Unique
     private static final Logger logger = draaft.LOGGER;
 
@@ -40,7 +39,7 @@ public abstract class EnderPearlEntityMixin extends ThrownItemEntity {
 
     @Redirect(method = "onCollision", at = @At(value = "INVOKE", target = "Ljava/util/Random;nextFloat()F"))
     private float injected(Random instance) {
-        if (!(world instanceof ServerWorld)) {
+        if (!(this.world instanceof ServerWorld)) {
             logger.warn("EnderPearlEntityMixin - Not ServerWorld");
             return instance.nextFloat();
         }

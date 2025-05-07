@@ -13,12 +13,13 @@ import java.io.ObjectOutputStream;
 import java.util.Random;
 
 public class WorldState extends PersistentState {
-    private long test;
-    private Random pearlRng;
+    private final RandomState pearlRng = new RandomState(null, "pearl_rng", "pearl_seed");
+    private final RandomState barterRng = new RandomState(null, "barter_rng", "barter_seed");
+    private final RandomState tridentRng = new RandomState(null, "trident_rng", "trident_seed");
+    private final RandomState skullRng = new RandomState(null, "skull_rng", "skull_seed");
 
     public WorldState(String key) {
         super(key);
-        this.test = 0L;
     }
 
     public static WorldState getServerState(ServerWorld world) {
@@ -28,53 +29,118 @@ public class WorldState extends PersistentState {
 
     @Override
     public void fromTag(CompoundTag tag) {
-        this.test = tag.getLong("test");
+        serializeRandom(tag, pearlRng);
+        serializeRandom(tag, barterRng);
+        serializeRandom(tag, tridentRng);
+        serializeRandom(tag, skullRng);
+    }
 
-        if (tag.contains("pearl_rng")) {
-            try (ByteArrayInputStream bais = new ByteArrayInputStream(tag.getByteArray("pearl_rng"));
-                    ObjectInputStream ois = new ObjectInputStream(bais)) {
-                this.pearlRng = (Random) ois.readObject();
+    private void serializeRandom(CompoundTag tag, RandomState randomState) {
+        if (tag.contains(randomState.getKey())) {
+            try (ByteArrayInputStream bais = new ByteArrayInputStream(tag.getByteArray(randomState.getKey()));
+                 ObjectInputStream ois = new ObjectInputStream(bais)) {
+                randomState.setRandom((Random) ois.readObject());
             } catch (IOException | ClassNotFoundException e) {
                 // If deserialization fails, fall back to just using the seed
-                if (tag.contains("pearl_seed")) {
-                    this.pearlRng = new Random(tag.getLong("pearl_seed"));
+                if (tag.contains(randomState.getFallbackKey())) {
+                    draaft.LOGGER.warn("Unable to deserialize {}", randomState.getKey());
+                    randomState.setRandom(new Random(tag.getLong(randomState.getFallbackKey())));
                 }
             }
-        } else if (tag.contains("pearl_seed")) {
-            this.pearlRng = new Random(tag.getLong("pearl_seed"));
+        } else if (tag.contains(randomState.getFallbackKey())) {
+            randomState.setRandom(new Random(tag.getLong(randomState.getFallbackKey())));
         }
     }
 
     @Override
     public CompoundTag toTag(CompoundTag nbt) {
-        nbt.putLong("test", this.test);
-
-        if (this.pearlRng != null) {
-            try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                    ObjectOutputStream oos = new ObjectOutputStream(baos)) {
-                oos.writeObject(this.pearlRng);
-                nbt.putByteArray("pearl_rng", baos.toByteArray());
-            } catch (IOException e) {
-                // If serialization fails, fall back to just storing the seed
-                nbt.putLong("pearl_seed", this.pearlRng.nextLong());
-            }
-        }
+        deserializeRandom(nbt, pearlRng);
+        deserializeRandom(nbt, barterRng);
+        deserializeRandom(nbt, tridentRng);
+        deserializeRandom(nbt, skullRng);
 
         return nbt;
     }
 
-    public Random getOrCreatePearlRng(ServerWorld world) {
-        if (this.pearlRng == null) {
-            draaft.LOGGER.info("Is Client: {}", world.isClient);
-            long seed = world.getSeed();
-            this.pearlRng = new Random(seed);
+    private void deserializeRandom(CompoundTag nbt, RandomState randomState) {
+        if (randomState.getRandom() != null) {
+            try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    ObjectOutputStream oos = new ObjectOutputStream(baos)) {
+                oos.writeObject(randomState.getRandom());
+                nbt.putByteArray(randomState.getKey(), baos.toByteArray());
+            } catch (IOException e) {
+                // If serialization fails, fall back to just storing the seed
+                draaft.LOGGER.warn("Unable to serialize {}", randomState.getFallbackKey());
+                nbt.putLong(randomState.getFallbackKey(), randomState.getRandom().nextLong());
+            }
         }
-        this.markDirty();
-        return this.pearlRng;
     }
 
-    public void setPearlRng(Random rng) {
-        this.pearlRng = rng;
+    public Random getOrCreatePearlRng(ServerWorld world) {
+        if (this.pearlRng.getRandom() == null) {
+            draaft.LOGGER.info("Is Client: {}", world.isClient);
+            long seed = world.getSeed();
+            this.pearlRng.setRandom(new Random(seed));
+        }
         this.markDirty();
+        return this.pearlRng.getRandom();
+    }
+
+    public Random getOrCreateBarterRng(ServerWorld world) {
+        if (this.barterRng.getRandom() == null) {
+            draaft.LOGGER.info("Is Client: {}", world.isClient);
+            long seed = world.getSeed();
+            this.barterRng.setRandom(new Random(seed));
+        }
+        this.markDirty();
+        return this.barterRng.getRandom();
+    }
+
+    public Random getOrCreateTridentRng(ServerWorld world) {
+        if (this.tridentRng.getRandom() == null) {
+            draaft.LOGGER.info("Is Client: {}", world.isClient);
+            long seed = world.getSeed();
+            this.tridentRng.setRandom(new Random(seed));
+        }
+        this.markDirty();
+        return this.tridentRng.getRandom();
+    }
+
+    public Random getOrCreateSkullRng(ServerWorld world) {
+        if (this.skullRng.getRandom() == null) {
+            draaft.LOGGER.info("Is Client: {}", world.isClient);
+            long seed = world.getSeed();
+            this.skullRng.setRandom(new Random(seed));
+        }
+        this.markDirty();
+        return this.skullRng.getRandom();
+    }
+
+    private static class RandomState {
+        private Random random;
+        private final String key;
+        private final String fallbackKey;
+
+        public RandomState(Random random, String key, String fallbackKey) {
+            this.random = random;
+            this.key = key;
+            this.fallbackKey = fallbackKey;
+        }
+
+        public Random getRandom() {
+            return random;
+        }
+
+        public String getKey() {
+            return key;
+        }
+
+        public String getFallbackKey() {
+            return fallbackKey;
+        }
+
+        public void setRandom(Random random) {
+            this.random = random;
+        }
     }
 }
