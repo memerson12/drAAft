@@ -1,3 +1,3 @@
 # Changelog
 
-- Resolve incompatibility with Sodium
+- Trident, Skulls, Barters are now standardized

@@ -1,21 +1,25 @@
 package draaft.mixin.entity.projectile.thrown;
 
-import net.minecraft.entity.Entity;
+import draaft.draaft;
+import draaft.persistent.WorldState;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.projectile.thrown.EnderPearlEntity;
 import net.minecraft.entity.projectile.thrown.ThrownItemEntity;
-import net.minecraft.item.Items;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.stat.Stats;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.World;
+import org.apache.logging.log4j.Logger;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.*;
 
 import java.util.Random;
 
 @Mixin(EnderPearlEntity.class)
 public abstract class EnderPearlEntityMixin extends ThrownItemEntity {
+    @Unique
+    private static final Logger logger = draaft.LOGGER;
+
     public EnderPearlEntityMixin(EntityType<? extends ThrownItemEntity> entityType, World world) {
         super(entityType, world);
     }
@@ -35,17 +39,14 @@ public abstract class EnderPearlEntityMixin extends ThrownItemEntity {
 
     @Redirect(method = "onCollision", at = @At(value = "INVOKE", target = "Ljava/util/Random;nextFloat()F"))
     private float injected(Random instance) {
-        Entity entity = this.getOwner();
-        int pearlsUsed = 0;
-        if (entity instanceof ServerPlayerEntity) {
-            ServerPlayerEntity serverPlayerEntity = (ServerPlayerEntity) entity;
-            pearlsUsed = serverPlayerEntity.getStatHandler().getStat(Stats.USED.getOrCreateStat(Items.ENDER_PEARL));
+        if (!(this.world instanceof ServerWorld)) {
+            logger.warn("EnderPearlEntityMixin - Not ServerWorld");
+            return instance.nextFloat();
         }
-        long seed = this.world.getServer().getSaveProperties().getGeneratorOptions().getSeed();
-        instance.setSeed(seed);
-        long l = random.nextLong() | 1L;
-        long m = random.nextLong() | 1L;
-        instance.setSeed((long) pearlsUsed * l + (long) pearlsUsed * m ^ seed);
-        return instance.nextFloat();
+        ServerWorld world = (ServerWorld) this.getEntityWorld();
+        WorldState state = WorldState.getServerState(world);
+        Random draaftPearlRng = state.getOrCreatePearlRng(world);
+
+        return draaftPearlRng.nextFloat();
     }
 }

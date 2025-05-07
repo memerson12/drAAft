@@ -37,6 +37,8 @@ speedrun. Ideal for competitive events
 - Drowned:
     - Chance of spawning with Trident 18.75% (was 6.25%)
         - Dropped Tridents will have at minimum 2 durability
+        - Trident drop chance is now 12.5% (was 8.5%) + 2% per level of looting (was 1%)
+        - Trident drops are standardized based on world seed
     - Chance of spawning with Fishing Rod 11.25% (was 3.75%)
     - Chance of spawning with Nautilus Shell 9% (was 3%)
     - Drowned equipment is standardized based on the world seed and block coordinates
@@ -50,9 +52,10 @@ speedrun. Ideal for competitive events
     - Require less time without sleep to spawn (10 minutes, down from 60 minutes)
     - Always spawn at least 2 phantoms on Hard difficulty
     - The local difficulty multiplier of 3.0F has been removed, so the spawn attempt should succeed 3x as often
-- All Mobs:
-    - Hand and Armor drop chance is now 12.5% (was 8.5%) + 2% per level of looting (was 1%)
-    - This affects Trident drop rates, as well as other naturally occurring mob equipment
+- Piglins:
+  - Piglin barters are standardized based on world seed
+- Wither Skeletons:
+  - Wither Skeleton Skull drops are standardized based on world seed
 
 ### Item Changes
 
