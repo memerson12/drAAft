@@ -61,6 +61,10 @@ speedrun. Ideal for competitive events
 
 - Elytra durability increased to 22,824 (from default)
     - This is to prevent losing to Unbreaking RNG.
+- Trident enchants have been tweaked
+  - Channeling is now Rare (was Very Rare)
+  - Loyalty is now Rare (was Uncommon)
+  - First enchant is still Channeling
 
 ## Installation
 

@@ -3,6 +3,7 @@
   "package": "draaft.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
+    "enchantment.EnchantmentsMixin",
     "entity.boss.dragon.EnderDragonEntityMixin",
     "entity.boss.dragon.phase.HoldingPatternPhaseMixin",
     "entity.mob.DrownedEntityMixin",

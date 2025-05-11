@@ -1,3 +1,5 @@
 # Changelog
 
-- Trident, Skulls, Barters are now standardized
+- Channeling is more common
+- Loyalty is less common
+- First enchant Trident is still Channeling
