@@ -11,13 +11,10 @@ import net.minecraft.entity.mob.DrownedEntity;
 import net.minecraft.entity.mob.ZombieEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
 import org.apache.logging.log4j.Logger;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Constant;
@@ -92,16 +89,29 @@ public abstract class DrownedEntityMixin extends ZombieEntity implements RangedA
             if (itemStack.getItem().equals(Items.NAUTILUS_SHELL)) {
                 continue;
             }
-            float f = itemStack.getItem().equals(Items.TRIDENT) ? 0.125F : this.getDropChance(equipmentSlot);
-            boolean bl = f > 1.0F;
-            if (!itemStack.isEmpty()
-                    && !EnchantmentHelper.hasVanishingCurse(itemStack)
-                    && (allowDrops || bl)
-                    && Math.max(draaftTridentRng.nextFloat() - (float)lootingMultiplier * 0.02F, 0.0F) < f) {
-                if (!bl && itemStack.isDamageable()) {
-                    itemStack.setDamage(Math.min(itemStack.getMaxDamage() - this.random.nextInt(1 + this.random.nextInt(Math.max(itemStack.getMaxDamage() - 3, 1))), itemStack.getMaxDamage() - 2));
+            if (itemStack.getItem().equals(Items.TRIDENT)) {
+                float f = 0.125F;
+                if (!itemStack.isEmpty()
+                        && !EnchantmentHelper.hasVanishingCurse(itemStack)
+                        && (allowDrops)
+                        && Math.max(draaftTridentRng.nextFloat() - (float)lootingMultiplier * 0.02F, 0.0F) < f) {
+                    if (itemStack.isDamageable()) {
+                        itemStack.setDamage(Math.min(itemStack.getMaxDamage() - draaftTridentRng.nextInt(1 + draaftTridentRng.nextInt(Math.max(itemStack.getMaxDamage() - 3, 1))), itemStack.getMaxDamage() - 2));
+                    }
+                    this.dropStack(itemStack);
                 }
-                this.dropStack(itemStack);
+            } else {
+                float f = this.getDropChance(equipmentSlot);
+                boolean bl = f > 1.0F;
+                if (!itemStack.isEmpty()
+                        && !EnchantmentHelper.hasVanishingCurse(itemStack)
+                        && (allowDrops || bl)
+                        && Math.max(this.random.nextFloat() - (float)lootingMultiplier * 0.02F, 0.0F) < f) {
+                    if (!bl && itemStack.isDamageable()) {
+                        itemStack.setDamage(Math.min(itemStack.getMaxDamage() - this.random.nextInt(1 + this.random.nextInt(Math.max(itemStack.getMaxDamage() - 3, 1))), itemStack.getMaxDamage() - 2));
+                    }
+                    this.dropStack(itemStack);
+                }
             }
         }
     }
