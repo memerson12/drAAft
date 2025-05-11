@@ -9,6 +9,7 @@
     "entity.mob.BlazeEntityMixin",
     "entity.mob.DrownedEntityMixin",
     "entity.mob.PiglinBrainMixin",
+    "entity.mob.ShulkerEntityMixin",
     "entity.mob.WitherSkeletonEntityMixin",
     "entity.passive.AnimalEntityMixin",
     "entity.projectile.thrown.EnderPearlEntityMixin",
