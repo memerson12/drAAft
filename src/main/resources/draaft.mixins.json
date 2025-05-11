@@ -6,6 +6,7 @@
     "enchantment.EnchantmentsMixin",
     "entity.boss.dragon.EnderDragonEntityMixin",
     "entity.boss.dragon.phase.HoldingPatternPhaseMixin",
+    "entity.mob.BlazeEntityMixin",
     "entity.mob.DrownedEntityMixin",
     "entity.mob.PiglinBrainMixin",
     "entity.mob.WitherSkeletonEntityMixin",

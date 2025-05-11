@@ -17,6 +17,10 @@ public class WorldState extends PersistentState {
     private final RandomState barterRng = new RandomState(null, "barter_rng", "barter_seed");
     private final RandomState tridentRng = new RandomState(null, "trident_rng", "trident_seed");
     private final RandomState skullRng = new RandomState(null, "skull_rng", "skull_seed");
+    private final RandomState catRng = new RandomState(null, "cat_rng", "cat_seed");
+    private final RandomState phantomRng = new RandomState(null, "phantom_rng", "phantom_seed");
+    private final RandomState blazeRng = new RandomState(null, "blaze_rng", "blaze_seed");
+    private final RandomState shulkerRng = new RandomState(null, "shulker_rng", "shulker_seed");
 
     public WorldState(String key) {
         super(key);
@@ -33,6 +37,10 @@ public class WorldState extends PersistentState {
         serializeRandom(tag, barterRng);
         serializeRandom(tag, tridentRng);
         serializeRandom(tag, skullRng);
+        serializeRandom(tag, catRng);
+        serializeRandom(tag, phantomRng);
+        serializeRandom(tag, blazeRng);
+        serializeRandom(tag, shulkerRng);
     }
 
     private void serializeRandom(CompoundTag tag, RandomState randomState) {
@@ -58,6 +66,10 @@ public class WorldState extends PersistentState {
         deserializeRandom(nbt, barterRng);
         deserializeRandom(nbt, tridentRng);
         deserializeRandom(nbt, skullRng);
+        deserializeRandom(nbt, catRng);
+        deserializeRandom(nbt, phantomRng);
+        deserializeRandom(nbt, blazeRng);
+        deserializeRandom(nbt, shulkerRng);
 
         return nbt;
     }
@@ -114,6 +126,46 @@ public class WorldState extends PersistentState {
         }
         this.markDirty();
         return this.skullRng.getRandom();
+    }
+
+    public Random getOrCreateCatRng(ServerWorld world) {
+        if (this.catRng.getRandom() == null) {
+            draaft.LOGGER.info("Is Client: {}", world.isClient);
+            long seed = world.getSeed();
+            this.catRng.setRandom(new Random(seed));
+        }
+        this.markDirty();
+        return this.catRng.getRandom();
+    }
+
+    public Random getOrCreatePhantomRng(ServerWorld world) {
+        if (this.phantomRng.getRandom() == null) {
+            draaft.LOGGER.info("Is Client: {}", world.isClient);
+            long seed = world.getSeed();
+            this.phantomRng.setRandom(new Random(seed));
+        }
+        this.markDirty();
+        return this.phantomRng.getRandom();
+    }
+
+    public Random getOrCreateBlazeRng(ServerWorld world) {
+        if (this.blazeRng.getRandom() == null) {
+            draaft.LOGGER.info("Is Client: {}", world.isClient);
+            long seed = world.getSeed();
+            this.blazeRng.setRandom(new Random(seed));
+        }
+        this.markDirty();
+        return this.blazeRng.getRandom();
+    }
+
+    public Random getOrCreateShulkerRng(ServerWorld world) {
+        if (this.shulkerRng.getRandom() == null) {
+            draaft.LOGGER.info("Is Client: {}", world.isClient);
+            long seed = world.getSeed();
+            this.shulkerRng.setRandom(new Random(seed));
+        }
+        this.markDirty();
+        return this.shulkerRng.getRandom();
     }
 
     private static class RandomState {
