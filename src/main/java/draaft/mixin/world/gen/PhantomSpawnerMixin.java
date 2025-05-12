@@ -1,5 +1,6 @@
 package draaft.mixin.world.gen;
 
+import draaft.persistent.WorldState;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.EntityData;
 import net.minecraft.entity.EntityType;
@@ -49,13 +50,14 @@ public abstract class PhantomSpawnerMixin implements Spawner {
         if (!serverWorld.getGameRules().getBoolean(GameRules.DO_INSOMNIA)) {
             return 0;
         }
-        Random random = serverWorld.random;
+        WorldState state = WorldState.getServerState(serverWorld);
+        Random draaftPhantomRng = state.getOrCreatePhantomRng(serverWorld);
         this.ticksUntilNextSpawn--;
 
         if (this.ticksUntilNextSpawn > 0) {
             return 0;
         }
-        this.ticksUntilNextSpawn = this.ticksUntilNextSpawn + (60 + random.nextInt(60)) * 20;
+        this.ticksUntilNextSpawn = this.ticksUntilNextSpawn + (60 + draaftPhantomRng.nextInt(60)) * 20;
 
         if (serverWorld.getAmbientDarkness() < 5 && serverWorld.getDimension().hasSkyLight()) {
             return 0;
@@ -71,18 +73,18 @@ public abstract class PhantomSpawnerMixin implements Spawner {
             if (!serverWorld.getDimension().hasSkyLight() || (playerPos.getY() >= serverWorld.getSeaLevel() && serverWorld.isSkyVisible(playerPos))) {
                 LocalDifficulty localDifficulty = serverWorld.getLocalDifficulty(playerPos);
 
-                if (localDifficulty.isHarderThan(random.nextFloat())) {
+                if (localDifficulty.isHarderThan(draaftPhantomRng.nextFloat())) {
                     ServerStatHandler serverStatHandler = ((ServerPlayerEntity) playerEntity).getStatHandler();
                     int timeSinceRest = MathHelper.clamp(serverStatHandler.getStat(Stats.CUSTOM.getOrCreateStat(Stats.TIME_SINCE_REST)), 1, Integer.MAX_VALUE);
 
-                    if (random.nextInt(timeSinceRest) >= 12_000) {
-                        BlockPos spawnPos = playerPos.up(20 + random.nextInt(15)).east(-10 + random.nextInt(21)).south(-10 + random.nextInt(21));
+                    if (draaftPhantomRng.nextInt(timeSinceRest) >= 12_000) {
+                        BlockPos spawnPos = playerPos.up(20 + draaftPhantomRng.nextInt(15)).east(-10 + draaftPhantomRng.nextInt(21)).south(-10 + draaftPhantomRng.nextInt(21));
                         BlockState blockState = serverWorld.getBlockState(spawnPos);
                         FluidState fluidState = serverWorld.getFluidState(spawnPos);
 
                         if (SpawnHelper.isClearForSpawn(serverWorld, spawnPos, blockState, fluidState, EntityType.PHANTOM)) {
                             EntityData entityData = null;
-                            int groupSize = 1 + random.nextInt(localDifficulty.getGlobalDifficulty().getId() + 1);
+                            int groupSize = 1 + draaftPhantomRng.nextInt(localDifficulty.getGlobalDifficulty().getId() + 1);
 
                             if (localDifficulty.getGlobalDifficulty() == Difficulty.HARD && groupSize < 2) {
                                 groupSize = 2;
