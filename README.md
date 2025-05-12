@@ -20,7 +20,7 @@ speedrun. Ideal for competitive events
     - Spawn attempt per chunk is 7x as likely
 - Igloos always generate with basements (was 50%)
 - Beehive generation on trees is 2x as likely
-- Thunder happens more often and is standardized per seed
+- Thunder happens more often and is standardized
     - Thunder will now occur every 10 - 45 minutes (was 10 - 150 minutes)
     - Rain will occur 1 - 7 minutes before thunder starts
     - This guarantees at least two 3+ minute thunders in 1.5 hours
@@ -31,40 +31,48 @@ speedrun. Ideal for competitive events
     - This is intended for pandas in jungles but has side effects in other places such as mega taigas
     - Bamboo Jungle and Bamboo Jungle Hills have a 30% chance to attempt a passive mob spawn attempt per chunk (was
       10%)
-- Donkeys:
-  - Spawn chance in Plains and Sunflower Plains is 2x as likely
-  - Minimum pack size is 2 (was 1)
+- Blaze:
+    - Rod drops are standardized
+- Cat:
+    - Cat variant is standardized on block coordinates
+    - Cat taming is standardized
+- Donkey:
+    - Spawn chance in Plains and Sunflower Plains is 2x as likely
+    - Minimum pack size is 2 (was 1)
 - Drowned:
     - Chance of spawning with Trident 18.75% (was 6.25%)
         - Dropped Tridents will have at minimum 2 durability
         - Trident drop chance is now 12.5% (was 8.5%) + 2% per level of looting (was 1%)
-        - Trident drops are standardized based on world seed
+        - Trident drops are standardized
     - Chance of spawning with Fishing Rod 11.25% (was 3.75%)
     - Chance of spawning with Nautilus Shell 9% (was 3%)
-    - Drowned equipment is standardized based on the world seed and block coordinates
+    - Drowned equipment is standardized on block coordinates
 - Ender Dragon:
     - Fly-away will happen less frequently
-    - Dragon instant perch and straight node / diagonal node selection standardized based on the world seed
+    - Dragon instant perch and straight node / diagonal node selection standardized
 - Endermite:
     - Spawn chance per thrown pearl is now 7% (was 5%)
-    - Endermite spawns are standardized based on the world seed
-- Phantoms:
+    - Endermite spawns are standardized
+- Phantom:
     - Require less time without sleep to spawn (10 minutes, down from 60 minutes)
     - Always spawn at least 2 phantoms on Hard difficulty
     - The local difficulty multiplier of 3.0F has been removed, so the spawn attempt should succeed 3x as often
-- Piglins:
-  - Piglin barters are standardized based on world seed
-- Wither Skeletons:
-  - Wither Skeleton Skull drops are standardized based on world seed
+    - Phantom spawns are standardized
+- Piglin:
+    - Piglin barters are standardized
+- Shulker:
+    - Shell drops are standardized
+- Wither Skeleton:
+    - Wither Skeleton Skull drops are standardized
 
 ### Item Changes
 
 - Elytra durability increased to 22,824 (from default)
     - This is to prevent losing to Unbreaking RNG.
 - Trident enchants have been tweaked
-  - Channeling is now Rare (was Very Rare)
-  - Loyalty is now Rare (was Uncommon)
-  - First enchant is still Channeling
+    - Channeling is now Rare (was Very Rare)
+    - Loyalty is now Rare (was Uncommon)
+    - First enchant is still Channeling
 
 ## Installation
 
