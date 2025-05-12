@@ -12,6 +12,7 @@
     "entity.mob.ShulkerEntityMixin",
     "entity.mob.WitherSkeletonEntityMixin",
     "entity.passive.AnimalEntityMixin",
+    "entity.passive.CatEntityMixin",
     "entity.projectile.thrown.EnderPearlEntityMixin",
     "item.ItemsMixin",
     "server.world.ServerWorldMixin",
