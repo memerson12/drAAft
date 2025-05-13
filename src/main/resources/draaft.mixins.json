@@ -32,7 +32,6 @@
     "defaultRequire": 1
   },
   "client": [
-    "MinecraftClientMixin",
     "client.gui.DebugHudMixin"
   ]
 }
