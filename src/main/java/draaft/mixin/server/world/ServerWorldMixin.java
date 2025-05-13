@@ -30,6 +30,17 @@ public abstract class ServerWorldMixin extends World implements ServerWorldAcces
     @Unique
     boolean lastTickRain = true;
 
+    @Unique
+    private boolean isIllegalRain(int timer) {
+        return timer > 1_000_000;
+    }
+
+    @Unique
+    private int getRainFromThunder(int thunder) {
+        Random random = new Random(this.server.getSaveProperties().getGeneratorOptions().getSeed() + this.worldProperties.getTimeOfDay());
+        return thunder - (random.nextInt(7200) + 1200);
+    }
+
     protected ServerWorldMixin(MutableWorldProperties mutableWorldProperties, RegistryKey<World> registryKey, RegistryKey<DimensionType> registryKey2, DimensionType dimensionType, Supplier<Profiler> profiler, boolean bl, boolean bl2, long l) {
         super(mutableWorldProperties, registryKey, registryKey2, dimensionType, profiler, bl, bl2, l);
     }
@@ -37,7 +48,7 @@ public abstract class ServerWorldMixin extends World implements ServerWorldAcces
     @ModifyArg(method = "tick",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/ServerWorldProperties;setThunderTime(I)V"))
     private int injectedThunder(int thunderTime) {
-        Random random = new Random(this.server.getSaveProperties().getGeneratorOptions().getSeed() + this.worldProperties.getTimeOfDay());
+
 
         /*
         TODO: BLACK MAGIC
@@ -56,9 +67,19 @@ public abstract class ServerWorldMixin extends World implements ServerWorldAcces
         then decrement by 1
          */
         if ((lastTickThunder && this.worldProperties.getThunderTime() == 0 && !this.worldProperties.isThundering()) || this.worldProperties.getTime() == 0) {
+            Random random = new Random(this.server.getSaveProperties().getGeneratorOptions().getSeed() + this.worldProperties.getTimeOfDay());
             lastTickThunder = false;
-            return random.nextInt(42000) + 12000;
+            int newThunder = random.nextInt(42000) + 12000;
+
+            // right now, it is guaranteed to not be thundering.
+            // check if we have to reset our rain timer based on this newly calculated thunder timer
+            if (this.isIllegalRain(this.worldProperties.getRainTime())) {
+                this.worldProperties.setRainTime(this.getRainFromThunder(newThunder));
+            }
+
+            return newThunder;
         } else if (!lastTickThunder && this.worldProperties.getThunderTime() == 0 && this.worldProperties.isThundering()) {
+            Random random = new Random(this.server.getSaveProperties().getGeneratorOptions().getSeed() + this.worldProperties.getTimeOfDay());
             lastTickThunder = true;
             return random.nextInt(12000) + 3600;
         }
@@ -69,7 +90,11 @@ public abstract class ServerWorldMixin extends World implements ServerWorldAcces
     @ModifyArg(method = "tick",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/ServerWorldProperties;setRainTime(I)V"))
     private int injectedRain(int rainTime) {
-        Random random = new Random(this.server.getSaveProperties().getGeneratorOptions().getSeed() + this.worldProperties.getTimeOfDay());
+        // if we are waiting for a 'valid' rain time, simply chillax. it'll come when it comes.
+        if (this.isIllegalRain(rainTime)) {
+            // keep current time. no decrementing! shame on you, really, for trying to subtract from such a majestic number.
+            return this.worldProperties.getRainTime();
+        }
 
         /*
         TODO: BLACK MAGIC
@@ -89,9 +114,17 @@ public abstract class ServerWorldMixin extends World implements ServerWorldAcces
          */
         if ((lastTickRain && this.worldProperties.getRainTime() == 0 && !this.worldProperties.isRaining()) || this.worldProperties.getTime() == 0) {
             lastTickRain = false;
+
+            if (this.worldProperties.isThundering()) {
+                // currently thundering -- we cannot actually set our rain timer :/ sad!
+                // instead, set it to a sentinel value and wait for it to stop thundering.
+                return 2_000_000;
+            }
+
             int thunderTime = this.worldProperties.getThunderTime();
-            return thunderTime - (random.nextInt(7200) + 1200);
+            return this.getRainFromThunder(thunderTime);
         } else if (!lastTickRain && this.worldProperties.getRainTime() == 0 && this.worldProperties.isRaining()) {
+            Random random = new Random(this.server.getSaveProperties().getGeneratorOptions().getSeed() + this.worldProperties.getTimeOfDay());
             lastTickRain = true;
             return random.nextInt(12000) + 12000;
         }
