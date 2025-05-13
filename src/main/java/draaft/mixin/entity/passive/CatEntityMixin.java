@@ -29,7 +29,7 @@ public abstract class CatEntityMixin extends TameableEntity {
     private int redirectCatTame(Random instance, int i) {
         ServerWorld world = (ServerWorld) this.getEntityWorld();
         WorldState state = WorldState.getServerState(world);
-        Random draaftCatRng = state.getOrCreateCatRng(world);
+        Random draaftCatRng = state.getOrCreateRng(WorldState.RngType.CAT, world);
 
         return draaftCatRng.nextInt(i);
     }

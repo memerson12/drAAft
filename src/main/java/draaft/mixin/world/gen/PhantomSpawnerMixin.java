@@ -51,7 +51,7 @@ public abstract class PhantomSpawnerMixin implements Spawner {
             return 0;
         }
         WorldState state = WorldState.getServerState(serverWorld);
-        Random draaftPhantomRng = state.getOrCreatePhantomRng(serverWorld);
+        Random draaftPhantomRng = state.getOrCreateRng(WorldState.RngType.PHANTOM, serverWorld);
         this.ticksUntilNextSpawn--;
 
         if (this.ticksUntilNextSpawn > 0) {

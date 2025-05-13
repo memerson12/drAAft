@@ -20,7 +20,7 @@ public abstract class WitherSkeletonEntityMixin extends AbstractSkeletonEntity {
     @Override
     protected LootContext.Builder getLootContextBuilder(boolean causedByPlayer, DamageSource source) {
         LootContext.Builder builder = new LootContext.Builder((ServerWorld) this.world)
-                .random(WorldState.getServerState((ServerWorld) this.world).getOrCreateSkullRng((ServerWorld) this.world))
+                .random(WorldState.getServerState((ServerWorld) this.world).getOrCreateRng(WorldState.RngType.SKULL, (ServerWorld) this.world))
                 .parameter(LootContextParameters.THIS_ENTITY, this)
                 .parameter(LootContextParameters.POSITION, this.getBlockPos())
                 .parameter(LootContextParameters.DAMAGE_SOURCE, source)

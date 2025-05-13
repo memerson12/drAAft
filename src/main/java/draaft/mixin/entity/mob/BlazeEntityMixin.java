@@ -20,7 +20,7 @@ public abstract class BlazeEntityMixin extends HostileEntity {
     @Override
     protected LootContext.Builder getLootContextBuilder(boolean causedByPlayer, DamageSource source) {
         LootContext.Builder builder = new LootContext.Builder((ServerWorld) this.world)
-                .random(WorldState.getServerState((ServerWorld) this.world).getOrCreateBlazeRng((ServerWorld) this.world))
+                .random(WorldState.getServerState((ServerWorld) this.world).getOrCreateRng(WorldState.RngType.BLAZE, (ServerWorld) this.world))
                 .parameter(LootContextParameters.THIS_ENTITY, this)
                 .parameter(LootContextParameters.POSITION, this.getBlockPos())
                 .parameter(LootContextParameters.DAMAGE_SOURCE, source)

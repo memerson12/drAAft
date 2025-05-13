@@ -13,6 +13,6 @@ import java.util.Random;
 public abstract class PiglinBrainMixin {
     @Redirect(method = "getBarteredItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/loot/context/LootContext$Builder;random(Ljava/util/Random;)Lnet/minecraft/loot/context/LootContext$Builder;"))
     private static LootContext.Builder injected(LootContext.Builder instance, Random random) {
-        return instance.random(WorldState.getServerState(instance.getWorld()).getOrCreateBarterRng(instance.getWorld()));
+        return instance.random(WorldState.getServerState(instance.getWorld()).getOrCreateRng(WorldState.RngType.BARTER, instance.getWorld()));
     }
 }

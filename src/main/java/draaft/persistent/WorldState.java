@@ -10,189 +10,178 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.EnumMap; // Use EnumMap for better performance with enum keys
+import java.util.Map;
 import java.util.Random;
 
 public class WorldState extends PersistentState {
-    private final RandomState pearlRng = new RandomState(null, "pearl_rng", "pearl_seed");
-    private final RandomState barterRng = new RandomState(null, "barter_rng", "barter_seed");
-    private final RandomState tridentRng = new RandomState(null, "trident_rng", "trident_seed");
-    private final RandomState skullRng = new RandomState(null, "skull_rng", "skull_seed");
-    private final RandomState catRng = new RandomState(null, "cat_rng", "cat_seed");
-    private final RandomState phantomRng = new RandomState(null, "phantom_rng", "phantom_seed");
-    private final RandomState blazeRng = new RandomState(null, "blaze_rng", "blaze_seed");
-    private final RandomState shulkerRng = new RandomState(null, "shulker_rng", "shulker_seed");
+
+    /**
+     * Enum defining the different types of Random Number Generators managed by WorldState.
+     */
+    public enum RngType {
+        PEARL("pearl"),
+        BARTER("barter"),
+        TRIDENT("trident"),
+        SKULL("skull"),
+        CAT("cat"),
+        PHANTOM("phantom"),
+        BLAZE("blaze"),
+        SHULKER("shulker");
+
+        private final String keyName; // The base name used for NBT keys
+
+        RngType(String keyName) {
+            this.keyName = keyName;
+        }
+
+        public String getKeyName() {
+            return keyName;
+        }
+
+        public String getNbtKey() {
+            return keyName + "_rng";
+        }
+
+        public String getFallbackNbtKey() {
+            return keyName + "_seed";
+        }
+    }
+
+    // Use EnumMap for potentially better performance and memory usage with enum keys
+    private final Map<RngType, RandomState> randomStates = new EnumMap<>(RngType.class);
 
     public WorldState(String key) {
         super(key);
+        for (RngType type : RngType.values()) {
+            randomStates.put(type, new RandomState(null, type));
+        }
     }
 
+    /**
+     * Gets or creates the persistent WorldState for the given server world.
+     * @param world The server world.
+     * @return The WorldState instance.
+     */
     public static WorldState getServerState(ServerWorld world) {
-        return world.getPersistentStateManager().getOrCreate(() -> new WorldState("draaft_world_state"),
+        return world.getPersistentStateManager().getOrCreate(
+                () -> new WorldState("draaft_world_state"),
                 "draaft_world_state");
     }
 
     @Override
     public void fromTag(CompoundTag tag) {
-        serializeRandom(tag, pearlRng);
-        serializeRandom(tag, barterRng);
-        serializeRandom(tag, tridentRng);
-        serializeRandom(tag, skullRng);
-        serializeRandom(tag, catRng);
-        serializeRandom(tag, phantomRng);
-        serializeRandom(tag, blazeRng);
-        serializeRandom(tag, shulkerRng);
+        for (RandomState randomState : randomStates.values()) {
+            deserializeFromTag(tag, randomState);
+        }
     }
 
-    private void serializeRandom(CompoundTag tag, RandomState randomState) {
-        if (tag.contains(randomState.getKey())) {
-            try (ByteArrayInputStream bais = new ByteArrayInputStream(tag.getByteArray(randomState.getKey()));
+    private void deserializeFromTag(CompoundTag tag, RandomState randomState) {
+        String primaryKey = randomState.getNbtKey();
+        if (tag.contains(primaryKey)) {
+            try (ByteArrayInputStream bais = new ByteArrayInputStream(tag.getByteArray(primaryKey));
                  ObjectInputStream ois = new ObjectInputStream(bais)) {
                 randomState.setRandom((Random) ois.readObject());
             } catch (IOException | ClassNotFoundException e) {
-                // If deserialization fails, fall back to just using the seed
-                if (tag.contains(randomState.getFallbackKey())) {
-                    draaft.LOGGER.warn("Unable to deserialize {}", randomState.getKey());
-                    randomState.setRandom(new Random(tag.getLong(randomState.getFallbackKey())));
-                }
+                // If deserialization fails, attempt to fall back to using the stored seed
+                draaft.LOGGER.warn("Unable to deserialize RNG state for key '{}', attempting fallback.", primaryKey, e);
+                tryFallbackSeed(tag, randomState);
             }
-        } else if (tag.contains(randomState.getFallbackKey())) {
-            randomState.setRandom(new Random(tag.getLong(randomState.getFallbackKey())));
+        } else {
+            // If primary key doesn't exist, try the fallback seed key directly
+            tryFallbackSeed(tag, randomState);
+        }
+    }
+
+    private void tryFallbackSeed(CompoundTag tag, RandomState randomState) {
+        String fallbackKey = randomState.getFallbackNbtKey();
+        if (tag.contains(fallbackKey)) {
+            draaft.LOGGER.info("Falling back to seed for RNG state key '{}'", fallbackKey);
+            randomState.setRandom(new Random(tag.getLong(fallbackKey)));
+        } else {
+            // Neither key found; RNG will be initialized lazily if requested via getOrCreateRng
+            draaft.LOGGER.debug("Neither primary key '{}' nor fallback key '{}' found for RNG type {}.",
+                    randomState.getNbtKey(), fallbackKey, randomState.getType().name());
         }
     }
 
     @Override
     public CompoundTag toTag(CompoundTag nbt) {
-        deserializeRandom(nbt, pearlRng);
-        deserializeRandom(nbt, barterRng);
-        deserializeRandom(nbt, tridentRng);
-        deserializeRandom(nbt, skullRng);
-        deserializeRandom(nbt, catRng);
-        deserializeRandom(nbt, phantomRng);
-        deserializeRandom(nbt, blazeRng);
-        deserializeRandom(nbt, shulkerRng);
-
+        for (RandomState randomState : randomStates.values()) {
+            serializeToTag(nbt, randomState);
+        }
         return nbt;
     }
 
-    private void deserializeRandom(CompoundTag nbt, RandomState randomState) {
+    private void serializeToTag(CompoundTag nbt, RandomState randomState) {
         if (randomState.getRandom() != null) {
+            String primaryKey = randomState.getNbtKey();
+            String fallbackKey = randomState.getFallbackNbtKey();
             try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                    ObjectOutputStream oos = new ObjectOutputStream(baos)) {
+                 ObjectOutputStream oos = new ObjectOutputStream(baos)) {
                 oos.writeObject(randomState.getRandom());
-                nbt.putByteArray(randomState.getKey(), baos.toByteArray());
+                nbt.putByteArray(primaryKey, baos.toByteArray());
+                // Clean up the old fallback key if full serialization is successful
+                nbt.remove(fallbackKey);
             } catch (IOException e) {
-                // If serialization fails, fall back to just storing the seed
-                draaft.LOGGER.warn("Unable to serialize {}", randomState.getFallbackKey());
-                nbt.putLong(randomState.getFallbackKey(), randomState.getRandom().nextLong());
+                // If full serialization fails, fall back to storing only the seed
+                draaft.LOGGER.warn("Unable to serialize RNG state for key '{}', falling back to storing seed.", primaryKey, e);
+                nbt.putLong(fallbackKey, randomState.getRandom().nextLong());
+                // Clean up the primary key if fallback seed is used
+                nbt.remove(primaryKey);
             }
         }
     }
 
-    public Random getOrCreatePearlRng(ServerWorld world) {
-        if (this.pearlRng.getRandom() == null) {
-            draaft.LOGGER.info("Is Client: {}", world.isClient);
-            long seed = world.getSeed();
-            this.pearlRng.setRandom(new Random(seed));
-        }
-        this.markDirty();
-        return this.pearlRng.getRandom();
-    }
+    /**
+     * Gets the Random instance for the specified type, creating it based on the
+     * world seed if it doesn't exist yet in this session.
+     *
+     * @param type  The RngType enum constant representing the desired RNG.
+     * @param world The ServerWorld instance.
+     * @return The Random instance for the specified type.
+     */
+    public Random getOrCreateRng(RngType type, ServerWorld world) {
+        // EnumMap guarantees the key exists if initialized correctly
+        RandomState randomState = randomStates.get(type);
 
-    public Random getOrCreateBarterRng(ServerWorld world) {
-        if (this.barterRng.getRandom() == null) {
-            draaft.LOGGER.info("Is Client: {}", world.isClient);
+        if (randomState.getRandom() == null) {
+            draaft.LOGGER.info("Initializing '{}' RNG state. Is Client: {}", type.name(), world.isClient);
             long seed = world.getSeed();
-            this.barterRng.setRandom(new Random(seed));
+            randomState.setRandom(new Random(seed));
         }
-        this.markDirty();
-        return this.barterRng.getRandom();
-    }
 
-    public Random getOrCreateTridentRng(ServerWorld world) {
-        if (this.tridentRng.getRandom() == null) {
-            draaft.LOGGER.info("Is Client: {}", world.isClient);
-            long seed = world.getSeed();
-            this.tridentRng.setRandom(new Random(seed));
-        }
         this.markDirty();
-        return this.tridentRng.getRandom();
-    }
-
-    public Random getOrCreateSkullRng(ServerWorld world) {
-        if (this.skullRng.getRandom() == null) {
-            draaft.LOGGER.info("Is Client: {}", world.isClient);
-            long seed = world.getSeed();
-            this.skullRng.setRandom(new Random(seed));
-        }
-        this.markDirty();
-        return this.skullRng.getRandom();
-    }
-
-    public Random getOrCreateCatRng(ServerWorld world) {
-        if (this.catRng.getRandom() == null) {
-            draaft.LOGGER.info("Is Client: {}", world.isClient);
-            long seed = world.getSeed();
-            this.catRng.setRandom(new Random(seed));
-        }
-        this.markDirty();
-        return this.catRng.getRandom();
-    }
-
-    public Random getOrCreatePhantomRng(ServerWorld world) {
-        if (this.phantomRng.getRandom() == null) {
-            draaft.LOGGER.info("Is Client: {}", world.isClient);
-            long seed = world.getSeed();
-            this.phantomRng.setRandom(new Random(seed));
-        }
-        this.markDirty();
-        return this.phantomRng.getRandom();
-    }
-
-    public Random getOrCreateBlazeRng(ServerWorld world) {
-        if (this.blazeRng.getRandom() == null) {
-            draaft.LOGGER.info("Is Client: {}", world.isClient);
-            long seed = world.getSeed();
-            this.blazeRng.setRandom(new Random(seed));
-        }
-        this.markDirty();
-        return this.blazeRng.getRandom();
-    }
-
-    public Random getOrCreateShulkerRng(ServerWorld world) {
-        if (this.shulkerRng.getRandom() == null) {
-            draaft.LOGGER.info("Is Client: {}", world.isClient);
-            long seed = world.getSeed();
-            this.shulkerRng.setRandom(new Random(seed));
-        }
-        this.markDirty();
-        return this.shulkerRng.getRandom();
+        return randomState.getRandom();
     }
 
     private static class RandomState {
         private Random random;
-        private final String key;
-        private final String fallbackKey;
+        private final RngType type;
 
-        public RandomState(Random random, String key, String fallbackKey) {
+        public RandomState(Random random, RngType type) {
             this.random = random;
-            this.key = key;
-            this.fallbackKey = fallbackKey;
+            this.type = type;
         }
 
         public Random getRandom() {
             return random;
         }
 
-        public String getKey() {
-            return key;
-        }
-
-        public String getFallbackKey() {
-            return fallbackKey;
-        }
-
         public void setRandom(Random random) {
             this.random = random;
+        }
+
+        public String getNbtKey() {
+            return type.getNbtKey();
+        }
+
+        public String getFallbackNbtKey() {
+            return type.getFallbackNbtKey();
+        }
+
+        public RngType getType() {
+            return type;
         }
     }
 }
