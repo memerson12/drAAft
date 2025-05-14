@@ -15,6 +15,7 @@
     "entity.passive.CatEntityMixin",
     "entity.projectile.thrown.EnderPearlEntityMixin",
     "item.ItemsMixin",
+    "server.world.MinecraftServerMixin",
     "server.world.ServerWorldMixin",
     "structure.IglooGeneratorMixin",
     "world.WanderingTraderManagerMixin",
@@ -32,6 +33,7 @@
     "defaultRequire": 1
   },
   "client": [
+    "ClientWorldMixin",
     "client.gui.DebugHudMixin"
   ]
 }
