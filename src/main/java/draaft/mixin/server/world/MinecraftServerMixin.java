@@ -1,32 +1,25 @@
 package draaft.mixin.server.world;
 
 import draaft.draaft;
-import it.unimi.dsi.fastutil.longs.LongIterator;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.WorldGenerationProgressListener;
-import net.minecraft.server.world.ChunkTicketManager;
 import net.minecraft.server.world.ChunkTicketType;
 import net.minecraft.server.world.ServerChunkManager;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Unit;
-import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.RegistryKey;
-import net.minecraft.world.ForcedChunkState;
 import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.World;
-import net.minecraft.world.chunk.ChunkStatus;
 import org.apache.logging.log4j.Logger;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
-import org.spongepowered.asm.mixin.injection.*;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyConstant;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.Map;
+import java.util.HashSet;
 import java.util.Set;
 
 @Mixin(MinecraftServer.class)
@@ -38,133 +31,186 @@ public abstract class MinecraftServerMixin {
     @Shadow
     public abstract ServerWorld getOverworld();
 
-    @Shadow @Final private Map<RegistryKey<World>, ServerWorld> worlds;
+    @Unique
+    private final Set<ChunkPos> temporaryStartTicketPositions = new HashSet<>();
+    @Unique
+    private int calculatedOptimalTicketLevel;
 
-    @Inject(method = "loadWorld", at = @At("TAIL"))
-    private void onWorldLoad(CallbackInfo ci) {
-        ServerWorld serverWorld = getOverworld();
-        ServerChunkManager serverChunkManager = serverWorld.getChunkManager();
-        int loadedChunks = serverChunkManager.getTotalChunksLoadedCount();
-        int loadedChunks2 = serverChunkManager.getLoadedChunkCount();
-        logger.info("{} chunks are currently loaded", loadedChunks);
-        logger.info("{} total chunks loaded", loadedChunks2);
+    @Unique
+    private static final int MAX_TICKET_LEVEL = 33; // Maximum allowed ticket level for sub tickets (minecraft hardcodes a max of 33)
 
-//        logger.info("Generating Extra Chunks");
-//        MinecraftServer server = (MinecraftServer) (Object) this;
-//        ServerWorld overworld = getOverworld();
-//
-//        if (overworld == null) return;
-//
-//        BlockPos spawnPos = overworld.getSpawnPos();
-//        ChunkPos centerChunk = new ChunkPos(spawnPos);
-//
-//        int extraRadius = 5; // Loads 11x11 chunks (does not affect spawn chunk radius)
-//
-//        for (int dx = -extraRadius; dx <= extraRadius; dx++) {
-//            for (int dz = -extraRadius; dz <= extraRadius; dz++) {
-//                ChunkPos chunkPos = new ChunkPos(centerChunk.x + dx, centerChunk.z + dz);
-//
-//                logger.info("\tGenerating Extra Chunk at {}", chunkPos.toString());
-//                // Force-load chunk synchronously
-//                overworld.getChunk(chunkPos.x, chunkPos.z, ChunkStatus.FULL, true);
-//            }
-//        }
+    // The level defining the overall desired coverage area
+    // (2*level-1)x(2*level-1) chunk area (i.e. a 185x185 chunk area for level 93)
+    @Unique
+//    private static final int DESIRED_COVERAGE_LEVEL = 93;
+    private static final int DESIRED_COVERAGE_LEVEL = 35;
+
+    // The number of chunks that should be loaded to cover the desired area (2*DESIRED_COVERAGE_LEVEL-1)^2
+    @Unique
+    private static final int DESIRED_CHUNK_COUNT = (2 * DESIRED_COVERAGE_LEVEL - 1) * (2 * DESIRED_COVERAGE_LEVEL - 1);
+
+    /**
+     * Creates multiple smaller chunk tickets to cover a large area instead of using one oversized ticket.
+     * <p>
+     * Minecraft has a hard limit of 33 for ticket levels, but we want to cover a much larger area.
+     * This method calculates the optimal ticket level that will evenly divide our desired coverage area,
+     * then places multiple tickets in a grid pattern to exactly tile the entire area without gaps or overlaps.
+     * <p>
+     * Each ticket of level L creates a (2L-1)×(2L-1) square of loaded chunks centered around the ticket position.
+     * By carefully spacing these tickets, we can create a seamless grid covering the full desired area.
+     *
+     * @param world    The server world where tickets will be added
+     * @param spawnPos The world spawn position to center the tickets around
+     */
+    @Unique
+    private void addMultipleStartTickets(ServerWorld world, BlockPos spawnPos) {
+        ServerChunkManager chunkManager = world.getChunkManager();
+        ChunkPos spawnChunkPos = new ChunkPos(spawnPos);
+
+        // Calculate the side length of the desired coverage area in chunks
+        // For a level L ticket, the coverage area is a square with side length (2L-1)
+        int desiredCoverageSide = 2 * DESIRED_COVERAGE_LEVEL - 1;
+
+        int optimalTicketLevel = 0;
+        int optimalTicketSide = 0;
+
+        // Find the largest ticket level <= MAX_TICKET_LEVEL that evenly divides the desired coverage area
+        // This ensures we can tile the area perfectly without gaps or overlaps
+        for (int level = MAX_TICKET_LEVEL; level >= 1; level--) {
+            int currentSide = 2 * level - 1; // Side length of a ticket with this level
+            // Check if this ticket size divides the desired area evenly
+            if (currentSide > 0 && currentSide < desiredCoverageSide && desiredCoverageSide % currentSide == 0) {
+                optimalTicketLevel = level;
+                optimalTicketSide = currentSide;
+                break;
+            }
+        }
+
+        // Fallback to level 1 if no optimal level was found
+        // This can happen if the desired coverage side length is prime or has large prime factors
+        if (optimalTicketLevel == 0) {
+            logger.warn("Could not find a ticket level <= {} that exactly divides a {}x{} area's side length ({}) and is < level {}. Falling back to level 1.",
+                    MAX_TICKET_LEVEL, DESIRED_COVERAGE_LEVEL, DESIRED_COVERAGE_LEVEL, desiredCoverageSide, DESIRED_COVERAGE_LEVEL);
+            if (desiredCoverageSide > 0) {
+                optimalTicketLevel = 1;
+                optimalTicketSide = 1;
+            } else {
+                logger.error("Desired coverage side length is not positive ({})!", desiredCoverageSide);
+                return;
+            }
+        }
+
+        // Calculate how many tickets we need in each direction to cover the desired area
+        int numTicketsPerSide = desiredCoverageSide / optimalTicketSide;
+        int totalTickets = numTicketsPerSide * numTicketsPerSide;
+
+        logger.info("Creating {} tickets at optimal level {} (side {}) to exactly tile desired area side {} (level {})",
+                totalTickets, optimalTicketLevel, optimalTicketSide, desiredCoverageSide, DESIRED_COVERAGE_LEVEL);
+
+        // Spacing between ticket centers equals the side length of each ticket's coverage
+        // This ensures tickets perfectly align edge-to-edge without gaps or overlaps
+        int spacing = optimalTicketSide;
+
+        // Calculate the total span covered by the centers of the tickets along one axis.
+        // This is the number of intervals (numTicketsPerSide - 1) times the spacing.
+        int totalSpanOfCenters = (numTicketsPerSide - 1) * spacing;
+
+        // Calculate offsets to center the entire grid of tickets around the spawn point
+        // We need to shift the first ticket position by half of the total span in both directions
+        int firstTicketOffsetX = totalSpanOfCenters / 2;
+        int firstTicketOffsetZ = totalSpanOfCenters / 2;
+
+        // Clear any previous ticket positions and store the calculated optimal level
+        temporaryStartTicketPositions.clear();
+        calculatedOptimalTicketLevel = optimalTicketLevel;
+
+        // Create the grid of tickets
+        for (int x = 0; x < numTicketsPerSide; x++) {
+            for (int z = 0; z < numTicketsPerSide; z++) {
+                // Calculate the center for this ticket.
+                // Start from the spawn chunk, subtract the offset for the first ticket's position,
+                // and then add the offset for the current ticket's position (x, z) within the grid.
+                int ticketX = spawnChunkPos.x - firstTicketOffsetX + (x * spacing);
+                int ticketZ = spawnChunkPos.z - firstTicketOffsetZ + (z * spacing);
+                ChunkPos ticketPos = new ChunkPos(ticketX, ticketZ);
+
+                // Add the ticket and remember its position for later cleanup
+                chunkManager.addTicket(ChunkTicketType.START, ticketPos, optimalTicketLevel, Unit.INSTANCE);
+                temporaryStartTicketPositions.add(ticketPos);
+
+                // Optional logging for each ticket added (can be noisy)
+                // logger.info("Added start ticket at {} with level {}", ticketPos, optimalTicketLevel);
+            }
+        }
     }
 
-    // New ticket level for the start region. Original is 11.
-    // A level L results in a (2L-1)x(2L-1) square of chunks.
-    @Unique
-    private static final int NEW_START_REGION_TICKET_LEVEL = 93; // Example: 16 for a 31x31 chunk area
-//    private static final int NEW_START_REGION_TICKET_LEVEL = 11; // Example: 16 for a 31x31 chunk area
+    // Replace the default single START ticket addition with our multi-ticket approach
+    @Inject(
+            method = "prepareStartRegion",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/server/world/ServerChunkManager;addTicket(Lnet/minecraft/server/world/ChunkTicketType;Lnet/minecraft/util/math/ChunkPos;ILjava/lang/Object;)V"
+//                    shift = At.Shift.BEFORE
+            )
+    )
+    private void overrideTicketAddition(WorldGenerationProgressListener worldGenerationProgressListener, CallbackInfo ci) {
+        ServerWorld serverWorld = this.getOverworld();
+        BlockPos spawnPos = serverWorld.getSpawnPos();
 
-    // Calculate the corresponding number of chunks for the new ticket level.
-    // This is (2 * NEW_START_REGION_TICKET_LEVEL - 1)^2.
-    @Unique
-    private static final int NEW_EXPECTED_CHUNK_COUNT = (2 * NEW_START_REGION_TICKET_LEVEL - 1) * (2 * NEW_START_REGION_TICKET_LEVEL - 1); // e.g., 31*31 = 961
+        addMultipleStartTickets(serverWorld, spawnPos);
+    }
 
-
-//    @ModifyConstant(
-//            method = "prepareStartRegion(Lnet/minecraft/server/WorldGenerationProgressListener;)V",
-//            constant = @Constant(intValue = 11)
-//    )
-//    private int modifyStartTicketLevel(int originalLevel) {
-//        return NEW_START_REGION_TICKET_LEVEL;
-//    }
-
+    // Modify the amount of chunks the loading screen expects
     @ModifyConstant(
             method = "loadWorld",
             constant = @Constant(intValue = 11)
     )
-    private int modifyLoadWorld(int original) {
-        return NEW_START_REGION_TICKET_LEVEL;
+    private int modifyLoadWorldLevel(int original) {
+        return DESIRED_COVERAGE_LEVEL;
     }
 
-    /**
-     * Modifies the expected number of loaded chunks in the while loop condition.
-     * This must match the new ticket level: (2 * NEW_TICKET_LEVEL - 1)^2.
-     */
+    // Adjust how many chunks we wait to load
     @ModifyConstant(
             method = "prepareStartRegion(Lnet/minecraft/server/WorldGenerationProgressListener;)V",
             constant = @Constant(intValue = 441)
     )
     private int modifyExpectedLoadedChunks(int originalCount) {
-//        logger.info("Going to load {} chunks", NEW_EXPECTED_CHUNK_COUNT);
-        return NEW_EXPECTED_CHUNK_COUNT;
+        return DESIRED_CHUNK_COUNT;
     }
 
-    @Inject(method = "prepareStartRegion", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/world/ServerChunkManager;addTicket(Lnet/minecraft/server/world/ChunkTicketType;Lnet/minecraft/util/math/ChunkPos;ILjava/lang/Object;)V"))
-    private void addNewTicker(WorldGenerationProgressListener worldGenerationProgressListener, CallbackInfo ci) {
-        ServerWorld serverWorld = this.getOverworld();
-        BlockPos blockPos = serverWorld.getSpawnPos();
-        ServerChunkManager serverChunkManager = serverWorld.getChunkManager();
-        ChunkTicketManager ticketManager = serverChunkManager.threadedAnvilChunkStorage.getTicketManager();
-        ChunkPos chunkPos = new ChunkPos(blockPos);
-//        serverChunkManager.addTicket(ChunkTicketType.START, new ChunkPos(blockPos), 11, Unit.INSTANCE);
-        ticketManager.addTicket(ChunkTicketType.field_14032, chunkPos, NEW_START_REGION_TICKET_LEVEL, chunkPos);
-
+    // Adjust how many chunks we wait to load
+    @ModifyConstant(
+            method = "prepareStartRegion",
+            constant = @Constant(intValue = 11)
+    )
+    private int modifyInitialTicket(int originalCount) {
+        return 0;
     }
 
+    // Remove the temporary tickets we added earlier and save the forced chunks
     @Inject(method = "prepareStartRegion", at = @At(value = "TAIL"))
-    private void test(CallbackInfo ci) {
+    private void cleanupAndFinalizeTickets(CallbackInfo ci) {
         ServerWorld serverWorld = this.getOverworld();
         BlockPos blockPos = serverWorld.getSpawnPos();
         ServerChunkManager serverChunkManager = serverWorld.getChunkManager();
-//        logger.info("Removing temp ticket");
-//        serverChunkManager.removeTicket(ChunkTicketType.START, new ChunkPos(blockPos), NEW_START_REGION_TICKET_LEVEL, Unit.INSTANCE);
-//        logger.info("Adding spawn chunk ticket");
-//        serverChunkManager.addTicket(ChunkTicketType.START, new ChunkPos(blockPos), 11, Unit.INSTANCE);
 
-        for (ServerWorld serverWorld2 : worlds.values()) {
-            int count = 0;
-            ForcedChunkState forcedChunkState = serverWorld2.getPersistentStateManager().get(ForcedChunkState::new, "chunks");
-            if (forcedChunkState != null) {
-                LongIterator longIterator = forcedChunkState.getChunks().iterator();
+        logger.info("Removing {} temporary START tickets", temporaryStartTicketPositions.size());
 
-                while (longIterator.hasNext()) {
-                    longIterator.nextLong();
-                    count++;
-                }
-            }
-            logger.info("{} chunks forced for world {}", count, serverWorld.getRegistryKey());
+        // Use stored ticket positions to remove tickets at the determined optimal level.
+        // The stored positions already include the centering offset calculated during addition.
+        for (ChunkPos ticketPos : temporaryStartTicketPositions) {
+//            logger.info("\tRemoving temporary start ticket at {}", ticketPos);
+            serverChunkManager.removeTicket(ChunkTicketType.START, ticketPos, calculatedOptimalTicketLevel, Unit.INSTANCE);
         }
+        temporaryStartTicketPositions.clear();
+
+
+        logger.info("Adding final spawn chunk ticket at level 11");
+        serverChunkManager.addTicket(ChunkTicketType.START, new ChunkPos(blockPos), 11, Unit.INSTANCE);
+
+        logger.info("Saving forced chunks... (may take a while)");
+        logger.info("This prevents quitting the game taking a really long time (and I assume it would apply to 5 minute lag as well");
+        serverChunkManager.save(true);
+        logger.info("done saving forced chunks");
     }
-
-//    @Unique
-//    private int debugCount = 0;
-//
-//    @Inject(method = "tick", at = @At(value = "TAIL"))
-//    private void tick(CallbackInfo ci) {
-//        ServerWorld serverWorld = getOverworld();
-//        if (debugCount == 20) {
-//            ServerChunkManager serverChunkManager = serverWorld.getChunkManager();
-//            int loadedChunks = serverChunkManager.getTotalChunksLoadedCount();
-//            int loadedChunks2 = serverChunkManager.getLoadedChunkCount();
-////            serverChunkManager.threadedAnvilChunkStorage
-//            logger.info("{} chunks are currently loaded", loadedChunks);
-//            logger.info("{} total chunks loaded", loadedChunks2);
-//            debugCount = 0;
-//        }
-//        debugCount++;
-//    }
-
 }
