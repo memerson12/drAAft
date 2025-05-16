@@ -112,6 +112,7 @@ Any items left undrafted will be added to every player's datapack.
 ## Mod Dependencies
 
 - Minecraft 1.16.1
+- SpeedRunIGT 15.1
 - Fabric Loader ≥0.16.13
 
 ## License
