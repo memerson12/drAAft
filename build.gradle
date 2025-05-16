@@ -28,6 +28,7 @@ dependencies {
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	// modImplementation "com.github.KingContaria:SpeedrunAPI:a3e3998294"
 	// modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+	modCompileOnly "com.github.RedLime:SpeedRunIGT:15.1"
 }
 
 // Task to generate config.properties from gradle.properties
