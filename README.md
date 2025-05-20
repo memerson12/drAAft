@@ -60,6 +60,8 @@ speedrun. Ideal for competitive events
     - Phantom spawns are standardized
 - Piglin:
     - Piglin barters are standardized
+- Rabbit
+    - Rabbit drops are standardized
 - Shulker:
     - Shell drops are standardized
 - Wither Skeleton:

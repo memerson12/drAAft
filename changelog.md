@@ -1,3 +1,3 @@
 # Changelog
 
-- Fix: SpeedRunIGT compatibility with draaftpack
+- Rabbit foot is now standardized (as well as rabbit meat and hide ig)
