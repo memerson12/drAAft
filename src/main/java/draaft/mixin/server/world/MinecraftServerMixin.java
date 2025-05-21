@@ -2,14 +2,19 @@ package draaft.mixin.server.world;
 
 import draaft.draaft;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.ServerMetadata;
 import net.minecraft.server.WorldGenerationProgressListener;
 import net.minecraft.server.world.ChunkTicketType;
 import net.minecraft.server.world.ServerChunkManager;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.MetricsData;
 import net.minecraft.util.Unit;
+import net.minecraft.util.UserCache;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.world.SaveProperties;
 import org.apache.logging.log4j.Logger;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -48,6 +53,9 @@ public abstract class MinecraftServerMixin {
     // The number of chunks that should be loaded to cover the desired area (2*DESIRED_COVERAGE_LEVEL-1)^2
     @Unique
     private static final int DESIRED_CHUNK_COUNT = (2 * DESIRED_COVERAGE_LEVEL - 1) * (2 * DESIRED_COVERAGE_LEVEL - 1);
+
+    @Unique boolean isNewWorld = true;
+    @Unique boolean hasCheckedIfNewWorld = false;
 
     /**
      * Creates multiple smaller chunk tickets to cover a large area instead of using one oversized ticket.
@@ -144,6 +152,19 @@ public abstract class MinecraftServerMixin {
         }
     }
 
+    @Unique
+    private boolean isNewWorld() {
+        if(hasCheckedIfNewWorld) {
+            return isNewWorld;
+        }
+        ServerWorld serverWorld = this.getOverworld();
+        ServerChunkManager chunkManager = serverWorld.getChunkManager();
+        int loadedCount = chunkManager.getLoadedChunkCount(); // is 0 for existing worlds
+        this.hasCheckedIfNewWorld = true;
+        this.isNewWorld = loadedCount != 0;
+        return this.isNewWorld;
+    }
+
     // Replace the default single START ticket addition with our multi-ticket approach
     @Inject(
             method = "prepareStartRegion",
@@ -154,6 +175,9 @@ public abstract class MinecraftServerMixin {
             )
     )
     private void overrideTicketAddition(WorldGenerationProgressListener worldGenerationProgressListener, CallbackInfo ci) {
+        if (!isNewWorld()) {
+            return;
+        }
         ServerWorld serverWorld = this.getOverworld();
         BlockPos spawnPos = serverWorld.getSpawnPos();
 
@@ -175,6 +199,9 @@ public abstract class MinecraftServerMixin {
             constant = @Constant(intValue = 441)
     )
     private int modifyExpectedLoadedChunks(int originalCount) {
+        if (!isNewWorld()) {
+            return originalCount;
+        }
         return DESIRED_CHUNK_COUNT;
     }
 
@@ -184,12 +211,18 @@ public abstract class MinecraftServerMixin {
             constant = @Constant(intValue = 11)
     )
     private int modifyInitialTicket(int originalCount) {
+        if (!isNewWorld()) {
+            return originalCount;
+        }
         return 0;
     }
 
     // Remove the temporary tickets we added earlier and save the forced chunks
     @Inject(method = "prepareStartRegion", at = @At(value = "TAIL"))
     private void cleanupAndFinalizeTickets(CallbackInfo ci) {
+        if (!isNewWorld()) {
+            return;
+        }
         ServerWorld serverWorld = this.getOverworld();
         BlockPos blockPos = serverWorld.getSpawnPos();
         ServerChunkManager serverChunkManager = serverWorld.getChunkManager();
