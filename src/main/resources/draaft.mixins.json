@@ -17,6 +17,7 @@
     "entity.passive.RabbitEntityMixin",
     "entity.projectile.thrown.EnderPearlEntityMixin",
     "item.ItemsMixin",
+    "screen.slot.TradeOutputSlotMixin",
     "server.world.ServerWorldMixin",
     "structure.IglooGeneratorMixin",
     "world.WanderingTraderManagerMixin",

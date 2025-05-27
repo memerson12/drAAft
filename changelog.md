@@ -1,3 +1,3 @@
 # Changelog
 
-- Rabbit foot is now standardized (as well as rabbit meat and hide ig)
+- Fixed bug that caused trading for an item to increment the crafting statistic
