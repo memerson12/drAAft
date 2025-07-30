@@ -24,6 +24,7 @@ dependencies {
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
 	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+	modImplementation "com.github.contariaa:SpeedrunAPI:v2.1-1.16.1"
 
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	// modImplementation "com.github.KingContaria:SpeedrunAPI:a3e3998294"

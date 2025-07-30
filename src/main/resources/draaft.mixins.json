@@ -15,6 +15,7 @@
     "entity.passive.AnimalEntityMixin",
     "entity.passive.CatEntityMixin",
     "entity.passive.RabbitEntityMixin",
+    "entity.player.PlayerEntityMixin",
     "entity.projectile.thrown.EnderPearlEntityMixin",
     "item.ItemsMixin",
     "screen.slot.TradeOutputSlotMixin",

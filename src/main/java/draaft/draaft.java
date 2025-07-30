@@ -11,11 +11,13 @@ public class draaft implements ModInitializer {
 	public static final String MOD_ID = "draaft";
 	public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
 	public static final String DRAAFT_VERSION = getDraaftVersion();
+	public static DraaftConfig draaftConfig;
 
 	@Override
 	public void onInitialize() {
         LOGGER.info("Draaft version: {}", DRAAFT_VERSION);
 	}
+
 	public static String getDraaftVersion() {
 		try (InputStream input = draaft.class.getClassLoader().getResourceAsStream("config.properties")) {
 			Properties prop = new Properties();
