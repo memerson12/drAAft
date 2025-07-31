@@ -10,14 +10,13 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
-import java.net.URI;
 
 public class RemoteMapUpdater {
     private static final Logger logger = draaft.LOGGER;
 
     private static int currentTickCount = 0;
-    private static final int UPDATE_FREQUENCY_SECONDS = 1;
-    private static final int TOTAL_TICKS_TO_WAIT = UPDATE_FREQUENCY_SECONDS * 20;
+    private static final float UPDATE_FREQUENCY_SECONDS = 0.5f;
+    private static final float TOTAL_TICKS_TO_WAIT = UPDATE_FREQUENCY_SECONDS * 20;
 
     private static final HttpClient httpclient = HttpClients.createDefault();
 
