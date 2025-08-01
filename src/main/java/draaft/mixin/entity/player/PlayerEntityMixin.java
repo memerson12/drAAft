@@ -18,7 +18,7 @@ public class PlayerEntityMixin {
         PlayerEntity self = (PlayerEntity) (Object) this;
 
         BackgroundTaskRunner.runAsync(() -> {
-            RemoteMapUpdater.updateRemoteMap(self.getX(), self.getY(), self.getZ());
+            RemoteMapUpdater.updateRemoteMap(self.getEntityWorld().getRegistryKey().getValue().toString(), self.getX(), self.getY(), self.getZ());
         });
 
         Runtime.getRuntime().addShutdownHook(new Thread(BackgroundTaskRunner::shutdown));

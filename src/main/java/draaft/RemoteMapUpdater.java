@@ -20,9 +20,19 @@ public class RemoteMapUpdater {
 
     private static final HttpClient httpclient = HttpClients.createDefault();
 
-    public static void updateRemoteMap(double x, double y, double z) {
+    public static void updateRemoteMap(String worldId, double x, double y, double z) {
         if (currentTickCount >= TOTAL_TICKS_TO_WAIT) {
             currentTickCount = 0;
+
+            String dimension = "world";
+            switch (worldId) {
+                case "minecraft:the_end":
+                    dimension = "world_the_end";
+                    break;
+                case "minecraft:the_nether":
+                    dimension = "world_nether";
+                    break;
+            }
 
             HttpPost httppost = new HttpPost(draaft.draaftConfig.competitionMapUrl);
 
@@ -30,6 +40,7 @@ public class RemoteMapUpdater {
             body.addProperty("x", Integer.toString((int) x));
             body.addProperty("y", Integer.toString((int) y));
             body.addProperty("z", Integer.toString((int) z));
+            body.addProperty("dimension", dimension);
 
             StringEntity requestEntity = new StringEntity(body.toString(), ContentType.APPLICATION_JSON);
             httppost.setEntity(requestEntity);
