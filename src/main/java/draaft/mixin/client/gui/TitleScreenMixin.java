@@ -8,7 +8,6 @@ import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
@@ -24,6 +23,8 @@ public abstract class TitleScreenMixin extends Screen {
     @Unique
     private static final Identifier BUTTON_IMAGE = IdentifierUtil.ofVanilla("textures/item/bucket.png");
 
+    private static final String DEFAULT_BUTTON_HOVER = "drAAft Login";
+
     protected TitleScreenMixin(Text title) {
         super(title);
     }
@@ -34,7 +35,7 @@ public abstract class TitleScreenMixin extends Screen {
     )
     private void addDraaftLoginButton(CallbackInfo info) {
         this.addButton(new ButtonWidget(this.width / 2 + 124 - 20, this.height / 4 + 48, 20, 20, LiteralText.EMPTY, button -> {
-            ServerClient.getInstance().evilConnectionTesting();
+            ServerClient.getInstance().draaftLogin();
         }) {
             @Override
             public void renderButton(MatrixStack matrices, int mouseX, int mouseY, float delta) {
@@ -43,8 +44,14 @@ public abstract class TitleScreenMixin extends Screen {
                 MinecraftClient.getInstance().getTextureManager().bindTexture(BUTTON_IMAGE);
                 DrawableHelper.drawTexture(matrices, this.x + 2, this.y + 2, 0.0F, 0.0F, 16, 16, 16, 16);
 
-                if (this.isHovered()) {
-                    this.drawCenteredText(matrices, TitleScreenMixin.this.textRenderer, TextUtil.literal("drAAft Login"), this.x + this.width / 2, this.y - 15, 16777215);
+                var inst = ServerClient.getInstance();
+                if (this.isHovered() || inst.connectingStatus != null) {
+                    String s = inst.connectingStatus;
+                    if (s == null) {
+                        s = DEFAULT_BUTTON_HOVER;
+                    }
+                    // todo - I can probably make this more efficient? lol
+                    this.drawCenteredText(matrices, TitleScreenMixin.this.textRenderer, TextUtil.literal(s), this.x + this.width / 2, this.y - 15, 16777215);
                 }
             }
         });

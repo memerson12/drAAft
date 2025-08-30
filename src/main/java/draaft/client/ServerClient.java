@@ -12,7 +12,6 @@ import org.apache.commons.codec.binary.Base32;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.awt.datatransfer.StringSelection;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -29,6 +28,8 @@ public class ServerClient {
     private String clientToken = null;
     public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
     HttpClient httpClient = HttpClient.newBuilder().version(HttpClient.Version.HTTP_1_1).build();
+
+    public String connectingStatus = null;
 
     public static ServerClient INSTANCE = null;
 
@@ -52,22 +53,30 @@ public class ServerClient {
     }
 
     // thanks menx :)
-    public void evilConnectionTesting(/* :) */) {
+    public void draaftLogin(/* :) */) {
         MinecraftClient inst = MinecraftClient.getInstance();
         Session session = inst.getSession();
         // okay: then we add a "generate room" button ingame and it gives you a key
         // https://sessionserver.mojang.com/session/minecraft/hasJoined?username=DesktopFolder&serverId=draaft2025server
 
+        connectingStatus = "Contacting Minecraft auth server...";
         try {
             inst.getSessionService().joinServer(session.getProfile(), session.getAccessToken(), clientPassword);
             LOGGER.info("draaft successfully joined server with clientPassword");
         } catch (AuthenticationUnavailableException var3) {
             LOGGER.warn("disconnect.loginFailedInfo: disconnect.loginFailedInfo.serversUnavailable");
+            connectingStatus = "Error: Servers unavailable!";
+            return;
         } catch (InvalidCredentialsException var4) {
             LOGGER.warn("disconnect.loginFailedInfo: disconnect.loginFailedInfo.invalidSession");
+            connectingStatus = "Error: Invalid session!";
+            return;
         } catch (AuthenticationException authenticationException) {
             LOGGER.warn("disconnect.loginFailedInfo {}", authenticationException.getMessage());
+            connectingStatus = authenticationException.getMessage();
+            return;
         }
+        connectingStatus = "Contacting drAAft server...";
         String username = session.getUsername();
 
         JsonObject body = new JsonObject();
@@ -83,9 +92,12 @@ public class ServerClient {
             JsonObject result  = new Gson().fromJson(resp.body(), JsonObject.class);
             clientToken = result.get("token").getAsString();
         } catch (IOException | InterruptedException | URISyntaxException e) {
-            throw new RuntimeException(e);
+            LOGGER.warn("Could not contact drAAft server: {}", e.getMessage());
+            connectingStatus = "Error contacting drAAft server!";
+            return;
         }
 
+        /*
         try {
             var req = HttpRequest.newBuilder(new URI("http://localhost:8000/room/create"))
                     .GET()
@@ -98,8 +110,11 @@ public class ServerClient {
         } catch (IOException | InterruptedException | URISyntaxException e) {
             throw new RuntimeException(e);
         }
+        */
 
         Clipboard clipboard = new Clipboard();
         clipboard.setClipboard(MinecraftClient.getInstance().getWindow().getHandle(), clientToken);
+
+        connectingStatus = "Connected! Password copied to clipboard.";
     }
 }
