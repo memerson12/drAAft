@@ -6,11 +6,13 @@ import com.mojang.authlib.exceptions.AuthenticationException;
 import com.mojang.authlib.exceptions.AuthenticationUnavailableException;
 import com.mojang.authlib.exceptions.InvalidCredentialsException;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.util.Clipboard;
 import net.minecraft.client.util.Session;
 import org.apache.commons.codec.binary.Base32;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.awt.datatransfer.StringSelection;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -27,6 +29,15 @@ public class ServerClient {
     private String clientToken = null;
     public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
     HttpClient httpClient = HttpClient.newBuilder().version(HttpClient.Version.HTTP_1_1).build();
+
+    public static ServerClient INSTANCE = null;
+
+    public static ServerClient getInstance() {
+        if (INSTANCE == null) {
+            INSTANCE = new ServerClient();
+        }
+        return INSTANCE;
+    }
 
     public ServerClient() {
         SecureRandom instanceStrong = null;
@@ -87,5 +98,8 @@ public class ServerClient {
         } catch (IOException | InterruptedException | URISyntaxException e) {
             throw new RuntimeException(e);
         }
+
+        Clipboard clipboard = new Clipboard();
+        clipboard.setClipboard(MinecraftClient.getInstance().getWindow().getHandle(), clientToken);
     }
 }

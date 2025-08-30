@@ -19,12 +19,9 @@ public class draaft implements ModInitializer {
 	public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
 	public static final String DRAAFT_VERSION = getDraaftVersion();
 
-	public static final ServerClient SERVER_CLIENT = new ServerClient();
-
 	@Override
 	public void onInitialize() {
 		LOGGER.info("Draaft version: {}", DRAAFT_VERSION);
-		SERVER_CLIENT.evilConnectionTesting();
 	}
 	public static String getDraaftVersion() {
 		try (InputStream input = draaft.class.getClassLoader().getResourceAsStream("config.properties")) {
