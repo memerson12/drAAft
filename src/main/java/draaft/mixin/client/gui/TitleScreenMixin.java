@@ -1,17 +1,19 @@
 package draaft.mixin.client.gui;
 
 import draaft.client.ServerClient;
-import me.contaria.speedrunapi.util.IdentifierUtil;
 import me.contaria.speedrunapi.util.TextUtil;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.enchantment.Enchantments;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -21,8 +23,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(TitleScreen.class)
 public abstract class TitleScreenMixin extends Screen {
     @Unique
-    private static final Identifier BUTTON_IMAGE = IdentifierUtil.ofVanilla("textures/item/bucket.png");
-
     private static final String DEFAULT_BUTTON_HOVER = "drAAft Login";
 
     protected TitleScreenMixin(Text title) {
@@ -34,15 +34,38 @@ public abstract class TitleScreenMixin extends Screen {
             at = @At("TAIL")
     )
     private void addDraaftLoginButton(CallbackInfo info) {
-        this.addButton(new ButtonWidget(this.width / 2 + 124 - 20, this.height / 4 + 48, 20, 20, LiteralText.EMPTY, button -> {
-            ServerClient.getInstance().draaftLogin();
-        }) {
+        int login_button_width = 20;
+        int login_button_heigh = 20;
+        // Can probably get these from the Bucket Item somehow but didn't bother
+        int bucket_texture_width = 16;
+        int bucket_texture_height = 16;
+        int single_player_button_y = this.height / 4 + 48;
+        int single_player_button_half_width = 100;
+        int horizontal_button_spacing = 4;
+        this.addButton(new ButtonWidget(
+            this.width / 2 + single_player_button_half_width + horizontal_button_spacing,
+            single_player_button_y,
+            login_button_width,
+            login_button_heigh,
+            LiteralText.EMPTY,
+            button -> { ServerClient.getInstance().draaftLogin(); })
+        {
             @Override
             public void renderButton(MatrixStack matrices, int mouseX, int mouseY, float delta) {
                 super.renderButton(matrices, mouseX, mouseY, delta);
 
-                MinecraftClient.getInstance().getTextureManager().bindTexture(BUTTON_IMAGE);
-                DrawableHelper.drawTexture(matrices, this.x + 2, this.y + 2, 0.0F, 0.0F, 16, 16, 16, 16);
+                Item bucket_item = Items.BUCKET;
+                ItemStack stack = new ItemStack(bucket_item);
+                // I mean... Of course a bucket has AQUA AFFINITY 10
+                stack.addEnchantment(Enchantments.AQUA_AFFINITY, 10);
+
+                MinecraftClient minecraftClient = MinecraftClient.getInstance();
+                ItemRenderer itemRenderer = minecraftClient.getItemRenderer();
+                itemRenderer.renderInGui(
+                    stack,
+                    this.x + (login_button_width - bucket_texture_width) / 2,
+                    this.y + (login_button_heigh - bucket_texture_height) / 2
+                );
 
                 var inst = ServerClient.getInstance();
                 if (this.isHovered() || inst.connectingStatus != null) {
