@@ -6,8 +6,8 @@ import com.mojang.authlib.exceptions.AuthenticationException;
 import com.mojang.authlib.exceptions.AuthenticationUnavailableException;
 import com.mojang.authlib.exceptions.InvalidCredentialsException;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.util.Clipboard;
 import net.minecraft.client.util.Session;
+import net.minecraft.util.Util;
 import org.apache.commons.codec.binary.Base32;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -24,8 +24,9 @@ import java.security.SecureRandom;
 import static draaft.draaft.MOD_ID;
 
 public class ServerClient {
-    private String clientPassword = null;
-    private String clientToken = null;
+    private final String clientPassword;
+    private final AuthRedirectServer redirectServer;
+
     public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
     HttpClient httpClient = HttpClient.newBuilder().version(HttpClient.Version.HTTP_1_1).build();
 
@@ -41,7 +42,7 @@ public class ServerClient {
     }
 
     public ServerClient() {
-        SecureRandom instanceStrong = null;
+        SecureRandom instanceStrong;
         try {
             instanceStrong = SecureRandom.getInstanceStrong();
         } catch (NoSuchAlgorithmException e) {
@@ -50,6 +51,13 @@ public class ServerClient {
         byte[] randomBytes = new byte[15];
         instanceStrong.nextBytes(randomBytes);
         clientPassword = new Base32().encodeAsString(randomBytes) + "draaaaft";
+
+        try {
+            this.redirectServer = new AuthRedirectServer();
+        } catch (IOException err) {
+            LOGGER.fatal("failed to create an HTTP server", err);
+            throw new RuntimeException(err);
+        }
     }
 
     // thanks menx :)
@@ -83,6 +91,7 @@ public class ServerClient {
         body.addProperty("serverID", clientPassword);
         body.addProperty("username", username);
 
+        String clientToken;
         try {
             var req = HttpRequest.newBuilder(new URI("http://localhost:8000/authenticate"))
                     .POST(HttpRequest.BodyPublishers.ofString(body.toString()))
@@ -112,8 +121,8 @@ public class ServerClient {
         }
         */
 
-        Clipboard clipboard = new Clipboard();
-        clipboard.setClipboard(MinecraftClient.getInstance().getWindow().getHandle(), clientToken);
+        this.redirectServer.token = clientToken;
+        Util.getOperatingSystem().open(this.redirectServer.uri());
 
         connectingStatus = "Connected! Password copied to clipboard.";
     }
