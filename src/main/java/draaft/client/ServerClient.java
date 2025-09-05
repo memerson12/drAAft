@@ -14,7 +14,6 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -25,7 +24,11 @@ import static draaft.draaft.MOD_ID;
 
 public class ServerClient {
     private final String clientPassword;
-    private final AuthTokenServer tokenServer;
+
+    // TODO(me-nx): remove hardcoded URIs
+    public static final URI API_BASE_URI = URI.create("http://localhost:8000/");
+    public static final URI FRONTEND_BASE_URI = URI.create("http://localhost:8080/draaft/");
+    public static final String FRONTEND_ORIGIN = "http://localhost:8080"; // do not add a trailing slash
 
     public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
     HttpClient httpClient = HttpClient.newBuilder().version(HttpClient.Version.HTTP_1_1).build();
@@ -51,13 +54,6 @@ public class ServerClient {
         byte[] randomBytes = new byte[15];
         instanceStrong.nextBytes(randomBytes);
         clientPassword = new Base32().encodeAsString(randomBytes) + "draaaaft";
-
-        try {
-            this.tokenServer = new AuthTokenServer();
-        } catch (IOException err) {
-            LOGGER.fatal("failed to create an HTTP server", err);
-            throw new RuntimeException(err);
-        }
     }
 
     // thanks menx :)
@@ -93,14 +89,14 @@ public class ServerClient {
 
         String clientToken;
         try {
-            var req = HttpRequest.newBuilder(new URI("http://localhost:8000/authenticate"))
+            var req = HttpRequest.newBuilder(API_BASE_URI.resolve("authenticate"))
                     .POST(HttpRequest.BodyPublishers.ofString(body.toString()))
                     .setHeader("Content-Type", "application/json")
                     .build();
             HttpResponse<String> resp = httpClient.send(req, HttpResponse.BodyHandlers.ofString());
             JsonObject result  = new Gson().fromJson(resp.body(), JsonObject.class);
             clientToken = result.get("token").getAsString();
-        } catch (IOException | InterruptedException | URISyntaxException e) {
+        } catch (IOException | InterruptedException e) {
             LOGGER.warn("Could not contact drAAft server: {}", e.getMessage());
             connectingStatus = "Error contacting drAAft server!";
             return;
@@ -121,10 +117,10 @@ public class ServerClient {
         }
         */
 
-        this.tokenServer.token = clientToken;
-        // TODO: replace the hardcoded draaft URI
+        AuthTokenServer.get().token = clientToken;
+
         Util.getOperatingSystem().open(
-            "http://localhost:8080/draaft/?auth_port=%d".formatted(this.tokenServer.port())
+            FRONTEND_BASE_URI.toString() + "?auth_port=%d".formatted(AuthTokenServer.get().port())
         );
 
         connectingStatus = "Connected! Password copied to clipboard.";

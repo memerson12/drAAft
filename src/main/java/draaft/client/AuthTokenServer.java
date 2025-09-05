@@ -10,22 +10,47 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 
+/**
+ * An HTTP server serving tokens to the frontend
+ */
 public class AuthTokenServer {
     public String token = "";
 
     private final HttpServer server;
     private final Gson gson = new Gson();
 
-    public AuthTokenServer() throws IOException {
+    private static final AuthTokenServer INSTANCE;
+
+    static {
+		try {
+            INSTANCE = new AuthTokenServer();
+		} catch (IOException e) {
+			throw new RuntimeException("failed to create an HTTP server", e);
+		}
+	}
+
+    private AuthTokenServer() throws IOException {
+        // Bind to any ephemeral free port, listen only for local connections
         var bindAddr = new InetSocketAddress(InetAddress.getLoopbackAddress(), 0);
+
+        // 0 indicates the default backlog size
         this.server = HttpServer.create(bindAddr, 0);
+
         this.server.createContext("/", new Handler());
+
         this.server.setExecutor(null);
         this.server.start();
     }
 
+    /**
+     * @return the port the server is listening on.
+     */
     public int port() {
         return this.server.getAddress().getPort();
+    }
+
+    public static AuthTokenServer get() {
+        return INSTANCE;
     }
 
     record Response(String token) {}
@@ -38,8 +63,7 @@ public class AuthTokenServer {
 
             var headers = exchange.getResponseHeaders();
             headers.add("Content-Type", "application/json;charset=utf-8");
-            // TODO: replace the hardcoded draaft origin
-            headers.add("Access-Control-Allow-Origin", "http://localhost:8080");
+            headers.add("Access-Control-Allow-Origin", ServerClient.FRONTEND_ORIGIN);
             exchange.sendResponseHeaders(200, response.length);
 
             var stream = exchange.getResponseBody();
