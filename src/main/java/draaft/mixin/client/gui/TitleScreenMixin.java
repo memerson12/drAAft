@@ -20,6 +20,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.time.Instant;
+
 @Mixin(TitleScreen.class)
 public abstract class TitleScreenMixin extends Screen {
     @Unique
@@ -72,6 +74,16 @@ public abstract class TitleScreenMixin extends Screen {
                     String s = inst.connectingStatus;
                     if (s == null) {
                         s = DEFAULT_BUTTON_HOVER;
+                    }
+                    else {
+                        if (inst.connectingStatusTimestamp == 0 && !this.isHovered()) {
+                            // Timed out already, just return
+                            return;
+                        }
+                        long t = Instant.now().getEpochSecond();
+                        if (t - inst.connectingStatusTimestamp > 10) {
+                            inst.connectingStatusTimestamp = 0;
+                        }
                     }
                     // todo - I can probably make this more efficient? lol
                     this.drawCenteredText(matrices, TitleScreenMixin.this.textRenderer, TextUtil.literal(s), this.x + this.width / 2, this.y - 15, 16777215);

@@ -19,6 +19,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.time.Instant;
 
 import static draaft.draaft.MOD_ID;
 
@@ -34,6 +35,7 @@ public class ServerClient {
     HttpClient httpClient = HttpClient.newBuilder().version(HttpClient.Version.HTTP_1_1).build();
 
     public String connectingStatus = null;
+    public long connectingStatusTimestamp = 0; // 0 indicates to only show on hover
 
     public static ServerClient INSTANCE = null;
 
@@ -56,6 +58,11 @@ public class ServerClient {
         clientPassword = new Base32().encodeAsString(randomBytes) + "draaaaft";
     }
 
+    private void setConnectionText(String text) {
+        this.connectingStatus = text;
+        this.connectingStatusTimestamp = Instant.now().getEpochSecond();
+    }
+
     // thanks menx :)
     public void draaftLogin(/* :) */) {
         MinecraftClient inst = MinecraftClient.getInstance();
@@ -63,24 +70,24 @@ public class ServerClient {
         // okay: then we add a "generate room" button ingame and it gives you a key
         // https://sessionserver.mojang.com/session/minecraft/hasJoined?username=DesktopFolder&serverId=draaft2025server
 
-        connectingStatus = "Contacting Minecraft auth server...";
+        this.setConnectionText("Contacting Minecraft auth server...");
         try {
             inst.getSessionService().joinServer(session.getProfile(), session.getAccessToken(), clientPassword);
             LOGGER.info("draaft successfully joined server with clientPassword");
         } catch (AuthenticationUnavailableException var3) {
             LOGGER.warn("disconnect.loginFailedInfo: disconnect.loginFailedInfo.serversUnavailable");
-            connectingStatus = "Error: Servers unavailable!";
+            this.setConnectionText("Error: Servers unavailable!");
             return;
         } catch (InvalidCredentialsException var4) {
             LOGGER.warn("disconnect.loginFailedInfo: disconnect.loginFailedInfo.invalidSession");
-            connectingStatus = "Error: Invalid session!";
+            this.setConnectionText("Error: Invalid session!");
             return;
         } catch (AuthenticationException authenticationException) {
             LOGGER.warn("disconnect.loginFailedInfo {}", authenticationException.getMessage());
-            connectingStatus = authenticationException.getMessage();
+            this.setConnectionText(authenticationException.getMessage());
             return;
         }
-        connectingStatus = "Contacting drAAft server...";
+        this.setConnectionText("Contacting drAAft server...");
         String username = session.getUsername();
 
         JsonObject body = new JsonObject();
@@ -98,7 +105,7 @@ public class ServerClient {
             clientToken = result.get("token").getAsString();
         } catch (IOException | InterruptedException e) {
             LOGGER.warn("Could not contact drAAft server: {}", e.getMessage());
-            connectingStatus = "Error contacting drAAft server!";
+            this.setConnectionText("Error contacting drAAft server!");
             return;
         }
 
@@ -123,6 +130,6 @@ public class ServerClient {
             FRONTEND_BASE_URI.toString() + "?auth_port=%d".formatted(AuthTokenServer.get().port())
         );
 
-        connectingStatus = "Connected! Password copied to clipboard.";
+        this.setConnectionText("Opening in browser...");
     }
 }
