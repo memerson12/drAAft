@@ -25,7 +25,7 @@ import static draaft.draaft.MOD_ID;
 
 public class ServerClient {
     private final String clientPassword;
-    private final AuthRedirectServer redirectServer;
+    private final AuthTokenServer tokenServer;
 
     public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
     HttpClient httpClient = HttpClient.newBuilder().version(HttpClient.Version.HTTP_1_1).build();
@@ -53,7 +53,7 @@ public class ServerClient {
         clientPassword = new Base32().encodeAsString(randomBytes) + "draaaaft";
 
         try {
-            this.redirectServer = new AuthRedirectServer();
+            this.tokenServer = new AuthTokenServer();
         } catch (IOException err) {
             LOGGER.fatal("failed to create an HTTP server", err);
             throw new RuntimeException(err);
@@ -121,8 +121,11 @@ public class ServerClient {
         }
         */
 
-        this.redirectServer.token = clientToken;
-        Util.getOperatingSystem().open(this.redirectServer.uri());
+        this.tokenServer.token = clientToken;
+        // TODO: replace the hardcoded draaft URI
+        Util.getOperatingSystem().open(
+            "http://localhost:8080/draaft/?auth_port=%d".formatted(this.tokenServer.port())
+        );
 
         connectingStatus = "Connected! Password copied to clipboard.";
     }
