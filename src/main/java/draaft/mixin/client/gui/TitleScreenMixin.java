@@ -44,6 +44,14 @@ public abstract class TitleScreenMixin extends Screen {
         int single_player_button_y = this.height / 4 + 48;
         int single_player_button_half_width = 100;
         int horizontal_button_spacing = 4;
+
+        Item bucket_item = Items.BUCKET;
+        ItemStack stack = new ItemStack(bucket_item);
+        // I mean... Of course a bucket has AQUA AFFINITY 10
+        stack.addEnchantment(Enchantments.AQUA_AFFINITY, 10);
+        MinecraftClient minecraftClient = MinecraftClient.getInstance();
+        ItemRenderer itemRenderer = minecraftClient.getItemRenderer();
+
         this.addButton(new ButtonWidget(
             this.width / 2 + single_player_button_half_width + horizontal_button_spacing,
             single_player_button_y,
@@ -56,13 +64,6 @@ public abstract class TitleScreenMixin extends Screen {
             public void renderButton(MatrixStack matrices, int mouseX, int mouseY, float delta) {
                 super.renderButton(matrices, mouseX, mouseY, delta);
 
-                Item bucket_item = Items.BUCKET;
-                ItemStack stack = new ItemStack(bucket_item);
-                // I mean... Of course a bucket has AQUA AFFINITY 10
-                stack.addEnchantment(Enchantments.AQUA_AFFINITY, 10);
-
-                MinecraftClient minecraftClient = MinecraftClient.getInstance();
-                ItemRenderer itemRenderer = minecraftClient.getItemRenderer();
                 itemRenderer.renderInGui(
                     stack,
                     this.x + (login_button_width - bucket_texture_width) / 2,
