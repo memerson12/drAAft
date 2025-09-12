@@ -1,6 +1,8 @@
 package draaft.mixin.client.gui;
 
+import draaft.client.AuthTokenServer;
 import draaft.client.ServerClient;
+import draaft.client.gui.screen.DraaftScreen;
 import me.contaria.speedrunapi.util.TextUtil;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
@@ -14,6 +16,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
+import net.minecraft.util.Util;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -21,6 +24,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.time.Instant;
+
+import static draaft.draaft.FRONTEND_BASE_URI;
 
 @Mixin(TitleScreen.class)
 public abstract class TitleScreenMixin extends Screen {
@@ -50,7 +55,13 @@ public abstract class TitleScreenMixin extends Screen {
             login_button_width,
             login_button_heigh,
             LiteralText.EMPTY,
-            button -> { ServerClient.getInstance().draaftLogin(); })
+            button -> {
+//                AuthTokenServer.get().token = ServerClient.getInstance().draaftLogin();
+//                Util.getOperatingSystem().open(
+//                        FRONTEND_BASE_URI + "?auth_port=%d".formatted(AuthTokenServer.get().port())
+//                );
+                this.client.openScreen(new DraaftScreen(this));
+            })
         {
             @Override
             public void renderButton(MatrixStack matrices, int mouseX, int mouseY, float delta) {

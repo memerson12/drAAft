@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
+import draaft.draaft;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -63,7 +64,7 @@ public class AuthTokenServer {
 
             var headers = exchange.getResponseHeaders();
             headers.add("Content-Type", "application/json;charset=utf-8");
-            headers.add("Access-Control-Allow-Origin", ServerClient.FRONTEND_ORIGIN);
+            headers.add("Access-Control-Allow-Origin", draaft.FRONTEND_ORIGIN);
             exchange.sendResponseHeaders(200, response.length);
 
             var stream = exchange.getResponseBody();

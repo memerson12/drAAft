@@ -12,12 +12,17 @@ import net.minecraft.text.TranslatableText;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import java.io.InputStream;
+import java.net.URI;
 import java.util.Properties;
 
 public class draaft implements ModInitializer {
 	public static final String MOD_ID = "draaft";
 	public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
 	public static final String DRAAFT_VERSION = getDraaftVersion();
+
+	public static final String FRONTEND_ORIGIN = "http://localhost:8080";
+	public static final URI FRONTEND_BASE_URI = URI.create(FRONTEND_ORIGIN + "/draaft/");
+	public static final URI API_BASE_URI = URI.create("http://localhost:8000/");
 
 	@Override
 	public void onInitialize() {

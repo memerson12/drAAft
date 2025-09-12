@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import com.mojang.authlib.exceptions.AuthenticationException;
 import com.mojang.authlib.exceptions.AuthenticationUnavailableException;
 import com.mojang.authlib.exceptions.InvalidCredentialsException;
+import draaft.draaft;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.Session;
 import net.minecraft.util.Util;
@@ -21,30 +22,18 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.time.Instant;
 
-import static draaft.draaft.MOD_ID;
+import static draaft.draaft.*;
 
 public class ServerClient {
     private final String clientPassword;
 
-    // TODO(me-nx): remove hardcoded URIs
-    public static final URI API_BASE_URI = URI.create("http://localhost:8000/");
-    public static final URI FRONTEND_BASE_URI = URI.create("http://localhost:8080/draaft/");
-    public static final String FRONTEND_ORIGIN = "http://localhost:8080"; // do not add a trailing slash
-
-    public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
+    public static final Logger LOGGER = draaft.LOGGER;
     HttpClient httpClient = HttpClient.newBuilder().version(HttpClient.Version.HTTP_1_1).build();
 
     public String connectingStatus = null;
     public long connectingStatusTimestamp = 0; // 0 indicates to only show on hover
 
     public static ServerClient INSTANCE = null;
-
-    public static ServerClient getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new ServerClient();
-        }
-        return INSTANCE;
-    }
 
     public ServerClient() {
         SecureRandom instanceStrong;
@@ -58,13 +47,20 @@ public class ServerClient {
         clientPassword = new Base32().encodeAsString(randomBytes) + "draaaaft";
     }
 
+    public static ServerClient getInstance() {
+        if (INSTANCE == null) {
+            INSTANCE = new ServerClient();
+        }
+        return INSTANCE;
+    }
+
     private void setConnectionText(String text) {
         this.connectingStatus = text;
         this.connectingStatusTimestamp = Instant.now().getEpochSecond();
     }
 
     // thanks menx :)
-    public void draaftLogin(/* :) */) {
+    public String draaftLogin(/* :) */) {
         MinecraftClient inst = MinecraftClient.getInstance();
         Session session = inst.getSession();
         // okay: then we add a "generate room" button ingame and it gives you a key
@@ -77,15 +73,15 @@ public class ServerClient {
         } catch (AuthenticationUnavailableException var3) {
             LOGGER.warn("disconnect.loginFailedInfo: disconnect.loginFailedInfo.serversUnavailable");
             this.setConnectionText("Error: Servers unavailable!");
-            return;
+            return null;
         } catch (InvalidCredentialsException var4) {
             LOGGER.warn("disconnect.loginFailedInfo: disconnect.loginFailedInfo.invalidSession");
             this.setConnectionText("Error: Invalid session!");
-            return;
+            return null;
         } catch (AuthenticationException authenticationException) {
             LOGGER.warn("disconnect.loginFailedInfo {}", authenticationException.getMessage());
             this.setConnectionText(authenticationException.getMessage());
-            return;
+            return null;
         }
         this.setConnectionText("Contacting drAAft server...");
         String username = session.getUsername();
@@ -106,30 +102,16 @@ public class ServerClient {
         } catch (IOException | InterruptedException e) {
             LOGGER.warn("Could not contact drAAft server: {}", e.getMessage());
             this.setConnectionText("Error contacting drAAft server!");
-            return;
+            return null;
         }
 
-        /*
-        try {
-            var req = HttpRequest.newBuilder(new URI("http://localhost:8000/room/create"))
-                    .GET()
-                    .setHeader("Content-Type", "application/json")
-                    .setHeader("token", clientToken)
-                    .build();
-            HttpResponse<String> resp = httpClient.send(req, HttpResponse.BodyHandlers.ofString());
-            System.out.println("----- YOUR DRAAFT ROOM CODE! READY FOR JOINING :) (in 2027)");
-            System.out.println(resp.body());
-        } catch (IOException | InterruptedException | URISyntaxException e) {
-            throw new RuntimeException(e);
-        }
-        */
+//        AuthTokenServer.get().token = clientToken;
+        return clientToken;
+//
+//        Util.getOperatingSystem().open(
+//            FRONTEND_BASE_URI + "?auth_port=%d".formatted(AuthTokenServer.get().port())
+//        );
 
-        AuthTokenServer.get().token = clientToken;
-
-        Util.getOperatingSystem().open(
-            FRONTEND_BASE_URI.toString() + "?auth_port=%d".formatted(AuthTokenServer.get().port())
-        );
-
-        this.setConnectionText("Opening in browser...");
+//        this.setConnectionText("Opening in browser...");
     }
 }

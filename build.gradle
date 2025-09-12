@@ -78,6 +78,10 @@ jar {
 	}
 }
 
+loom {
+	accessWidenerPath = file("src/main/resources/draaft.accesswidener")
+}
+
 // configure the maven publication
 publishing {
 	publications {
