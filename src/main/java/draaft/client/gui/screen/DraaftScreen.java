@@ -15,6 +15,42 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+// Enum for player ready status
+enum ReadyStatus {
+    READY("Ready"),
+    NOT_READY("Not Ready"),
+    DRAAFTING("Draafting");
+
+    private final String displayName;
+
+    ReadyStatus(String displayName) {
+        this.displayName = displayName;
+    }
+
+    public String getDisplayName() {
+        return displayName;
+    }
+}
+
+// Enum for game stages
+enum Stage {
+    DRAAFT("Draaft"),
+    BUILD_DATAPACK("Build Datapack"),
+    DOWNLOAD_WORLD("Download World"),
+    READY_UP("Ready Up"),
+    PLAY("Play");
+
+    private final String displayName;
+
+    Stage(String displayName) {
+        this.displayName = displayName;
+    }
+
+    public String getDisplayName() {
+        return displayName;
+    }
+}
+
 @Environment(EnvType.CLIENT)
 public class DraaftScreen extends Screen {
     private final Screen parent;
@@ -23,6 +59,9 @@ public class DraaftScreen extends Screen {
     private static final int PLAYER_ENTRY_HEIGHT = 50;
     private static final int PLAYER_FACE_SIZE = 32;
     private static final double LEFT_PANEL_WIDTH_RATIO = 0.25; // 25% of screen width
+
+    // Current game stage
+    private Stage currentStage = Stage.DRAAFT;
 
     // Room code functionality
     private String roomCode;
@@ -68,16 +107,39 @@ public class DraaftScreen extends Screen {
         // Setup room code field dimensions
         int leftPanelWidth = getLeftPanelWidth();
         this.roomCodeFieldWidth = leftPanelWidth - 70;
-        System.out.println("Left panel width: " + leftPanelWidth + ", room code field width: " + this.roomCodeFieldWidth);
+        System.out
+                .println("Left panel width: " + leftPanelWidth + ", room code field width: " + this.roomCodeFieldWidth);
         this.roomCodeFieldHeight = 20;
         this.roomCodeFieldX = 10;
-        this.roomCodeFieldY = this.height - 40;
+        this.roomCodeFieldY = this.height - 30;
 
         // Add copy button (inline with room code field)
         this.copyButton = this.addButton(new ButtonWidget(
                 this.roomCodeFieldX + this.roomCodeFieldWidth + 5, this.roomCodeFieldY, 50, 20,
                 new TranslatableText("draaft.draaftingScreen.button.copy"),
                 button -> copyRoomCode()));
+
+        // Add Next Stage button above Ready button
+        this.addButton(new ButtonWidget(
+                this.width - 100, this.height - 55, 80, 20,
+                new TranslatableText("draaft.draaftingScreen.button.nextStage"),
+                button -> {
+                    // Cycle to next stage
+                    Stage[] stages = Stage.values();
+                    int nextIndex = (currentStage.ordinal() + 1) % stages.length;
+                    currentStage = stages[nextIndex];
+                }));
+
+        // Add Ready button in bottom right corner
+        this.addButton(new ButtonWidget(
+                this.width - 100, this.height - 30, 80, 20,
+                new TranslatableText("draaft.draaftingScreen.button.ready"),
+                button -> {
+                    // For now, this button doesn't do anything
+                    for (PlayerEntry player : this.players) {
+                        player.setReadyStatus(ReadyStatus.values()[(player.readyStatus.ordinal() + 1) % 3]);
+                    }
+                }));
     }
 
     @Override
@@ -86,6 +148,9 @@ public class DraaftScreen extends Screen {
 
         // Draw title
         this.drawCenteredText(matrices, this.textRenderer, this.title, this.width / 2, 17, 16777215);
+
+        // Draw stage indicator
+        this.renderStageIndicator(matrices);
 
         // Draw left panel background
         int leftPanelWidth = getLeftPanelWidth();
@@ -127,7 +192,18 @@ public class DraaftScreen extends Screen {
 
             // Draw username
             this.textRenderer.draw(matrices, player.username,
-                    PLAYER_FACE_SIZE + 8, y + (float) PLAYER_ENTRY_HEIGHT / 2 - 4, 0xFFFFFF);
+                    PLAYER_FACE_SIZE + 8, y + 8, 0xFFFFFF);
+
+            // Draw ready status below username (smaller text)
+            int statusColor = getStatusColor(player.readyStatus);
+            matrices.push();
+            matrices.scale(0.75f, 0.75f, 1.0f); // Scale down to 75% size
+            this.textRenderer.draw(matrices, "Status: ",
+                    (PLAYER_FACE_SIZE + 8) / 0.75f, (y + 22) / 0.75f, 0xFFFFFF); // White
+            this.textRenderer.draw(matrices, player.readyStatus.getDisplayName(),
+                    (PLAYER_FACE_SIZE + this.textRenderer.getWidth("Status: ")) / 0.75f, (y + 22) / 0.75f,
+                    statusColor);
+            matrices.pop();
         }
 
         // Draw scrollbar if needed
@@ -196,6 +272,67 @@ public class DraaftScreen extends Screen {
 
         // Draw scrollbar thumb
         fill(matrices, scrollbarX, thumbY, scrollbarX + 8, thumbY + thumbHeight, 0x80FFFFFF);
+    }
+
+    private int getStatusColor(ReadyStatus status) {
+        return switch (status) {
+            case READY -> 0xFF00FF00; // Green
+            case NOT_READY -> 0xFFFF0000; // Red
+            case DRAAFTING -> 0x80808080; // Grey
+        };
+    }
+
+    private void renderStageIndicator(MatrixStack matrices) {
+        Stage[] stages = Stage.values();
+        int startY = 40; // Below the title
+        int arrowSpacing = 10; // Space between stage name and arrow
+
+        // Calculate total width needed
+        int totalWidth = 0;
+        for (int i = 0; i < stages.length; i++) {
+            totalWidth += this.textRenderer.getWidth(stages[i].getDisplayName());
+            if (i < stages.length - 1) {
+                totalWidth += this.textRenderer.getWidth("→") + (arrowSpacing * 2); // Padding on both sides
+            }
+        }
+
+        // Start position to center the entire indicator
+        int currentX = (this.width - totalWidth) / 2;
+
+        for (int i = 0; i < stages.length; i++) {
+            Stage stage = stages[i];
+            int color;
+
+            if (stage == currentStage) {
+                color = 0xFFFFFFFF; // White for current stage
+            } else if (stage.ordinal() < currentStage.ordinal()) {
+                color = 0x8800FF00; // Semi-transparent green for past stages
+            } else {
+                color = 0xFF909090; // Light grey for upcoming stages
+            }
+
+            // Draw stage name
+            this.textRenderer.draw(matrices, stage.getDisplayName(), currentX, startY, color);
+            currentX += this.textRenderer.getWidth(stage.getDisplayName());
+
+            // Draw arrow between stages (except for the last one)
+            if (i < stages.length - 1) {
+                currentX += arrowSpacing; // Padding before arrow
+                int arrowColor = stage.ordinal() < currentStage.ordinal() ? 0xFF404040 : 0xFF808080;
+
+                // Animate the arrow if it's from current stage to next stage
+                int arrowX = currentX;
+                if (stage == currentStage) {
+                    // Smooth back and forth animation without pauses
+                    long time = System.currentTimeMillis();
+                    float animationOffset = (float) ((float) Math.sin(time * 0.009) * 2.5); // Smoother movement
+                    arrowX += (int) animationOffset;
+                }
+
+                this.textRenderer.draw(matrices, "→", arrowX, startY, arrowColor);
+                currentX += this.textRenderer.getWidth("→") + arrowSpacing; // Arrow width + padding after
+            }
+        }
     }
 
     @Override
@@ -296,9 +433,16 @@ public class DraaftScreen extends Screen {
         public Identifier faceTexture;
         public boolean skinLoaded = false;
         public boolean skinLoading = false;
+        public ReadyStatus readyStatus;
 
         public PlayerEntry(String username) {
             this.username = username;
+            this.readyStatus = ReadyStatus.DRAAFTING; // Default to Draafting
+        }
+
+        public void setReadyStatus(ReadyStatus readyStatus) {
+            // TODO: Upsert ready status to backend
+            this.readyStatus = readyStatus;
         }
 
         public void loadSkin() {
