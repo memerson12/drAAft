@@ -28,12 +28,12 @@ public abstract class HoldingPatternPhaseMixin extends AbstractPhase {
         }
     }
 
-    @ModifyConstant(method = "method_6842", constant = @Constant(floatValue = 20.0F))
+    @ModifyConstant(method = "followPath", constant = @Constant(floatValue = 20.0F))
     private float injectedFloat(float value) {
         return 10.0F;
     }
 
-    @Redirect(method = "method_6841", at = @At(value = "INVOKE", target = "Ljava/util/Random;nextInt(I)I"))
+    @Redirect(method = "tickInRange", at = @At(value = "INVOKE", target = "Ljava/util/Random;nextInt(I)I"))
     private int injectedInt(Random instance, int i) {
         return this.random.nextInt(i);
     }
