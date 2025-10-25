@@ -26,10 +26,15 @@ import static draaft.draaft.MOD_ID;
 public class ServerClient {
     private final String clientPassword;
 
+    private static final boolean LOCAL_TESTING = false;
+    private static final String WEBSITE_BASE_URI = (ServerClient.LOCAL_TESTING ? "http://localhost:8080" : "https://disrespec.tech");
+    private static final String API_BASE_TESTING = (ServerClient.LOCAL_TESTING ? "http://localhost:8000" : "https://api.disrespec.tech");
+
+
     // TODO(me-nx): remove hardcoded URIs
-    public static final URI API_BASE_URI = URI.create("http://localhost:8000/");
-    public static final URI FRONTEND_BASE_URI = URI.create("http://localhost:8080/draaft/");
-    public static final String FRONTEND_ORIGIN = "http://localhost:8080"; // do not add a trailing slash
+    public static final URI API_BASE_URI = URI.create(String.format("%s/", API_BASE_TESTING));
+    public static final URI FRONTEND_BASE_URI = URI.create(String.format("%s/draaft/", WEBSITE_BASE_URI));
+    public static final String FRONTEND_ORIGIN = WEBSITE_BASE_URI; // do not add a trailing slash
 
     public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
     HttpClient httpClient = HttpClient.newBuilder().version(HttpClient.Version.HTTP_1_1).build();
@@ -96,18 +101,27 @@ public class ServerClient {
 
         String clientToken;
         try {
-            var req = HttpRequest.newBuilder(API_BASE_URI.resolve("authenticate"))
+            final var remote = API_BASE_URI.resolve("authenticate");
+            LOGGER.info("Connecting to {}", remote);
+            var req = HttpRequest.newBuilder(remote)
                     .POST(HttpRequest.BodyPublishers.ofString(body.toString()))
                     .setHeader("Content-Type", "application/json")
                     .build();
             HttpResponse<String> resp = httpClient.send(req, HttpResponse.BodyHandlers.ofString());
             JsonObject result  = new Gson().fromJson(resp.body(), JsonObject.class);
-            clientToken = result.get("token").getAsString();
+            var decodeRes = result.get("token");
+            if (decodeRes == null) {
+                LOGGER.warn("Could not get token from drAAft server result!");
+                this.setConnectionText("Error in drAAft server response!");
+                return;
+            }
+            clientToken = decodeRes.getAsString();
         } catch (IOException | InterruptedException e) {
             LOGGER.warn("Could not contact drAAft server: {}", e.getMessage());
             this.setConnectionText("Error contacting drAAft server!");
             return;
         }
+        LOGGER.info("Successfully authenticated with the server, received {} long client token", clientToken.length());
 
         /*
         try {
