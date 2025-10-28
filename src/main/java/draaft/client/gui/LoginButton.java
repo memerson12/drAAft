@@ -2,26 +2,28 @@ package draaft.client.gui;
 
 import draaft.client.DraaftServices;
 import draaft.client.ServerClient;
+import draaft.client.gui.screen.DraaftScreen;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.text.LiteralText;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.function.BooleanSupplier;
-import java.util.function.Function;
 
 public class LoginButton extends ButtonWidget {
     private final BooleanSupplier glintSupplier;
     private final ItemStack item;
     private final ItemStack itemWithGlint;
 
-    public LoginButton(int x, int y, Item guiItem, BooleanSupplier glintSupplier, DraaftServices draaftServices) {
-        super(x, y, 20, 20, LiteralText.EMPTY, (btn) -> ServerClient.login(draaftServices));
+    public LoginButton(int x, int y, Item guiItem, BooleanSupplier glintSupplier, DraaftServices draaftServices, Screen screen, MinecraftClient client) {
+        super(x, y, 20, 20, LiteralText.EMPTY, (btn) -> {
+            ServerClient.login(draaftServices);
+            client.openScreen(new DraaftScreen(screen));
+        });
 
         this.glintSupplier = glintSupplier;
 
