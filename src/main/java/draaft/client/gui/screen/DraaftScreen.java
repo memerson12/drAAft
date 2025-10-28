@@ -1,7 +1,11 @@
 package draaft.client.gui.screen;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import draaft.client.gui.skin.SkinManager;
+import draaft.client.ServerClient;
+import draaft.client.models.DraaftPlayer;
+import draaft.client.models.ReadyStatus;
+import draaft.client.models.Room;
+import draaft.draaft;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.DrawableHelper;
@@ -10,27 +14,10 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
+import org.apache.logging.log4j.Logger;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-
-// Enum for player ready status
-enum ReadyStatus {
-    READY("Ready"),
-    NOT_READY("Not Ready"),
-    DRAAFTING("Draafting");
-
-    private final String displayName;
-
-    ReadyStatus(String displayName) {
-        this.displayName = displayName;
-    }
-
-    public String getDisplayName() {
-        return displayName;
-    }
-}
 
 // Enum for game stages
 enum Stage {
@@ -53,8 +40,10 @@ enum Stage {
 
 @Environment(EnvType.CLIENT)
 public class DraaftScreen extends Screen {
+    private final static Logger logger = draaft.LOGGER;
+
     private final Screen parent;
-    private final List<PlayerEntry> players;
+    private List<DraaftPlayer> players;
     private int scrollOffset = 0;
     private static final int PLAYER_ENTRY_HEIGHT = 50;
     private static final int PLAYER_FACE_SIZE = 32;
@@ -70,24 +59,24 @@ public class DraaftScreen extends Screen {
     private int roomCodeFieldX, roomCodeFieldY, roomCodeFieldWidth, roomCodeFieldHeight;
 
     // Hardcoded test players - all using the same test texture for now
-    private static final List<PlayerEntry> TEST_PLAYERS = List.of(
-            new PlayerEntry("Memerson"),
-            new PlayerEntry("PacManMVC"),
-            new PlayerEntry("DesktopFolder"),
-            new PlayerEntry("Me_nx"));
+    // private static final List<PlayerEntry> TEST_PLAYERS = List.of(
+    // new PlayerEntry("Memerson"),
+    // new PlayerEntry("PacManMVC"),
+    // new PlayerEntry("DesktopFolder"),
+    // new PlayerEntry("Me_nx"));
 
     public DraaftScreen(Screen parent) {
         super(new TranslatableText("draaft.draaftingScreen.title"));
         this.parent = parent;
-        this.players = new ArrayList<>(TEST_PLAYERS);
+        // this.players = new ArrayList<>(TEST_PLAYERS);
 
         // Generate a random room code
         this.roomCode = generateRoomCode();
 
         // Start loading skins for all players
-        for (PlayerEntry player : this.players) {
-            player.loadSkin();
-        }
+        // for (PlayerEntry player : this.players) {
+        // player.loadSkin();
+        // }
     }
 
     private int getLeftPanelWidth() {
@@ -97,6 +86,15 @@ public class DraaftScreen extends Screen {
     @Override
     protected void init() {
         super.init();
+
+        assert ServerClient.getInstance() != null;
+        Room room = ServerClient.getInstance().getRoom();
+        if (room != null) {
+            logger.info(room.toString());
+            this.players = room.members();
+        } else {
+            logger.warn("Room is null");
+        }
 
         // Add a back button
         this.addButton(new ButtonWidget(
@@ -136,8 +134,8 @@ public class DraaftScreen extends Screen {
                 new TranslatableText("draaft.draaftingScreen.button.ready"),
                 button -> {
                     // For now, this button doesn't do anything
-                    for (PlayerEntry player : this.players) {
-                        player.setReadyStatus(ReadyStatus.values()[(player.readyStatus.ordinal() + 1) % 3]);
+                    for (DraaftPlayer player : this.players) {
+                        player.setReadyStatus(ReadyStatus.values()[(player.getReadyStatus().ordinal() + 1) % 3]);
                     }
                 }));
     }
@@ -178,7 +176,7 @@ public class DraaftScreen extends Screen {
             if (playerIndex >= this.players.size())
                 break;
 
-            PlayerEntry player = this.players.get(playerIndex);
+            DraaftPlayer player = this.players.get(playerIndex);
             int y = startY + i * PLAYER_ENTRY_HEIGHT;
 
             int bgColor = 0x20FFFFFF;
@@ -191,16 +189,16 @@ public class DraaftScreen extends Screen {
             this.renderPlayerFace(matrices, player, 4, y + 4);
 
             // Draw username
-            this.textRenderer.draw(matrices, player.username,
+            this.textRenderer.draw(matrices, player.getUsername(),
                     PLAYER_FACE_SIZE + 8, y + 8, 0xFFFFFF);
 
             // Draw ready status below username (smaller text)
-            int statusColor = getStatusColor(player.readyStatus);
+            int statusColor = getStatusColor(player.getReadyStatus());
             matrices.push();
             matrices.scale(0.75f, 0.75f, 1.0f); // Scale down to 75% size
             this.textRenderer.draw(matrices, "Status: ",
                     (PLAYER_FACE_SIZE + 8) / 0.75f, (y + 22) / 0.75f, 0xFFFFFF); // White
-            this.textRenderer.draw(matrices, player.readyStatus.getDisplayName(),
+            this.textRenderer.draw(matrices, player.getReadyStatus().getDisplayName(),
                     (PLAYER_FACE_SIZE + this.textRenderer.getWidth("Status: ")) / 0.75f, (y + 22) / 0.75f,
                     statusColor);
             matrices.pop();
@@ -212,13 +210,13 @@ public class DraaftScreen extends Screen {
         }
     }
 
-    private void renderPlayerFace(MatrixStack matrices, PlayerEntry player, int x, int y) {
-        if (player.skinLoading) {
+    private void renderPlayerFace(MatrixStack matrices, DraaftPlayer player, int x, int y) {
+        if (player.isSkinLoading() || !player.isSkinLoaded()) {
             // Show loading indicator (animated dots or spinner)
             this.renderLoadingIndicator(matrices, x, y);
         } else {
             // Render the player face texture
-            this.drawPlayerFace(matrices, x, y, player.faceTexture);
+            this.drawPlayerFace(matrices, x, y, player.getFaceTexture());
         }
     }
 
@@ -427,36 +425,4 @@ public class DraaftScreen extends Screen {
         return super.mouseClicked(mouseX, mouseY, button);
     }
 
-    // Inner class to represent a player entry
-    private static class PlayerEntry {
-        public final String username;
-        public Identifier faceTexture;
-        public boolean skinLoaded = false;
-        public boolean skinLoading = false;
-        public ReadyStatus readyStatus;
-
-        public PlayerEntry(String username) {
-            this.username = username;
-            this.readyStatus = ReadyStatus.DRAAFTING; // Default to Draafting
-        }
-
-        public void setReadyStatus(ReadyStatus readyStatus) {
-            // TODO: Upsert ready status to backend
-            this.readyStatus = readyStatus;
-        }
-
-        public void loadSkin() {
-            if (!skinLoading && !skinLoaded) {
-                skinLoading = true;
-                SkinManager.fetchPlayerSkin(username).thenAccept(skinId -> {
-                    this.faceTexture = skinId;
-                    this.skinLoaded = true;
-                    this.skinLoading = false;
-                }).exceptionally(throwable -> {
-                    this.skinLoading = false;
-                    return null;
-                });
-            }
-        }
-    }
 }

@@ -65,21 +65,17 @@ public class SkinManager {
      * Fetches a player skin asynchronously using Minecraft's built-in
      * PlayerSkinProvider
      */
-    public static CompletableFuture<Identifier> fetchPlayerSkin(String username) {
+    public static CompletableFuture<Identifier> fetchPlayerSkin(GameProfile profile) {
         return CompletableFuture.supplyAsync(() -> {
+            String uuid = profile.getId().toString();
             try {
                 // Check cache first
-                Identifier cachedSkin = SKIN_CACHE.getIfPresent(username);
+                Identifier cachedSkin = SKIN_CACHE.getIfPresent(uuid);
                 if (cachedSkin != null) {
                     return cachedSkin;
                 }
 
-                // Get GameProfile for the username
-                GameProfile profile = getPlayerProfile(username);
-                if (profile == null) {
-                    LOGGER.warn("Could not find profile for player: {}", username);
-                    return getDefaultSkin();
-                }
+                // Get GameProfile for the uuid
                 MinecraftClient client = MinecraftClient.getInstance();
                 PlayerSkinProvider skinProvider = client.getSkinProvider();
 
@@ -87,7 +83,7 @@ public class SkinManager {
                 CompletableFuture<Identifier> skinFuture = new CompletableFuture<>();
                 skinProvider.loadSkin(profile, (type, identifier, texture) -> {
                     if (type == MinecraftProfileTexture.Type.SKIN) {
-                        SKIN_CACHE.put(username, identifier);
+                        SKIN_CACHE.put(uuid, identifier);
                         skinFuture.complete(identifier);
                     }
                 }, false);
@@ -96,26 +92,26 @@ public class SkinManager {
                 try {
                     return skinFuture.get(10, TimeUnit.SECONDS);
                 } catch (Exception e) {
-                    LOGGER.warn("Timeout or error loading skin for {}: {}", username, e.getMessage());
+                    LOGGER.warn("Timeout or error loading skin for {}: {}", uuid, e.getMessage());
                     return getDefaultSkin();
                 }
 
             } catch (Exception e) {
-                LOGGER.error("Error fetching skin for player {}: {}", username, e.getMessage());
+                LOGGER.error("Error fetching skin for player {}: {}", uuid, e.getMessage());
                 return getDefaultSkin();
             }
         }, Util.getServerWorkerExecutor());
     }
 
-    private static GameProfile getPlayerProfile(String username) {
+    public static GameProfile getPlayerProfile(String uuid) {
         try {
             // Initialize UserCache if needed
             initializeUserCache();
 
             // Use Minecraft's built-in UserCache to find the profile
             // UserCache handles its own caching internally
-            System.out.println("Looking up profile for: " + username);
-            GameProfile profile = userCache.findByName(username);
+            System.out.println("Looking up profile for: " + uuid);
+            GameProfile profile = userCache.getByUuid(UUID.fromString(uuid));
             if (profile != null && profile.getId() != null) {
                 System.out.println(profile);
                 return profile;
@@ -124,7 +120,7 @@ public class SkinManager {
             }
 
         } catch (Exception e) {
-            LOGGER.error("Error fetching profile for {}: {}", username, e.getMessage());
+            LOGGER.error("Error fetching profile for {}: {}", uuid, e.getMessage());
             return null;
         }
     }

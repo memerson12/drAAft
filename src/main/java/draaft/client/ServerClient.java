@@ -1,9 +1,12 @@
 package draaft.client;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.mojang.authlib.exceptions.AuthenticationException;
 import com.mojang.authlib.exceptions.AuthenticationUnavailableException;
 import com.mojang.authlib.exceptions.InvalidCredentialsException;
+import draaft.client.models.Room;
+import draaft.client.models.RoomDeserializer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.Session;
@@ -25,11 +28,14 @@ import java.time.Instant;
 import static draaft.draaft.MOD_ID;
 
 public class ServerClient {
-    public static final Gson GSON = new Gson();
+    public static final Gson GSON = new GsonBuilder()
+            .registerTypeAdapter(Room.class, new RoomDeserializer())
+            .create();
 
     private final AuthTokenServer authTokenServer;
     private final HttpClient httpClient;
     private final String token;
+    private final DraaftServices draaftServices;
 
     public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
 
@@ -42,23 +48,48 @@ public class ServerClient {
         return INSTANCE;
     }
 
-    private ServerClient(AuthTokenServer authTokenServer, HttpClient httpClient, String token) {
+    private ServerClient(AuthTokenServer authTokenServer, HttpClient httpClient, String token,
+            DraaftServices draaftServices) {
         this.authTokenServer = authTokenServer;
         this.httpClient = httpClient;
         this.token = token;
+        this.draaftServices = draaftServices;
     }
 
     public <T> HttpResponse<T> httpSend(HttpRequest request, HttpResponse.BodyHandler<T> bodyPublisher)
-        throws IOException, InterruptedException
-    {
+            throws IOException, InterruptedException {
         ServerClient.LOGGER.debug("HTTP request to {}", request.uri());
-
         return this.httpClient.send(request, bodyPublisher);
     }
 
-    public HttpRequest.Builder httpRequest(URI uri) {
+    public HttpRequest.Builder authenticatedHttpRequestBuilder(URI uri) {
         return HttpRequest.newBuilder(uri)
-            .header("token", this.token);
+                .header("token", this.token)
+                .setHeader("Content-Type", "application/json");
+    }
+
+    public Room getRoom() {
+        try {
+            final URI remote = this.draaftServices.apiBase().resolve("room");
+            HttpRequest req = authenticatedHttpRequestBuilder(remote)
+                    .GET()
+                    .build();
+
+            HttpResponse<String> resp = httpClient.send(req, HttpResponse.BodyHandlers.ofString());
+            LOGGER.info("Response from drAAft server: {}", resp.body());
+            Room room = GSON.fromJson(resp.body(), Room.class);
+
+            if (room == null) {
+                LOGGER.error("Failed to get room from server");
+                setConnectionText("Error in drAAft server response!");
+                return null;
+            }
+            return room;
+        } catch (Throwable e) {
+            LOGGER.error("Failed getting room: {}", e.getMessage());
+            setConnectionText("Error contacting drAAft server!");
+            return null;
+        }
     }
 
     // thanks menx :)
@@ -76,8 +107,8 @@ public class ServerClient {
         // https://sessionserver.mojang.com/session/minecraft/hasJoined?username=DesktopFolder&serverId=draaft2025server
 
         var httpClient = HttpClient.newBuilder()
-            .version(HttpClient.Version.HTTP_1_1) // HTTP 2 is not supported by fastapi
-            .build();
+                .version(HttpClient.Version.HTTP_1_1) // HTTP 2 is not supported by fastapi
+                .build();
 
         var clientPassword = generateClientPassword();
 
@@ -133,7 +164,7 @@ public class ServerClient {
 
         var authTokenServer = new AuthTokenServer(draaftServices, clientToken);
 
-        INSTANCE = new ServerClient(authTokenServer, httpClient, clientToken);
+        INSTANCE = new ServerClient(authTokenServer, httpClient, clientToken, draaftServices);
 
         setConnectionText("Opening in browser...");
         INSTANCE.openWebLoginUri();
@@ -170,7 +201,8 @@ public class ServerClient {
     }
 
     // GSON can't deserialize to method-local classes
-    record LoginRequest(String serverID, String username) {}
+    record LoginRequest(String serverID, String username) {
+    }
 
     // Minecraft's version of GSON can't deserialize to records
     static class LoginResponse {
