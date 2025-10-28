@@ -41,11 +41,13 @@ public abstract class TitleScreenMixin extends Screen {
         int baseBtnY = this.height / 4 + 48;
 
         var btn = this.addButton(new LoginButton(
-            btnX,
-            baseBtnY,
-            Items.WATER_BUCKET,
-            () -> ServerClient.getInstance() != null,
-            DraaftServices.DEFAULT
+                btnX,
+                baseBtnY,
+                Items.WATER_BUCKET,
+                () -> ServerClient.getInstance() != null,
+                DraaftServices.DEFAULT,
+                this,
+                this.client
         ));
 
         var altDraaftServices = DraaftServices.fromJvmArgs();
@@ -54,11 +56,13 @@ public abstract class TitleScreenMixin extends Screen {
 
         if (altDraaftServices != null) {
             altBtn = this.addButton(new LoginButton(
-                btnX,
-                baseBtnY + 24,
-                Items.LAVA_BUCKET,
-                () -> ServerClient.getInstance() != null,
-                altDraaftServices
+                    btnX,
+                    baseBtnY + 24,
+                    Items.LAVA_BUCKET,
+                    () -> ServerClient.getInstance() != null,
+                    altDraaftServices,
+                    this,
+                    this.client
             ));
         } else {
             altBtn = null;
@@ -77,8 +81,7 @@ public abstract class TitleScreenMixin extends Screen {
             String s = ServerClient.connectingStatus;
             if (s == null) {
                 s = DEFAULT_BUTTON_HOVER;
-            }
-            else {
+            } else {
                 if (ServerClient.connectingStatusTimestamp == 0 && !this.anyButtonHovered.getAsBoolean()) {
                     // Timed out already, just return
                     return;
