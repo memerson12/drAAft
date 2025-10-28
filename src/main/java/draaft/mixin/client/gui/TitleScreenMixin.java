@@ -46,8 +46,7 @@ public abstract class TitleScreenMixin extends Screen {
                 Items.WATER_BUCKET,
                 () -> ServerClient.getInstance() != null,
                 DraaftServices.DEFAULT,
-                this,
-                this.client
+                this
         ));
 
         var altDraaftServices = DraaftServices.fromJvmArgs();
@@ -61,8 +60,7 @@ public abstract class TitleScreenMixin extends Screen {
                     Items.LAVA_BUCKET,
                     () -> ServerClient.getInstance() != null,
                     altDraaftServices,
-                    this,
-                    this.client
+                    this
             ));
         } else {
             altBtn = null;

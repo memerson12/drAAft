@@ -19,10 +19,10 @@ public class LoginButton extends ButtonWidget {
     private final ItemStack item;
     private final ItemStack itemWithGlint;
 
-    public LoginButton(int x, int y, Item guiItem, BooleanSupplier glintSupplier, DraaftServices draaftServices, Screen screen, MinecraftClient client) {
+    public LoginButton(int x, int y, Item guiItem, BooleanSupplier glintSupplier, DraaftServices draaftServices, Screen screen) {
         super(x, y, 20, 20, LiteralText.EMPTY, (btn) -> {
             ServerClient.login(draaftServices);
-            client.openScreen(new DraaftScreen(screen));
+            MinecraftClient.getInstance().openScreen(new DraaftScreen(screen));
         });
 
         this.glintSupplier = glintSupplier;
