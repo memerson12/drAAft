@@ -11,6 +11,8 @@ public record DraaftServices(
     // note: the origin MUST NOT end with a trailing slash
     String webOrigin
 ) {
+    public final static int API_VERSION = 1;
+
     public final static DraaftServices DEFAULT = new DraaftServices(
         URI.create("https://api.disrespec.tech/"),
         URI.create("https://disrespec.tech/draaft/"),

@@ -61,7 +61,6 @@ public class ServerClient {
             return;
         }
 
-        MinecraftClient inst = MinecraftClient.getInstance();
         // okay: then we add a "generate room" button ingame and it gives you a key
         // https://sessionserver.mojang.com/session/minecraft/hasJoined?username=DesktopFolder&serverId=draaft2025server
 
@@ -76,38 +75,8 @@ public class ServerClient {
         }
 
         LOGGER.info("Contacting drAAft server...");
-        String username = inst.getSession().getUsername();
-
-        String body = GSON.toJson(new LoginRequest(serverID, username), LoginRequest.class);
-
-        String clientToken;
-        try {
-            final var remote = draaftServices.apiBase().resolve("authenticate");
-            LOGGER.info("Connecting to {}", remote);
-
-            var req = HttpRequest.newBuilder(remote)
-                    .POST(HttpRequest.BodyPublishers.ofString(body))
-                    .setHeader("Content-Type", "application/json")
-                    .build();
-
-            HttpResponse<String> resp = httpClient.send(req, HttpResponse.BodyHandlers.ofString());
-
-            clientToken = GSON.fromJson(resp.body(), LoginResponse.class).token;
-
-            if (clientToken == null) {
-                LOGGER.error("Could not get token from drAAft server result!");
-                DraaftToast.showError(
-                    new TranslatableText("draaft.login.failed.title"),
-                    new TranslatableText("draaft.login.failed.unexpectedResponse")
-                );
-                return;
-            }
-        } catch (Throwable e) {
-            LOGGER.error("Could not contact drAAft server: {}", e.getMessage());
-            DraaftToast.showError(
-                new TranslatableText("draaft.login.failed.title"),
-                new TranslatableText("draaft.login.failed.errorContactingDraaft")
-            );
+        String clientToken = DraaftAuth.authenticate(draaftServices, httpClient, serverID);
+        if (clientToken == null) {
             return;
         }
 
@@ -140,14 +109,5 @@ public class ServerClient {
                 new TranslatableText("draaft.login.success.desc")
             );
         }
-    }
-
-    // GSON can't deserialize to method-local classes
-    record LoginRequest(String serverID, String username) {}
-
-    // Minecraft's version of GSON can't deserialize to records
-    @SuppressWarnings("unused") // assigned by GSON
-	static class LoginResponse {
-        public String token;
     }
 }
