@@ -128,46 +128,46 @@ public class DraaftScreen extends Screen {
 
         // Add a back button
         this.addButton(new ButtonWidget(
-                this.width - 100, 10, 80, 20,
-                new TranslatableText("draaft.draaftingScreen.button.back"),
-                button -> this.onClose()));
+            this.width - 100, 10, 80, 20,
+            new TranslatableText("draaft.draaftingScreen.button.back"),
+            button -> this.onClose()));
 
         // Setup room code field dimensions
         int leftPanelWidth = getLeftPanelWidth();
         this.roomCodeFieldWidth = leftPanelWidth - 70;
         System.out
-                .println("Left panel width: " + leftPanelWidth + ", room code field width: " + this.roomCodeFieldWidth);
+            .println("Left panel width: " + leftPanelWidth + ", room code field width: " + this.roomCodeFieldWidth);
         this.roomCodeFieldHeight = 20;
         this.roomCodeFieldX = 10;
         this.roomCodeFieldY = this.height - 30;
 
         // Add copy button (inline with room code field)
         this.copyButton = this.addButton(new ButtonWidget(
-                this.roomCodeFieldX + this.roomCodeFieldWidth + 5, this.roomCodeFieldY, 50, 20,
-                new TranslatableText("draaft.draaftingScreen.button.copy"),
-                button -> copyRoomCode()));
+            this.roomCodeFieldX + this.roomCodeFieldWidth + 5, this.roomCodeFieldY, 50, 20,
+            new TranslatableText("draaft.draaftingScreen.button.copy"),
+            button -> copyRoomCode()));
 
         // Add Next Stage button above Ready button
         this.addButton(new ButtonWidget(
-                this.width - 100, this.height - 55, 80, 20,
-                new TranslatableText("draaft.draaftingScreen.button.nextStage"),
-                button -> {
-                    // Cycle to next stage
-                    Stage[] stages = Stage.values();
-                    int nextIndex = (currentStage.ordinal() + 1) % stages.length;
-                    currentStage = stages[nextIndex];
-                }));
+            this.width - 100, this.height - 55, 80, 20,
+            new TranslatableText("draaft.draaftingScreen.button.nextStage"),
+            button -> {
+                // Cycle to next stage
+                Stage[] stages = Stage.values();
+                int nextIndex = (currentStage.ordinal() + 1) % stages.length;
+                currentStage = stages[nextIndex];
+            }));
 
         // Add Ready button in bottom right corner
         this.addButton(new ButtonWidget(
-                this.width - 100, this.height - 30, 80, 20,
-                new TranslatableText("draaft.draaftingScreen.button.ready"),
-                button -> {
-                    // For now, this button doesn't do anything
-                    for (DraaftPlayer player : this.players) {
-                        player.setReadyStatus(ReadyStatus.values()[(player.getReadyStatus().ordinal() + 1) % 3]);
-                    }
-                }));
+            this.width - 100, this.height - 30, 80, 20,
+            new TranslatableText("draaft.draaftingScreen.button.ready"),
+            button -> {
+                // For now, this button doesn't do anything
+                for (DraaftPlayer player : this.players) {
+                    player.setReadyStatus(ReadyStatus.values()[(player.getReadyStatus().ordinal() + 1) % 3]);
+                }
+            }));
     }
 
     @Override
@@ -220,17 +220,17 @@ public class DraaftScreen extends Screen {
 
             // Draw username
             this.textRenderer.draw(matrices, player.getUsername(),
-                    PLAYER_FACE_SIZE + 8, y + 8, 0xFFFFFF);
+                PLAYER_FACE_SIZE + 8, y + 8, 0xFFFFFF);
 
             // Draw ready status below username (smaller text)
             int statusColor = getStatusColor(player.getReadyStatus());
             matrices.push();
             matrices.scale(0.75f, 0.75f, 1.0f); // Scale down to 75% size
             this.textRenderer.draw(matrices, "Status: ",
-                    (PLAYER_FACE_SIZE + 8) / 0.75f, (y + 22) / 0.75f, 0xFFFFFF); // White
+                (PLAYER_FACE_SIZE + 8) / 0.75f, (y + 22) / 0.75f, 0xFFFFFF); // White
             this.textRenderer.draw(matrices, player.getReadyStatus().getDisplayName(),
-                    (PLAYER_FACE_SIZE + this.textRenderer.getWidth("Status: ")) / 0.75f, (y + 22) / 0.75f,
-                    statusColor);
+                (PLAYER_FACE_SIZE + this.textRenderer.getWidth("Status: ")) / 0.75f, (y + 22) / 0.75f,
+                statusColor);
             matrices.pop();
         }
 
@@ -405,38 +405,38 @@ public class DraaftScreen extends Screen {
     private void renderRoomCodeField(MatrixStack matrices, int mouseX, int mouseY) {
         // Draw "Room Code" label
         this.textRenderer.draw(matrices, "Room Code",
-                this.roomCodeFieldX, this.roomCodeFieldY - 15, 0xFFFFFF);
+            this.roomCodeFieldX, this.roomCodeFieldY - 15, 0xFFFFFF);
 
         // Draw room code field background
         int fieldColor = 0x80000000;
         fill(matrices, this.roomCodeFieldX, this.roomCodeFieldY,
-                this.roomCodeFieldX + this.roomCodeFieldWidth,
-                this.roomCodeFieldY + this.roomCodeFieldHeight, fieldColor);
+            this.roomCodeFieldX + this.roomCodeFieldWidth,
+            this.roomCodeFieldY + this.roomCodeFieldHeight, fieldColor);
 
         // Draw field border
         this.drawHorizontalLine(matrices, this.roomCodeFieldX,
-                this.roomCodeFieldX + this.roomCodeFieldWidth, this.roomCodeFieldY, 0xFFFFFFFF);
+            this.roomCodeFieldX + this.roomCodeFieldWidth, this.roomCodeFieldY, 0xFFFFFFFF);
         this.drawHorizontalLine(matrices, this.roomCodeFieldX,
-                this.roomCodeFieldX + this.roomCodeFieldWidth,
-                this.roomCodeFieldY + this.roomCodeFieldHeight, 0xFFFFFFFF);
+            this.roomCodeFieldX + this.roomCodeFieldWidth,
+            this.roomCodeFieldY + this.roomCodeFieldHeight, 0xFFFFFFFF);
         this.drawVerticalLine(matrices, this.roomCodeFieldX,
-                this.roomCodeFieldY, this.roomCodeFieldY + this.roomCodeFieldHeight, 0xFFFFFFFF);
+            this.roomCodeFieldY, this.roomCodeFieldY + this.roomCodeFieldHeight, 0xFFFFFFFF);
         this.drawVerticalLine(matrices, this.roomCodeFieldX + this.roomCodeFieldWidth,
-                this.roomCodeFieldY, this.roomCodeFieldY + this.roomCodeFieldHeight, 0xFFFFFFFF);
+            this.roomCodeFieldY, this.roomCodeFieldY + this.roomCodeFieldHeight, 0xFFFFFFFF);
 
         // Draw room code text (obfuscated or revealed)
         String displayText = this.roomCodeRevealed ? this.roomCode : "******";
         int textColor = this.roomCodeRevealed ? 0xFFFFFF : 0x808080;
         this.textRenderer.draw(matrices, displayText,
-                this.roomCodeFieldX + 4, this.roomCodeFieldY + 6, textColor);
+            this.roomCodeFieldX + 4, this.roomCodeFieldY + 6, textColor);
 
         // Check if mouse is over the room code field for tooltip
         if (mouseX >= this.roomCodeFieldX && mouseX <= this.roomCodeFieldX + this.roomCodeFieldWidth &&
-                mouseY >= this.roomCodeFieldY && mouseY <= this.roomCodeFieldY + this.roomCodeFieldHeight) {
+            mouseY >= this.roomCodeFieldY && mouseY <= this.roomCodeFieldY + this.roomCodeFieldHeight) {
 
             if (!this.roomCodeRevealed) {
                 this.renderTooltip(matrices, new TranslatableText("draaft.draaftingScreen.tooltip.revealRoomCode"),
-                        mouseX, mouseY);
+                    mouseX, mouseY);
             }
         }
     }
@@ -445,8 +445,8 @@ public class DraaftScreen extends Screen {
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         // Check if room code field was clicked
         if (button == 0 && // Left click
-                mouseX >= this.roomCodeFieldX && mouseX <= this.roomCodeFieldX + this.roomCodeFieldWidth &&
-                mouseY >= this.roomCodeFieldY && mouseY <= this.roomCodeFieldY + this.roomCodeFieldHeight) {
+            mouseX >= this.roomCodeFieldX && mouseX <= this.roomCodeFieldX + this.roomCodeFieldWidth &&
+            mouseY >= this.roomCodeFieldY && mouseY <= this.roomCodeFieldY + this.roomCodeFieldHeight) {
 
             this.roomCodeRevealed = !this.roomCodeRevealed;
             return true;

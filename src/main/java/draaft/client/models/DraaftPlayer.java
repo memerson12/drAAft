@@ -5,7 +5,6 @@ import draaft.client.Utils;
 import draaft.client.gui.skin.SkinManager;
 import draaft.draaft;
 import net.minecraft.util.Identifier;
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.UUID;

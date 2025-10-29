@@ -11,7 +11,7 @@ public class RoomDeserializer implements JsonDeserializer<Room> {
 
     @Override
     public Room deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
-            throws JsonParseException {
+        throws JsonParseException {
 
         JsonObject jsonObject = json.getAsJsonObject();
 
@@ -37,9 +37,9 @@ public class RoomDeserializer implements JsonDeserializer<Room> {
         // Deserialize config object
         JsonObject configObject = jsonObject.getAsJsonObject("config");
         RoomConfig roomConfig = new RoomConfig(
-                configObject.get("enforce_timer").getAsBoolean(),
-                configObject.get("pick_time").getAsInt(),
-                configObject.get("spectators_get_world").getAsBoolean());
+            configObject.get("enforce_timer").getAsBoolean(),
+            configObject.get("pick_time").getAsInt(),
+            configObject.get("spectators_get_world").getAsBoolean());
 
         return new Room(roomCode, members, roomAdmin, roomConfig);
     }

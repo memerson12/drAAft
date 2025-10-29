@@ -40,7 +40,7 @@ public class DraaftWebSocketClient {
     private ScheduledFuture<?> pingTask;
 
     public DraaftWebSocketClient(HttpClient httpClient, DraaftServices services, String token,
-            RoomEventDispatcher dispatcher) {
+                                 RoomEventDispatcher dispatcher) {
         this.httpClient = Objects.requireNonNull(httpClient);
         this.services = Objects.requireNonNull(services);
         this.token = Objects.requireNonNull(token);
@@ -90,18 +90,18 @@ public class DraaftWebSocketClient {
 
         DraaftWebSocketListener listener = new DraaftWebSocketListener(dispatcher, gson, this::scheduleReconnect);
         httpClient.newWebSocketBuilder()
-                .connectTimeout(Duration.ofSeconds(10))
-                .buildAsync(uri, listener)
-                .whenComplete((ws, ex) -> {
-                    if (ex != null) {
-                        LOGGER.warn("WS: connect failed: {}", ex.getMessage());
-                        scheduleReconnect();
-                    } else {
-                        wsRef.set(ws);
-                        reconnectAttempts.set(0);
-                        schedulePing();
-                    }
-                });
+            .connectTimeout(Duration.ofSeconds(10))
+            .buildAsync(uri, listener)
+            .whenComplete((ws, ex) -> {
+                if (ex != null) {
+                    LOGGER.warn("WS: connect failed: {}", ex.getMessage());
+                    scheduleReconnect();
+                } else {
+                    wsRef.set(ws);
+                    reconnectAttempts.set(0);
+                    schedulePing();
+                }
+            });
     }
 
     private void schedulePing() {
@@ -113,7 +113,7 @@ public class DraaftWebSocketClient {
                 WebSocket ws = wsRef.get();
                 if (ws == null)
                     return;
-                ws.sendPing(ByteBuffer.wrap(new byte[] { 'p', 'i', 'n', 'g' }));
+                ws.sendPing(ByteBuffer.wrap(new byte[]{'p', 'i', 'n', 'g'}));
             } catch (Throwable t) {
                 LOGGER.debug("WS: ping failed {}", t.getMessage());
             }

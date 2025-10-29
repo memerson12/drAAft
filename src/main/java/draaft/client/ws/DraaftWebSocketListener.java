@@ -51,7 +51,7 @@ public class DraaftWebSocketListener implements WebSocket.Listener {
                         case "playerupdate" -> {
                             String action = getOrElse(obj, "action", "unknown");
                             String rawUuid = getOrElse(obj, "uuid", null);
-                            if(rawUuid == null) {
+                            if (rawUuid == null) {
                                 LOGGER.warn("Unable to process playerupdate event with missing uuid: {}", message);
                                 dispatcher.emit(new RoomEvent.Raw(variant, obj));
                                 break;
