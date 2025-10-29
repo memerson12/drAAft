@@ -11,6 +11,8 @@ public record DraaftServices(
     // note: the origin MUST NOT end with a trailing slash
     String webOrigin
 ) {
+    public final static int API_VERSION = 1;
+
     public final static DraaftServices DEFAULT = new DraaftServices(
         URI.create("https://api.disrespec.tech/"),
         URI.create("https://disrespec.tech/draaft/"),
@@ -21,7 +23,7 @@ public record DraaftServices(
         if (System.getProperty("DRAAFT_DEV") != null || FabricLoader.getInstance().isDevelopmentEnvironment()) {
             return new DraaftServices(
                 URI.create(System.getProperty("DRAAFT_API_BASE", "http://localhost:8000/")),
-                URI.create(System.getProperty("DRAAFT_WEB_BASE", "http://localhost:8080/draaft")),
+                URI.create(System.getProperty("DRAAFT_WEB_BASE", "http://localhost:8080/draaft/")),
                 System.getProperty("DRAAFT_WEB_ORIGIN", "http://localhost:8080")
             );
         } else {
