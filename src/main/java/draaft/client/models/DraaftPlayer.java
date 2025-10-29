@@ -8,6 +8,8 @@ import net.minecraft.util.Identifier;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.UUID;
+
 public class DraaftPlayer {
     private static final Logger logger = draaft.LOGGER;
 
@@ -56,11 +58,13 @@ public class DraaftPlayer {
     public void loadSkin() {
         if (!skinLoading && !skinLoaded) {
             skinLoading = true;
-            GameProfile profile = SkinManager.getPlayerProfile(this.uuid);
+            GameProfile profile;
+            profile = SkinManager.getPlayerProfile(this.uuid);
             if (profile == null) {
-                this.skinLoading = false;
-                logger.warn("Skin loading failed for {} (failed to fetch profile).", Utils.getLoggableUuid(this.uuid));
-                return;
+                logger.warn("Skin loading failed for {} (failed to fetch profile). Falling back to incomplete profile", Utils.getLoggableUuid(this.uuid));
+                profile = new GameProfile(UUID.fromString(this.uuid), null);
+//                this.skinLoading = false;
+//                return;
             }
             this.username = profile.getName();
             SkinManager.fetchPlayerSkin(profile).thenAccept(skinId -> {

@@ -41,16 +41,19 @@ public class SkinManager {
      * Initialize the UserCache with Minecraft's authentication system
      */
     private static void initializeUserCache() {
+        LOGGER.info("Initializing user cache...");
         if (userCache == null) {
-            synchronized (userCacheLock) {
+            LOGGER.info("Initializing user cache... (was NULL)");
+//            synchronized (userCacheLock) {
                 if (userCache == null) {
                     System.out.println("Initializing UserCache");
                     MinecraftClient client = MinecraftClient.getInstance();
                     Proxy proxy = client.netProxy;
-
+                    LOGGER.info("Using proxy for UserCache: {}", proxy);
                     YggdrasilAuthenticationService yggdrasilAuthenticationService = new YggdrasilAuthenticationService(
                             proxy,
                             UUID.randomUUID().toString());
+
                     GameProfileRepository gameProfileRepository = yggdrasilAuthenticationService
                             .createProfileRepository();
 
@@ -58,7 +61,9 @@ public class SkinManager {
                     File cacheFile = new File(client.runDirectory, MinecraftServer.USER_CACHE_FILE.getName());
                     userCache = new UserCache(gameProfileRepository, cacheFile);
                 }
-            }
+//            }
+        } else {
+            LOGGER.info("User cache already initialized.");
         }
     }
 
@@ -76,7 +81,6 @@ public class SkinManager {
                     return cachedSkin;
                 }
 
-                // Get GameProfile for the uuid
                 MinecraftClient client = MinecraftClient.getInstance();
                 PlayerSkinProvider skinProvider = client.getSkinProvider();
 
@@ -106,20 +110,18 @@ public class SkinManager {
 
     public static GameProfile getPlayerProfile(String uuid) {
         try {
-            LOGGER.info("initializing user cache");
             // Initialize UserCache if needed
             initializeUserCache();
 
             // Use Minecraft's built-in UserCache to find the profile
             // UserCache handles its own caching internally
-            System.out.println("Looking up profile for: " + Utils.getLoggableUuid(uuid));
-            LOGGER.info("Ussercache: {}", userCache);
-            LOGGER.info(Utils.getLoggableUuid(UUID.fromString(uuid).toString()));
+            LOGGER.info("Getting player profile for {}", uuid);
             GameProfile profile = userCache.getByUuid(UUID.fromString(uuid));
             if (profile != null && profile.getId() != null) {
-                System.out.println(profile);
+                LOGGER.info("Player profile found for {}: {}", uuid, profile.getName());
                 return profile;
             } else {
+                LOGGER.warn("Player profile not found for {}", uuid);
                 return null;
             }
 

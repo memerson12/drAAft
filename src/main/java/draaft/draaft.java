@@ -9,8 +9,11 @@ import net.fabricmc.api.ModInitializer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.Session;
 import net.minecraft.text.TranslatableText;
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.config.Configurator;
+
 import java.io.InputStream;
 import java.net.URI;
 import java.util.Properties;
@@ -26,6 +29,7 @@ public class draaft implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
+        Configurator.setLevel(MOD_ID, Level.DEBUG);
 		LOGGER.info("Draaft version: {}", DRAAFT_VERSION);
 	}
 	public static String getDraaftVersion() {

@@ -5,6 +5,8 @@ import draaft.client.ServerClient;
 import draaft.client.models.DraaftPlayer;
 import draaft.client.models.ReadyStatus;
 import draaft.client.models.Room;
+import draaft.client.ws.RoomEvent;
+import draaft.client.ws.RoomEvent.RoomEventType;
 import draaft.draaft;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -88,9 +90,37 @@ public class DraaftScreen extends Screen {
         super.init();
 
         assert ServerClient.getInstance() != null;
-        Room room = ServerClient.getInstance().getRoom();
+        ServerClient serverClient = ServerClient.getInstance();
+        Room room = serverClient.getRoom();
+
+        serverClient.addRoomEventListener(event -> {
+            RoomEventType eventType = RoomEventType.valueOf(event.type().toUpperCase());
+            logger.info("DraaftScreen received event of type {}: ", eventType);
+            switch (eventType) {
+                // Add new player
+                case JOINED -> {
+                    RoomEvent.PlayerJoined playerJoined = (RoomEvent.PlayerJoined) event;
+                    logger.info(playerJoined.playerUuid());
+                    DraaftPlayer newPlayer = new DraaftPlayer(playerJoined.playerUuid());
+                    this.players.add(newPlayer);
+                }
+
+                // Remove player
+                case LEFT -> {
+                    RoomEvent.PlayerLeft playerLeft = (RoomEvent.PlayerLeft) event;
+                    this.players.removeIf(player -> player.getUuid().equals(playerLeft.playerUuid()));
+                }
+
+                // Remove kicked player
+                case KICK -> {
+                    RoomEvent.PlayerKick playerKick = (RoomEvent.PlayerKick) event;
+                    this.players.removeIf(player -> player.getUuid().equals(playerKick.playerUuid()));
+                }
+                default -> logger.warn("Unhandled event type in DraaftScreen: {}", event.type());
+            }
+        });
+
         if (room != null) {
-            logger.info(room.toString());
             this.players = room.members();
         } else {
             logger.warn("Room is null");

@@ -6,6 +6,9 @@ import com.mojang.authlib.exceptions.AuthenticationException;
 import com.mojang.authlib.exceptions.AuthenticationUnavailableException;
 import com.mojang.authlib.exceptions.InvalidCredentialsException;
 import draaft.client.models.Room;
+import draaft.client.ws.DraaftWebSocketClient;
+import draaft.client.ws.RoomEventDispatcher;
+import draaft.client.ws.RoomEventListener;
 import draaft.client.models.RoomDeserializer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
@@ -36,6 +39,9 @@ public class ServerClient {
     private final HttpClient httpClient;
     private final String token;
     private final DraaftServices draaftServices;
+    private final RoomEventDispatcher wsDispatcher;
+    private DraaftWebSocketClient wsClient;
+    private volatile Room cachedRoom;
 
     public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
 
@@ -54,6 +60,7 @@ public class ServerClient {
         this.httpClient = httpClient;
         this.token = token;
         this.draaftServices = draaftServices;
+        this.wsDispatcher = new RoomEventDispatcher();
     }
 
     public <T> HttpResponse<T> httpSend(HttpRequest request, HttpResponse.BodyHandler<T> bodyPublisher)
@@ -76,19 +83,63 @@ public class ServerClient {
                     .build();
 
             HttpResponse<String> resp = httpClient.send(req, HttpResponse.BodyHandlers.ofString());
-            Room room = GSON.fromJson(resp. body(), Room.class);
+            Room room = GSON.fromJson(resp.body(), Room.class);
 
             if (room == null) {
                 LOGGER.error("Failed to get room from server");
                 setConnectionText("Error in drAAft server response!");
                 return null;
             }
+            this.cachedRoom = room;
             return room;
         } catch (Throwable e) {
             LOGGER.error("Failed getting room: {}", e.getMessage());
             setConnectionText("Error contacting drAAft server!");
             return null;
         }
+    }
+
+    public @Nullable Room getCachedRoom() {
+        return this.cachedRoom;
+    }
+
+    private void refreshRoomFromServer() {
+        try {
+            Room room = getRoom();
+            if (room != null) {
+                LOGGER.info("Updated room cache: {} members", room.members().size());
+            }
+        } catch (Throwable ignored) {
+        }
+    }
+
+    public void startWs() {
+        if (this.wsClient != null)
+            return;
+        this.wsClient = new DraaftWebSocketClient(this.httpClient, this.draaftServices, this.token, this.wsDispatcher);
+        this.wsClient.start();
+        // Keep a simple cache updated on membership changes
+        this.addRoomEventListener(event -> {
+            String type = event.type();
+            if ("room_member_join".equals(type) || "room_member_leave".equals(type)) {
+                refreshRoomFromServer();
+            }
+        });
+    }
+
+    public void stopWs() {
+        if (this.wsClient != null) {
+            this.wsClient.stop();
+            this.wsClient = null;
+        }
+    }
+
+    public void addRoomEventListener(RoomEventListener listener) {
+        this.wsDispatcher.addListener(listener);
+    }
+
+    public void removeRoomEventListener(RoomEventListener listener) {
+        this.wsDispatcher.removeListener(listener);
     }
 
     // thanks menx :)
@@ -167,6 +218,7 @@ public class ServerClient {
 
         setConnectionText("Opening in browser...");
         INSTANCE.openWebLoginUri();
+        INSTANCE.startWs();
     }
 
     private void openWebLoginUri() {
