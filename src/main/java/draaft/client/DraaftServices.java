@@ -21,7 +21,7 @@ public record DraaftServices(
         if (System.getProperty("DRAAFT_DEV") != null || FabricLoader.getInstance().isDevelopmentEnvironment()) {
             return new DraaftServices(
                 URI.create(System.getProperty("DRAAFT_API_BASE", "http://localhost:8000/")),
-                URI.create(System.getProperty("DRAAFT_WEB_BASE", "http://localhost:8080/")),
+                URI.create(System.getProperty("DRAAFT_WEB_BASE", "http://localhost:8080/draaft/")),
                 System.getProperty("DRAAFT_WEB_ORIGIN", "http://localhost:8080")
             );
         } else {
