@@ -76,8 +76,7 @@ public class ServerClient {
                     .build();
 
             HttpResponse<String> resp = httpClient.send(req, HttpResponse.BodyHandlers.ofString());
-            LOGGER.info("Response from drAAft server: {}", resp.body());
-            Room room = GSON.fromJson(resp.body(), Room.class);
+            Room room = GSON.fromJson(resp. body(), Room.class);
 
             if (room == null) {
                 LOGGER.error("Failed to get room from server");

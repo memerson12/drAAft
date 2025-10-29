@@ -5,6 +5,7 @@ import com.google.common.cache.CacheBuilder;
 import com.mojang.authlib.*;
 import com.mojang.authlib.minecraft.MinecraftProfileTexture;
 import com.mojang.authlib.yggdrasil.YggdrasilAuthenticationService;
+import draaft.client.Utils;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
@@ -105,12 +106,15 @@ public class SkinManager {
 
     public static GameProfile getPlayerProfile(String uuid) {
         try {
+            LOGGER.info("initializing user cache");
             // Initialize UserCache if needed
             initializeUserCache();
 
             // Use Minecraft's built-in UserCache to find the profile
             // UserCache handles its own caching internally
-            System.out.println("Looking up profile for: " + uuid);
+            System.out.println("Looking up profile for: " + Utils.getLoggableUuid(uuid));
+            LOGGER.info("Ussercache: {}", userCache);
+            LOGGER.info(Utils.getLoggableUuid(UUID.fromString(uuid).toString()));
             GameProfile profile = userCache.getByUuid(UUID.fromString(uuid));
             if (profile != null && profile.getId() != null) {
                 System.out.println(profile);
@@ -120,7 +124,7 @@ public class SkinManager {
             }
 
         } catch (Exception e) {
-            LOGGER.error("Error fetching profile for {}: {}", uuid, e.getMessage());
+            LOGGER.error("Error fetching profile for {}: {}", Utils.getLoggableUuid(uuid), e.getMessage());
             return null;
         }
     }
