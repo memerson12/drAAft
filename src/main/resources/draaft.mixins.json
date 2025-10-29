@@ -36,6 +36,8 @@
   "client": [
     "compat.InGameTimerMixin",
     "client.gui.DebugHudMixin",
-    "client.gui.TitleScreenMixin"
+    "client.gui.TitleScreenMixin",
+    "client.gui.screen.options.OptionsScreenAccessor",
+    "client.gui.screen.options.OptionsScreenMixin"
   ]
 }

@@ -17,5 +17,6 @@
   "draaft.draaftingScreen.button.copy": "Copy",
   "draaft.draaftingScreen.button.ready": "Ready Up",
   "draaft.draaftingScreen.button.nextStage": "Next Stage",
-  "draaft.waiting_for_room_screen.title": "Draaft"
+  "draaft.waiting_for_room_screen.title": "Draaft",
+  "draaft.game.options.pseudoPeaceful": "Peaceless"
 }
