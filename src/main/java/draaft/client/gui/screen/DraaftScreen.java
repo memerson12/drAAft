@@ -60,25 +60,11 @@ public class DraaftScreen extends Screen {
     private ButtonWidget copyButton;
     private int roomCodeFieldX, roomCodeFieldY, roomCodeFieldWidth, roomCodeFieldHeight;
 
-    // Hardcoded test players - all using the same test texture for now
-    // private static final List<PlayerEntry> TEST_PLAYERS = List.of(
-    // new PlayerEntry("Memerson"),
-    // new PlayerEntry("PacManMVC"),
-    // new PlayerEntry("DesktopFolder"),
-    // new PlayerEntry("Me_nx"));
 
     public DraaftScreen(Screen parent) {
         super(new TranslatableText("draaft.draaftingScreen.title"));
         this.parent = parent;
-        // this.players = new ArrayList<>(TEST_PLAYERS);
-
-        // Generate a random room code
         this.roomCode = generateRoomCode();
-
-        // Start loading skins for all players
-        // for (PlayerEntry player : this.players) {
-        // player.loadSkin();
-        // }
     }
 
     private int getLeftPanelWidth() {
@@ -92,6 +78,13 @@ public class DraaftScreen extends Screen {
         assert ServerClient.getInstance() != null;
         ServerClient serverClient = ServerClient.getInstance();
         Room room = serverClient.getRoom();
+
+        if (room != null) {
+            this.players = room.members();
+            this.roomCode = room.code();
+        } else {
+            logger.warn("Room is null");
+        }
 
         serverClient.addRoomEventListener(event -> {
             RoomEventType eventType = RoomEventType.valueOf(event.type().toUpperCase());
@@ -119,12 +112,6 @@ public class DraaftScreen extends Screen {
                 default -> logger.warn("Unhandled event type in DraaftScreen: {}", event.type());
             }
         });
-
-        if (room != null) {
-            this.players = room.members();
-        } else {
-            logger.warn("Room is null");
-        }
 
         // Add a back button
         this.addButton(new ButtonWidget(
