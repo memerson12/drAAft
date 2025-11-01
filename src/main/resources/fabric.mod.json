@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "draaft",
   "version": "${version}",
-  "name": "draaft",
+  "name": "drAAft",
   "description": "Mod for Pac's awesome AA Event",
   "authors": ["Memerson", "PacManMVC"],
   "contact": {
@@ -21,5 +21,10 @@
     "fabricloader": ">=0.16.13",
     "minecraft": "~1.16.1",
     "java": ">=16"
+  },
+  "custom": {
+    "speedrunapi": {
+      "config": "draaft.client.ModConfig"
+    }
   }
 }
