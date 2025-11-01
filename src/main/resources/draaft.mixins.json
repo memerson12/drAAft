@@ -1,9 +1,8 @@
 {
   "required": true,
   "package": "draaft.mixin",
-  "compatibilityLevel": "JAVA_8",
+  "compatibilityLevel": "JAVA_11",
   "mixins": [
-    "compat.InGameTimerMixin",
     "enchantment.EnchantmentsMixin",
     "entity.boss.dragon.EnderDragonEntityMixin",
     "entity.boss.dragon.phase.HoldingPatternPhaseMixin",
@@ -35,6 +34,8 @@
     "defaultRequire": 1
   },
   "client": [
-    "client.gui.DebugHudMixin"
+    "compat.InGameTimerMixin",
+    "client.gui.DebugHudMixin",
+    "client.gui.TitleScreenMixin"
   ]
 }

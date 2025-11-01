@@ -1,31 +1,25 @@
 {
-	"schemaVersion": 1,
-	"id": "draaft",
-	"version": "${version}",
-	"name": "draaft",
-	"description": "Mod for Pac's awesome AA Event",
-	"authors": [
-		"Memerson",
-		"PacManMVC"
-	],
-	"contact": {
-		"homepage": "https://fabricmc.net/",
-		"sources": "https://github.com/FabricMC/fabric-example-mod"
-	},
-	"license": "CC0-1.0",
-	"icon": "assets/draaft/drAAft_logo.png",
-	"environment": "*",
-	"entrypoints": {
-		"main": [
-          "draaft.draaft"
-		]
-	},
-	"mixins": [
-      "draaft.mixins.json"
-	],
-	"depends": {
-		"fabricloader": ">=0.16.13",
-		"minecraft": "~1.16.1",
-		"java": ">=8"
-	}
+  "schemaVersion": 1,
+  "id": "draaft",
+  "version": "${version}",
+  "name": "draaft",
+  "description": "Mod for Pac's awesome AA Event",
+  "authors": ["Memerson", "PacManMVC"],
+  "contact": {
+    "homepage": "https://fabricmc.net/",
+    "sources": "https://github.com/FabricMC/fabric-example-mod"
+  },
+  "license": "CC0-1.0",
+  "icon": "assets/draaft/logo.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": ["draaft.draaft"]
+  },
+  "mixins": ["draaft.mixins.json"],
+  "accessWidener": "draaft.accesswidener",
+  "depends": {
+    "fabricloader": ">=0.16.13",
+    "minecraft": "~1.16.1",
+    "java": ">=16"
+  }
 }

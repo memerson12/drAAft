@@ -22,8 +22,9 @@ repositories {
 dependencies {
 	// To change the versions see the gradle.properties file
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+	mappings "dev.tildejustin:yarn:${project.yarn_mappings}:v2"
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+	modImplementation "com.github.contariaa:SpeedrunAPI:v2.1-1.16.1"
 
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	// modImplementation "com.github.KingContaria:SpeedrunAPI:a3e3998294"
@@ -56,7 +57,7 @@ processResources {
 }
 
 tasks.withType(JavaCompile).configureEach {
-	it.options.release = 8
+	it.options.release = 16
 }
 
 java {
@@ -65,8 +66,8 @@ java {
 	// If you remove this line, sources will not be generated.
 	withSourcesJar()
 
-	sourceCompatibility = JavaVersion.VERSION_1_8
-	targetCompatibility = JavaVersion.VERSION_1_8
+	sourceCompatibility = JavaVersion.VERSION_16
+	targetCompatibility = JavaVersion.VERSION_16
 }
 
 jar {
@@ -75,6 +76,10 @@ jar {
 	from("LICENSE") {
 		rename { "${it}_${inputs.properties.archivesName}" }
 	}
+}
+
+loom {
+	accessWidenerPath = file("src/main/resources/draaft.accesswidener")
 }
 
 // configure the maven publication
