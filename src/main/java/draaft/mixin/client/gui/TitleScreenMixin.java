@@ -42,7 +42,7 @@ public abstract class TitleScreenMixin extends Screen {
                 btnX,
                 baseBtnY,
                 Items.WATER_BUCKET,
-                () -> ServerClient.getInstance() != null,
+                () -> ServerClient.getInstanceOrNull() != null,
                 tooltipSupplier,
                 DraaftServices.DEFAULT,
                 this
@@ -55,7 +55,7 @@ public abstract class TitleScreenMixin extends Screen {
                     btnX,
                     baseBtnY + 24,
                     Items.LAVA_BUCKET,
-                    () -> ServerClient.getInstance() != null,
+                    () -> ServerClient.getInstanceOrNull() != null,
                     tooltipSupplier,
                     altDraaftServices,
                     this

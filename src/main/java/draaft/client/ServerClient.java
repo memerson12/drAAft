@@ -41,7 +41,14 @@ public class ServerClient {
 
     private static @Nullable ServerClient INSTANCE = null;
 
-    public static @Nullable ServerClient getInstance() {
+    public static ServerClient getInstance() {
+        if(INSTANCE == null) {
+            throw new IllegalStateException("ServerClient not initialized. Call ServerClient.login() first.");
+        }
+        return INSTANCE;
+    }
+
+    public static @Nullable ServerClient getInstanceOrNull() {
         return INSTANCE;
     }
 
@@ -74,31 +81,23 @@ public class ServerClient {
                 .build();
 
             HttpResponse<String> resp = httpClient.send(req, HttpResponse.BodyHandlers.ofString());
+
+            // User is not in a room
+            if(resp.statusCode() == 404) {
+                LOGGER.debug("User is not in a room");
+                return null;
+            }
+
             Room room = GSON.fromJson(resp.body(), Room.class);
 
             if (room == null) {
                 LOGGER.error("Failed to get room from server");
                 return null;
             }
-            this.cachedRoom = room;
             return room;
         } catch (Throwable e) {
             LOGGER.error("Failed getting room: {}", e.getMessage());
             return null;
-        }
-    }
-
-    public @Nullable Room getCachedRoom() {
-        return this.cachedRoom;
-    }
-
-    private void refreshRoomFromServer() {
-        try {
-            Room room = getRoom();
-            if (room != null) {
-                LOGGER.info("Updated room cache: {} members", room.members().size());
-            }
-        } catch (Throwable ignored) {
         }
     }
 
@@ -107,13 +106,6 @@ public class ServerClient {
             return;
         this.wsClient = new DraaftWebSocketClient(this.httpClient, this.draaftServices, this.token, this.wsDispatcher);
         this.wsClient.start();
-        // Keep a simple cache updated on membership changes
-        this.addRoomEventListener(event -> {
-            String type = event.type();
-            if ("room_member_join".equals(type) || "room_member_leave".equals(type)) {
-                refreshRoomFromServer();
-            }
-        });
     }
 
     public void stopWs() {

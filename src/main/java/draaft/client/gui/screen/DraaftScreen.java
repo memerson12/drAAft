@@ -1,12 +1,10 @@
 package draaft.client.gui.screen;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import draaft.client.ServerClient;
+import draaft.client.DraaftState;
 import draaft.client.models.DraaftPlayer;
 import draaft.client.models.ReadyStatus;
 import draaft.client.models.Room;
-import draaft.client.ws.RoomEvent;
-import draaft.client.ws.RoomEvent.RoomEventType;
 import draaft.draaft;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -40,13 +38,26 @@ enum Stage {
     }
 }
 
+/// TODO(s) (non-exhaustive):
+/// - Figure out how to get player usernames from UUIDs
+/// - Show room config setting somewhere
+///   - Editable by admin?
+/// - Make clear which player is the admin
+///   - Some symbol next to their name/profile? Command Block?
+/// - Make scaling work better
+///   - Check GUI scale? MC might handle this for us already
+/// - Give admin power to remove player?
+/// - Leave room button
+/// - Show actual draaft status (duh)
+/// - Custom draaft background?
+
 @Environment(EnvType.CLIENT)
 public class DraaftScreen extends Screen {
     private final static Logger logger = draaft.LOGGER;
 
     private final Screen parent;
-    private List<DraaftPlayer> players;
     private int scrollOffset = 0;
+    private final DraaftState draaftState = DraaftState.getInstance();
     private static final int PLAYER_ENTRY_HEIGHT = 50;
     private static final int PLAYER_FACE_SIZE = 32;
     private static final double LEFT_PANEL_WIDTH_RATIO = 0.25; // 25% of screen width
@@ -64,7 +75,6 @@ public class DraaftScreen extends Screen {
     public DraaftScreen(Screen parent) {
         super(new TranslatableText("draaft.draaftingScreen.title"));
         this.parent = parent;
-        this.roomCode = generateRoomCode();
     }
 
     private int getLeftPanelWidth() {
@@ -75,43 +85,8 @@ public class DraaftScreen extends Screen {
     protected void init() {
         super.init();
 
-        assert ServerClient.getInstance() != null;
-        ServerClient serverClient = ServerClient.getInstance();
-        Room room = serverClient.getRoom();
-
-        if (room != null) {
-            this.players = room.members();
-            this.roomCode = room.code();
-        } else {
-            logger.warn("Room is null");
-        }
-
-        serverClient.addRoomEventListener(event -> {
-            RoomEventType eventType = RoomEventType.valueOf(event.type().toUpperCase());
-            logger.info("DraaftScreen received event of type {}: ", eventType);
-            switch (eventType) {
-                // Add new player
-                case JOINED -> {
-                    RoomEvent.PlayerJoined playerJoined = (RoomEvent.PlayerJoined) event;
-                    logger.info(playerJoined.playerUuid());
-                    DraaftPlayer newPlayer = new DraaftPlayer(playerJoined.playerUuid());
-                    this.players.add(newPlayer);
-                }
-
-                // Remove player
-                case LEFT -> {
-                    RoomEvent.PlayerLeft playerLeft = (RoomEvent.PlayerLeft) event;
-                    this.players.removeIf(player -> player.getUuid().equals(playerLeft.playerUuid()));
-                }
-
-                // Remove kicked player
-                case KICK -> {
-                    RoomEvent.PlayerKick playerKick = (RoomEvent.PlayerKick) event;
-                    this.players.removeIf(player -> player.getUuid().equals(playerKick.playerUuid()));
-                }
-                default -> logger.warn("Unhandled event type in DraaftScreen: {}", event.type());
-            }
-        });
+        Room room = draaftState.getRoom();
+        this.roomCode = room.code();
 
         // Add a back button
         this.addButton(new ButtonWidget(
@@ -129,7 +104,7 @@ public class DraaftScreen extends Screen {
         this.roomCodeFieldY = this.height - 30;
 
         // Add copy button (inline with room code field)
-        this.copyButton = this.addButton(new ButtonWidget(
+        this.addButton(new ButtonWidget(
             this.roomCodeFieldX + this.roomCodeFieldWidth + 5, this.roomCodeFieldY, 50, 20,
             new TranslatableText("draaft.draaftingScreen.button.copy"),
             button -> copyRoomCode()));
@@ -151,7 +126,7 @@ public class DraaftScreen extends Screen {
             new TranslatableText("draaft.draaftingScreen.button.ready"),
             button -> {
                 // For now, this button doesn't do anything
-                for (DraaftPlayer player : this.players) {
+                for (DraaftPlayer player : draaftState.getRoom().members()) {
                     player.setReadyStatus(ReadyStatus.values()[(player.getReadyStatus().ordinal() + 1) % 3]);
                 }
             }));
@@ -187,13 +162,14 @@ public class DraaftScreen extends Screen {
         int startY = 20;
         int leftPanelWidth = getLeftPanelWidth();
         int visiblePlayers = (this.height - startY) / PLAYER_ENTRY_HEIGHT;
+        List<DraaftPlayer> players = draaftState.getRoom().members();
 
-        for (int i = 0; i < Math.min(visiblePlayers, this.players.size() - scrollOffset); i++) {
+        for (int i = 0; i < Math.min(visiblePlayers, players.size() - scrollOffset); i++) {
             int playerIndex = i + scrollOffset;
-            if (playerIndex >= this.players.size())
+            if (playerIndex >= players.size())
                 break;
 
-            DraaftPlayer player = this.players.get(playerIndex);
+            DraaftPlayer player = players.get(playerIndex);
             int y = startY + i * PLAYER_ENTRY_HEIGHT;
 
             int bgColor = 0x20FFFFFF;
@@ -222,7 +198,7 @@ public class DraaftScreen extends Screen {
         }
 
         // Draw scrollbar if needed
-        if (this.players.size() > visiblePlayers) {
+        if (players.size() > visiblePlayers) {
             this.renderScrollbar(matrices);
         }
     }
@@ -281,7 +257,7 @@ public class DraaftScreen extends Screen {
 
         // Calculate thumb position and size
         int visiblePlayers = scrollbarHeight / PLAYER_ENTRY_HEIGHT;
-        int totalPlayers = this.players.size();
+        int totalPlayers = draaftState.getRoom().members().size();
         int thumbHeight = Math.max(20, (visiblePlayers * scrollbarHeight) / totalPlayers);
         int thumbY = scrollbarY + (scrollOffset * scrollbarHeight) / totalPlayers;
 
@@ -355,7 +331,7 @@ public class DraaftScreen extends Screen {
         int leftPanelWidth = getLeftPanelWidth();
         if (mouseX >= 0 && mouseX <= leftPanelWidth) {
             int visiblePlayers = (this.height - 50) / PLAYER_ENTRY_HEIGHT;
-            int maxScroll = Math.max(0, this.players.size() - visiblePlayers);
+            int maxScroll = Math.max(0, draaftState.getRoom().members().size() - visiblePlayers);
 
             this.scrollOffset = (int) Math.max(0, Math.min(maxScroll, this.scrollOffset - amount));
             return true;

@@ -23,7 +23,7 @@ public class RoomDeserializer implements JsonDeserializer<Room> {
         DraaftPlayer roomAdmin = new DraaftPlayer(adminUuid);
 
         // Convert members array of UUID strings to List<DraaftPlayer>
-        List<DraaftPlayer> members = new ArrayList<>();
+        ArrayList<DraaftPlayer> members = new ArrayList<>();
         JsonArray membersArray = jsonObject.getAsJsonArray("members");
         for (JsonElement memberElement : membersArray) {
             String uuid = Utils.formatUuid(memberElement.getAsString());
