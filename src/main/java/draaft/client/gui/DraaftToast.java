@@ -24,6 +24,7 @@ public class DraaftToast implements Toast {
     private final boolean error;
 
     private long startTime = -1;
+    private int height = 32;
 
     private DraaftToast(StringRenderable title, StringRenderable content, boolean error) {
         this.title = title;
@@ -54,9 +55,11 @@ public class DraaftToast implements Toast {
         // Bottom
         manager.drawTexture(matrices, 0, textureY, 0, 28, this.getWidth(), 4);
 
+        this.height = textureY + 4;
+
         client.getTextureManager().bindTexture(this.error ? ERROR_ICON : ICON);
 
-        int middleY = (textureY + 4) / 2;
+        int middleY = this.height / 2;
 
         DrawableHelper.drawTexture(matrices, 6, middleY - 10, 0, 0, 20, 20, 20, 20);
 
@@ -69,6 +72,11 @@ public class DraaftToast implements Toast {
         }
 
         return (time - this.startTime) < TIME_TO_HIDE_MS ? Visibility.SHOW : Visibility.HIDE;
+    }
+
+    @Override
+    public int getHeight() {
+        return this.height;
     }
 
     public static DraaftToast of(StringRenderable title, StringRenderable content) {
