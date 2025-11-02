@@ -14,7 +14,7 @@ public class DraaftState {
 
     private final Logger logger = draaft.LOGGER;
 
-    private CURRENT_STATE currentState = CURRENT_STATE.WAITING_FOR_ROOM;
+    private STATE currentState = STATE.WAITING_FOR_ROOM;
     private final ServerClient serverClient = ServerClient.getInstance();
     private Room room;
 
@@ -56,7 +56,7 @@ public class DraaftState {
         });
     }
 
-    public enum CURRENT_STATE {
+    public enum STATE {
         WAITING_FOR_ROOM,
         IN_ROOM,
         DRAAFTING,
@@ -73,11 +73,11 @@ public class DraaftState {
         return INSTANCE;
     }
 
-    public CURRENT_STATE getCurrentState() {
+    public STATE getCurrentState() {
         return currentState;
     }
 
-    public void setCurrentState(CURRENT_STATE currentState) {
+    public void setCurrentState(STATE currentState) {
         this.currentState = currentState;
     }
 

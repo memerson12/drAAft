@@ -2,6 +2,8 @@ package draaft.client.ws;
 
 import com.google.gson.JsonObject;
 
+import java.util.UUID;
+
 public interface RoomEvent {
     String type();
 
@@ -22,28 +24,28 @@ public interface RoomEvent {
     }
 
     // Common events we expect from the server. These may be extended later.
-    record PlayerJoined(String playerUuid) implements RoomEvent {
+    record PlayerJoined(UUID playerUuid) implements RoomEvent {
         @Override
         public String type() {
             return "joined";
         }
     }
 
-    record PlayerLeft(String playerUuid) implements RoomEvent {
+    record PlayerLeft(UUID playerUuid) implements RoomEvent {
         @Override
         public String type() {
             return "left";
         }
     }
 
-    record PlayerKick(String playerUuid) implements RoomEvent {
+    record PlayerKick(UUID playerUuid) implements RoomEvent {
         @Override
         public String type() {
             return "kick";
         }
     }
 
-    record PlayerBecomeSpectator(String playerUuid) implements RoomEvent {
+    record PlayerBecomeSpectator(UUID playerUuid) implements RoomEvent {
         @Override
         public String type() {
             return "spectator";
@@ -53,7 +55,7 @@ public interface RoomEvent {
     /*
      * Player becomes a regular player from being a spectator.
      */
-    record PlayerBecomePlayer(String playerUuid) implements RoomEvent {
+    record PlayerBecomePlayer(UUID playerUuid) implements RoomEvent {
         @Override
         public String type() {
             return "player";

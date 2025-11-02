@@ -6,7 +6,6 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.GameProfileRepository;
 import com.mojang.authlib.minecraft.MinecraftProfileTexture;
 import com.mojang.authlib.yggdrasil.YggdrasilAuthenticationService;
-import draaft.client.Utils;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
@@ -45,7 +44,7 @@ public class SkinManager {
         LOGGER.info("Initializing user cache...");
         if (userCache == null) {
             LOGGER.info("Initializing user cache... (was NULL)");
-//            synchronized (userCacheLock) {
+            synchronized (userCacheLock) {
             if (userCache == null) {
                 System.out.println("Initializing UserCache");
                 MinecraftClient client = MinecraftClient.getInstance();
@@ -62,7 +61,7 @@ public class SkinManager {
                 File cacheFile = new File(client.runDirectory, MinecraftServer.USER_CACHE_FILE.getName());
                 userCache = new UserCache(gameProfileRepository, cacheFile);
             }
-//            }
+            }
         } else {
             LOGGER.info("User cache already initialized.");
         }
@@ -109,7 +108,7 @@ public class SkinManager {
         }, Util.getServerWorkerExecutor());
     }
 
-    public static GameProfile getPlayerProfile(String uuid) {
+    public static GameProfile getPlayerProfile(UUID uuid) {
         try {
             // Initialize UserCache if needed
             initializeUserCache();
@@ -117,7 +116,7 @@ public class SkinManager {
             // Use Minecraft's built-in UserCache to find the profile
             // UserCache handles its own caching internally
             LOGGER.info("Getting player profile for {}", uuid);
-            GameProfile profile = userCache.getByUuid(UUID.fromString(uuid));
+            GameProfile profile = userCache.getByUuid(uuid);
             if (profile != null && profile.getId() != null) {
                 LOGGER.info("Player profile found for {}: {}", uuid, profile.getName());
                 return profile;
@@ -127,7 +126,7 @@ public class SkinManager {
             }
 
         } catch (Exception e) {
-            LOGGER.error("Error fetching profile for {}: {}", Utils.getLoggableUuid(uuid), e.getMessage());
+            LOGGER.error("Error fetching profile for {}: {}", uuid, e.getMessage());
             return null;
         }
     }

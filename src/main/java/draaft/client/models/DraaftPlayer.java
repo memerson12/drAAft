@@ -1,7 +1,6 @@
 package draaft.client.models;
 
 import com.mojang.authlib.GameProfile;
-import draaft.client.Utils;
 import draaft.client.gui.skin.SkinManager;
 import draaft.draaft;
 import net.minecraft.util.Identifier;
@@ -12,20 +11,20 @@ import java.util.UUID;
 public class DraaftPlayer {
     private static final Logger logger = draaft.LOGGER;
 
-    private final String uuid;
+    private final UUID uuid;
     private String username;
     private Identifier faceTexture;
     private boolean skinLoaded = false;
     private boolean skinLoading = false;
     private ReadyStatus readyStatus;
 
-    public DraaftPlayer(String uuid) {
+    public DraaftPlayer(UUID uuid) {
         this.uuid = uuid;
         this.readyStatus = ReadyStatus.DRAAFTING; // Default to Draafting
         loadSkin(); // Automatically start loading skin on instantiation
     }
 
-    public String getUuid() {
+    public UUID getUuid() {
         return uuid;
     }
 
@@ -64,7 +63,7 @@ public class DraaftPlayer {
 //                logger.warn("Skin loading failed for {} (failed to fetch profile). Falling back to incomplete profile", Utils.getLoggableUuid(this.uuid));
 //                profile = new GameProfile(UUID.fromString(this.uuid), null);
 //            }
-            GameProfile profile = new GameProfile(UUID.fromString(this.uuid), "Temp Names");
+            GameProfile profile = new GameProfile(this.uuid, "Temp Names");
             this.username = profile.getName();
             SkinManager.fetchPlayerSkin(profile).thenAccept(skinId -> {
                 logger.info("Skin loaded for {}", this.username);
@@ -73,7 +72,7 @@ public class DraaftPlayer {
                 this.skinLoading = false;
             }).exceptionally(throwable -> {
                 this.skinLoading = false;
-                logger.warn("Skin loading failed for {}: {}", Utils.getLoggableUuid(this.uuid), throwable.getMessage());
+                logger.warn("Skin loading failed for {}: {}", this.uuid, throwable.getMessage());
                 return null;
             });
         }

@@ -1,11 +1,11 @@
 package draaft.client.models;
 
 import com.google.gson.*;
-import draaft.client.Utils;
+import com.mojang.util.UUIDTypeAdapter;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.UUID;
 
 public class RoomDeserializer implements JsonDeserializer<Room> {
 
@@ -19,14 +19,14 @@ public class RoomDeserializer implements JsonDeserializer<Room> {
         String roomCode = jsonObject.get("code").getAsString();
 
         // Convert admin UUID string to DraaftPlayer
-        String adminUuid = Utils.formatUuid(jsonObject.get("admin").getAsString());
+        UUID adminUuid = UUIDTypeAdapter.fromString(jsonObject.get("admin").getAsString());
         DraaftPlayer roomAdmin = new DraaftPlayer(adminUuid);
 
         // Convert members array of UUID strings to List<DraaftPlayer>
         ArrayList<DraaftPlayer> members = new ArrayList<>();
         JsonArray membersArray = jsonObject.getAsJsonArray("members");
         for (JsonElement memberElement : membersArray) {
-            String uuid = Utils.formatUuid(memberElement.getAsString());
+            UUID uuid = UUIDTypeAdapter.fromString(memberElement.getAsString());
             if (uuid.equals(adminUuid)) {
                 members.add(roomAdmin);
             } else {

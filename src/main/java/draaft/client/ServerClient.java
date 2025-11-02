@@ -8,11 +8,11 @@ import draaft.client.models.RoomDeserializer;
 import draaft.client.ws.DraaftWebSocketClient;
 import draaft.client.ws.RoomEventDispatcher;
 import draaft.client.ws.RoomEventListener;
+import draaft.draaft;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Util;
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
 
@@ -21,8 +21,6 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-
-import static draaft.draaft.MOD_ID;
 
 public class ServerClient {
     public static final Gson GSON = new GsonBuilder()
@@ -35,14 +33,13 @@ public class ServerClient {
     private final DraaftServices draaftServices;
     private final RoomEventDispatcher wsDispatcher;
     private DraaftWebSocketClient wsClient;
-    private volatile Room cachedRoom;
 
-    public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
+    private static final Logger logger = draaft.LOGGER;
 
     private static @Nullable ServerClient INSTANCE = null;
 
     public static ServerClient getInstance() {
-        if(INSTANCE == null) {
+        if (INSTANCE == null) {
             throw new IllegalStateException("ServerClient not initialized. Call ServerClient.login() first.");
         }
         return INSTANCE;
@@ -59,11 +56,12 @@ public class ServerClient {
         this.token = token;
         this.draaftServices = draaftServices;
         this.wsDispatcher = new RoomEventDispatcher();
+        this.startWs();
     }
 
     public <T> HttpResponse<T> httpSend(HttpRequest request, HttpResponse.BodyHandler<T> bodyPublisher)
         throws IOException, InterruptedException {
-        ServerClient.LOGGER.debug("HTTP request to {}", request.uri());
+        ServerClient.logger.debug("HTTP request to {}", request.uri());
         return this.httpClient.send(request, bodyPublisher);
     }
 
@@ -83,20 +81,20 @@ public class ServerClient {
             HttpResponse<String> resp = httpClient.send(req, HttpResponse.BodyHandlers.ofString());
 
             // User is not in a room
-            if(resp.statusCode() == 404) {
-                LOGGER.debug("User is not in a room");
+            if (resp.statusCode() == 404) {
+                logger.debug("User is not in a room");
                 return null;
             }
 
             Room room = GSON.fromJson(resp.body(), Room.class);
 
             if (room == null) {
-                LOGGER.error("Failed to get room from server");
+                logger.error("Failed to get room from server");
                 return null;
             }
             return room;
         } catch (Throwable e) {
-            LOGGER.error("Failed getting room: {}", e.getMessage());
+            logger.error("Failed getting room: {}", e.getMessage());
             return null;
         }
     }
@@ -139,26 +137,25 @@ public class ServerClient {
             .version(HttpClient.Version.HTTP_1_1) // HTTP 2 is not supported by fastapi
             .build();
 
-        LOGGER.info("Contacting Minecraft auth server...");
+        logger.info("Contacting Minecraft auth server...");
         var serverID = MojangAuth.joinDraaftServer();
         if (serverID == null) {
             return;
         }
 
-        LOGGER.info("Contacting drAAft server...");
+        logger.info("Contacting drAAft server...");
         String clientToken = DraaftAuth.authenticate(draaftServices, httpClient, serverID);
         if (clientToken == null) {
             return;
         }
 
-        LOGGER.info("Successfully authenticated with the server, received {} long client token", clientToken.length());
+        logger.info("Successfully authenticated with the server, received {} long client token", clientToken.length());
 
         var authTokenServer = new AuthTokenServer(draaftServices, clientToken);
 
         INSTANCE = new ServerClient(authTokenServer, httpClient, clientToken, draaftServices);
 
         INSTANCE.openWebLoginUri();
-        INSTANCE.startWs();
     }
 
     private void openWebLoginUri() {

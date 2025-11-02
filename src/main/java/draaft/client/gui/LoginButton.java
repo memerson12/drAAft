@@ -36,13 +36,13 @@ public class LoginButton extends ButtonWidget {
             // todo it feels kind of weird for this logic to be here in the button class
             MinecraftClient minecraftClient = MinecraftClient.getInstance();
             DraaftState draaftState = DraaftState.getInstance();
-            draaftState.setCurrentState(DraaftState.CURRENT_STATE.WAITING_FOR_ROOM);
+            draaftState.setCurrentState(DraaftState.STATE.WAITING_FOR_ROOM);
 
             Room room = draaftState.getRoom();
             if (room == null) {
                 minecraftClient.openScreen(new WaitingForRoomScreen(parent));
             } else {
-                draaftState.setCurrentState(DraaftState.CURRENT_STATE.IN_ROOM);
+                draaftState.setCurrentState(DraaftState.STATE.IN_ROOM);
                 minecraftClient.openScreen(new DraaftScreen(parent));
             }
         }, tooltipSupplier);

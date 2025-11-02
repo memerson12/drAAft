@@ -3,12 +3,12 @@ package draaft.client.ws;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import draaft.client.Utils;
+import com.mojang.util.UUIDTypeAdapter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.net.http.WebSocket;
-import java.nio.ByteBuffer;
+import java.util.UUID;
 import java.util.concurrent.CompletionStage;
 
 import static draaft.draaft.MOD_ID;
@@ -56,7 +56,7 @@ public class DraaftWebSocketListener implements WebSocket.Listener {
                                 dispatcher.emit(new RoomEvent.Raw(variant, obj));
                                 break;
                             }
-                            String uuid = Utils.formatUuid(rawUuid);
+                            UUID uuid = UUIDTypeAdapter.fromString(rawUuid);
                             LOGGER.info("Parsed action {} for player {}", action, uuid);
                             switch (action) {
                                 case "joined" -> dispatcher.emit(new RoomEvent.PlayerJoined(uuid));
@@ -85,24 +85,6 @@ public class DraaftWebSocketListener implements WebSocket.Listener {
 
     private String getOrElse(JsonObject obj, String key, String defaultValue) {
         return obj.has(key) ? obj.get(key).getAsString() : defaultValue;
-    }
-
-    @Override
-    public CompletionStage<?> onBinary(WebSocket webSocket, ByteBuffer data, boolean last) {
-        webSocket.request(1);
-        return null;
-    }
-
-    @Override
-    public CompletionStage<?> onPing(WebSocket webSocket, ByteBuffer message) {
-        webSocket.request(1);
-        return null;
-    }
-
-    @Override
-    public CompletionStage<?> onPong(WebSocket webSocket, ByteBuffer message) {
-        webSocket.request(1);
-        return null;
     }
 
     @Override
