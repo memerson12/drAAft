@@ -1,5 +1,7 @@
 package draaft.client.ws;
 
+import draaft.draaft;
+
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -20,8 +22,8 @@ public class RoomEventDispatcher {
         for (RoomEventListener listener : listeners) {
             try {
                 listener.onEvent(event);
-            } catch (Throwable ignored) {
-                // listeners must handle their own exceptions
+            } catch (Throwable error) {
+                draaft.LOGGER.warn("Exception in RoomEventListener: ", error);
             }
         }
     }
