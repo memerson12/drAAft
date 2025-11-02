@@ -1,16 +1,12 @@
 package draaft;
 
-import com.mojang.authlib.exceptions.AuthenticationException;
-import com.mojang.authlib.exceptions.AuthenticationUnavailableException;
-import com.mojang.authlib.exceptions.InvalidCredentialsException;
-import draaft.client.ServerClient;
 import net.fabricmc.api.ModInitializer;
-
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.util.Session;
-import net.minecraft.text.TranslatableText;
+import net.fabricmc.loader.api.FabricLoader;
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.config.Configurator;
+
 import java.io.InputStream;
 import java.net.URI;
 import java.util.Properties;
@@ -19,6 +15,7 @@ public class draaft implements ModInitializer {
 	public static final String MOD_ID = "draaft";
 	public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
 	public static final String DRAAFT_VERSION = getDraaftVersion();
+    public static final boolean IS_DEBUG = isDebugMode();
 
 	public static final String FRONTEND_ORIGIN = "http://localhost:8080";
 	public static final URI FRONTEND_BASE_URI = URI.create(FRONTEND_ORIGIN + "/draaft/");
@@ -26,6 +23,10 @@ public class draaft implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
+        if (IS_DEBUG) {
+            LOGGER.info(MOD_ID + " is running on debug mode");
+            Configurator.setLevel(MOD_ID, Level.DEBUG);
+        }
 		LOGGER.info("Draaft version: {}", DRAAFT_VERSION);
 	}
 	public static String getDraaftVersion() {
@@ -43,4 +44,8 @@ public class draaft implements ModInitializer {
 			return "Unknown";
 		}
 	}
+
+    private static boolean isDebugMode() {
+        return System.getProperty("DRAAFT_DEV") != null || FabricLoader.getInstance().isDevelopmentEnvironment();
+    }
 }

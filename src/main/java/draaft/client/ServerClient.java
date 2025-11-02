@@ -1,12 +1,18 @@
 package draaft.client;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import draaft.client.gui.DraaftToast;
+import draaft.client.models.Room;
+import draaft.client.models.RoomDeserializer;
+import draaft.client.ws.DraaftWebSocketClient;
+import draaft.client.ws.RoomEventDispatcher;
+import draaft.client.ws.RoomEventListener;
+import draaft.draaft;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Util;
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
 
@@ -16,40 +22,103 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
-import static draaft.draaft.MOD_ID;
-
 public class ServerClient {
-    public static final Gson GSON = new Gson();
+    public static final Gson GSON = new GsonBuilder()
+        .registerTypeAdapter(Room.class, new RoomDeserializer())
+        .create();
 
     private final AuthTokenServer authTokenServer;
     private final HttpClient httpClient;
     private final String token;
+    private final DraaftServices draaftServices;
+    private final RoomEventDispatcher wsDispatcher;
+    private DraaftWebSocketClient wsClient;
 
-    public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
+    private static final Logger logger = draaft.LOGGER;
 
     private static @Nullable ServerClient INSTANCE = null;
 
-    public static @Nullable ServerClient getInstance() {
+    public static ServerClient getInstance() {
+        if (INSTANCE == null) {
+            throw new IllegalStateException("ServerClient not initialized. Call ServerClient.login() first.");
+        }
         return INSTANCE;
     }
 
-    private ServerClient(AuthTokenServer authTokenServer, HttpClient httpClient, String token) {
+    public static @Nullable ServerClient getInstanceOrNull() {
+        return INSTANCE;
+    }
+
+    private ServerClient(AuthTokenServer authTokenServer, HttpClient httpClient, String token,
+                         DraaftServices draaftServices) {
         this.authTokenServer = authTokenServer;
         this.httpClient = httpClient;
         this.token = token;
+        this.draaftServices = draaftServices;
+        this.wsDispatcher = new RoomEventDispatcher();
+        this.startWs();
     }
 
     public <T> HttpResponse<T> httpSend(HttpRequest request, HttpResponse.BodyHandler<T> bodyPublisher)
-        throws IOException, InterruptedException
-    {
-        ServerClient.LOGGER.debug("HTTP request to {}", request.uri());
-
+        throws IOException, InterruptedException {
+        ServerClient.logger.debug("HTTP request to {}", request.uri());
         return this.httpClient.send(request, bodyPublisher);
     }
 
-    public HttpRequest.Builder httpRequest(URI uri) {
+    public HttpRequest.Builder authenticatedHttpRequestBuilder(URI uri) {
         return HttpRequest.newBuilder(uri)
-            .header("token", this.token);
+            .header("token", this.token)
+            .setHeader("Content-Type", "application/json");
+    }
+
+    public Room getRoom() {
+        try {
+            final URI remote = this.draaftServices.apiBase().resolve("room");
+            HttpRequest req = authenticatedHttpRequestBuilder(remote)
+                .GET()
+                .build();
+
+            HttpResponse<String> resp = httpClient.send(req, HttpResponse.BodyHandlers.ofString());
+
+            // User is not in a room
+            if (resp.statusCode() == 404) {
+                logger.debug("User is not in a room");
+                return null;
+            }
+
+            Room room = GSON.fromJson(resp.body(), Room.class);
+
+            if (room == null) {
+                logger.error("Failed to get room from server");
+                return null;
+            }
+            return room;
+        } catch (Throwable e) {
+            logger.error("Failed getting room: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    public void startWs() {
+        if (this.wsClient != null)
+            return;
+        this.wsClient = new DraaftWebSocketClient(this.httpClient, this.draaftServices, this.token, this.wsDispatcher);
+        this.wsClient.start();
+    }
+
+    public void stopWs() {
+        if (this.wsClient != null) {
+            this.wsClient.stop();
+            this.wsClient = null;
+        }
+    }
+
+    public void addRoomEventListener(RoomEventListener listener) {
+        this.wsDispatcher.addListener(listener);
+    }
+
+    public void removeRoomEventListener(RoomEventListener listener) {
+        this.wsDispatcher.removeListener(listener);
     }
 
     // thanks menx :)
@@ -68,23 +137,23 @@ public class ServerClient {
             .version(HttpClient.Version.HTTP_1_1) // HTTP 2 is not supported by fastapi
             .build();
 
-        LOGGER.info("Contacting Minecraft auth server...");
+        logger.info("Contacting Minecraft auth server...");
         var serverID = MojangAuth.joinDraaftServer();
         if (serverID == null) {
             return;
         }
 
-        LOGGER.info("Contacting drAAft server...");
+        logger.info("Contacting drAAft server...");
         String clientToken = DraaftAuth.authenticate(draaftServices, httpClient, serverID);
         if (clientToken == null) {
             return;
         }
 
-        LOGGER.info("Successfully authenticated with the server, received {} long client token", clientToken.length());
+        logger.info("Successfully authenticated with the server, received {} long client token", clientToken.length());
 
         var authTokenServer = new AuthTokenServer(draaftServices, clientToken);
 
-        INSTANCE = new ServerClient(authTokenServer, httpClient, clientToken);
+        INSTANCE = new ServerClient(authTokenServer, httpClient, clientToken, draaftServices);
 
         INSTANCE.openWebLoginUri();
     }

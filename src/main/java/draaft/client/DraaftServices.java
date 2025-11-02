@@ -1,6 +1,6 @@
 package draaft.client;
 
-import net.fabricmc.loader.api.FabricLoader;
+import draaft.draaft;
 import org.jetbrains.annotations.Nullable;
 
 import java.net.URI;
@@ -20,7 +20,7 @@ public record DraaftServices(
     );
 
     public static @Nullable DraaftServices fromJvmArgs() {
-        if (System.getProperty("DRAAFT_DEV") != null || FabricLoader.getInstance().isDevelopmentEnvironment()) {
+        if (draaft.IS_DEBUG) {
             return new DraaftServices(
                 URI.create(System.getProperty("DRAAFT_API_BASE", "http://localhost:8000/")),
                 URI.create(System.getProperty("DRAAFT_WEB_BASE", "http://localhost:8080/draaft/")),

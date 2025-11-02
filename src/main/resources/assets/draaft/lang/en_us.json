@@ -16,5 +16,6 @@
   "draaft.draaftingScreen.tooltip.revealRoomCode": "Click to reveal room code",
   "draaft.draaftingScreen.button.copy": "Copy",
   "draaft.draaftingScreen.button.ready": "Ready Up",
-  "draaft.draaftingScreen.button.nextStage": "Next Stage"
+  "draaft.draaftingScreen.button.nextStage": "Next Stage",
+  "draaft.waiting_for_room_screen.title": "Draaft"
 }
