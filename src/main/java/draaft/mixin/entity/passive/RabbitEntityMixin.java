@@ -20,12 +20,12 @@ public abstract class RabbitEntityMixin extends AnimalEntity {
     @Override
     protected LootContext.Builder getLootContextBuilder(boolean causedByPlayer, DamageSource source) {
         LootContext.Builder builder = new LootContext.Builder((ServerWorld) this.world)
-                .random(WorldState.getServerState((ServerWorld) this.world).getOrCreateRng(WorldState.RngType.RABBIT, (ServerWorld) this.world))
-                .parameter(LootContextParameters.THIS_ENTITY, this)
-                .parameter(LootContextParameters.POSITION, this.getBlockPos())
-                .parameter(LootContextParameters.DAMAGE_SOURCE, source)
-                .optionalParameter(LootContextParameters.KILLER_ENTITY, source.getAttacker())
-                .optionalParameter(LootContextParameters.DIRECT_KILLER_ENTITY, source.getSource());
+            .random(WorldState.getServerState((ServerWorld) this.world).getOrCreateRng(WorldState.RngType.RABBIT, (ServerWorld) this.world))
+            .parameter(LootContextParameters.THIS_ENTITY, this)
+            .parameter(LootContextParameters.POSITION, this.getBlockPos())
+            .parameter(LootContextParameters.DAMAGE_SOURCE, source)
+            .optionalParameter(LootContextParameters.KILLER_ENTITY, source.getAttacker())
+            .optionalParameter(LootContextParameters.DIRECT_KILLER_ENTITY, source.getSource());
         if (causedByPlayer && this.attackingPlayer != null) {
             builder = builder.parameter(LootContextParameters.LAST_DAMAGE_PLAYER, this.attackingPlayer).luck(this.attackingPlayer.getLuck());
         }

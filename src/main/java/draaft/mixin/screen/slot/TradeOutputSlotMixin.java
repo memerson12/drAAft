@@ -9,7 +9,8 @@ import org.spongepowered.asm.mixin.Shadow;
 
 @Mixin(TradeOutputSlot.class)
 public abstract class TradeOutputSlotMixin extends Slot {
-    @Shadow private int amount;
+    @Shadow
+    private int amount;
 
     public TradeOutputSlotMixin(Inventory inventory, int index, int x, int y) {
         super(inventory, index, x, y);

@@ -29,14 +29,13 @@ public class MenxServerAuth {
     }
 
     public static MenxServerAuth authenticate(HttpClient http, URI baseUri)
-            throws IOException, InterruptedException, NoSuchAlgorithmException, AuthenticationException
-    {
+        throws IOException, InterruptedException, NoSuchAlgorithmException, AuthenticationException {
         final String API_VERSION = "1";
 
         var authReq = HttpRequest.newBuilder(baseUri.resolve("/auth"))
-                .GET()
-                .timeout(API_TIMEOUT)
-                .build();
+            .GET()
+            .timeout(API_TIMEOUT)
+            .build();
 
         var authResponse = http.send(authReq, HttpResponse.BodyHandlers.ofString());
 
@@ -66,16 +65,16 @@ public class MenxServerAuth {
         var login = new LoginData(session.getUsername(), clientPrefix);
 
         var loginReq = HttpRequest.newBuilder(baseUri.resolve("/auth/login"))
-                .POST(HttpRequest.BodyPublishers.ofString(GSON.toJson(login, LoginData.class)))
-                .setHeader("Content-Type", "application/json")
-                .timeout(API_TIMEOUT)
-                .build();
+            .POST(HttpRequest.BodyPublishers.ofString(GSON.toJson(login, LoginData.class)))
+            .setHeader("Content-Type", "application/json")
+            .timeout(API_TIMEOUT)
+            .build();
 
         var loginResponse = http.send(loginReq, HttpResponse.BodyHandlers.ofString());
 
         return switch (loginResponse.statusCode()) {
             case 200 -> new MenxServerAuth(
-                    GSON.fromJson(loginResponse.body(), LoginResponse.class).token
+                GSON.fromJson(loginResponse.body(), LoginResponse.class).token
             );
             case 403 -> throw new RuntimeException("worldimporter.notWhitelisted");
             default -> throw new IllegalStateException("Unexpected value: " + loginResponse.statusCode());
@@ -93,7 +92,8 @@ public class MenxServerAuth {
         private String server_suffix;
     }
 
-    private record LoginData(String username, String client_prefix) {}
+    private record LoginData(String username, String client_prefix) {
+    }
 
     @SuppressWarnings("unused") // GSON
     private static final class LoginResponse {

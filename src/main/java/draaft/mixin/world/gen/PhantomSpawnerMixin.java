@@ -28,19 +28,19 @@ import java.util.Random;
 
 @Mixin(PhantomSpawner.class)
 public abstract class PhantomSpawnerMixin implements Spawner {
-    @Shadow private int ticksUntilNextSpawn;
+    @Shadow
+    private int ticksUntilNextSpawn;
 
     /**
      * Overwrites the vanilla phantom spawning logic to change minimum spawn delay,
      * difficulty check, and minimum spawn count on hard difficulty.
      *
+     * @param serverWorld   The world where spawning occurs.
+     * @param spawnMonsters Whether monster spawning is enabled.
+     * @param spawnAnimals  Whether animal spawning is enabled (unused by phantoms but part of signature).
+     * @return The number of phantoms spawned in this tick.
      * @author Memerson (and gemini)
      * @reason Apply multiple custom changes to phantom spawning mechanics.
-     *
-     * @param serverWorld The world where spawning occurs.
-     * @param spawnMonsters Whether monster spawning is enabled.
-     * @param spawnAnimals Whether animal spawning is enabled (unused by phantoms but part of signature).
-     * @return The number of phantoms spawned in this tick.
      */
     @Overwrite
     public int spawn(ServerWorld serverWorld, boolean spawnMonsters, boolean spawnAnimals) {
@@ -89,7 +89,7 @@ public abstract class PhantomSpawnerMixin implements Spawner {
                             if (localDifficulty.getGlobalDifficulty() == Difficulty.HARD && groupSize < 2) {
                                 groupSize = 2;
                             }
-                            for(int i = 0; i < groupSize; ++i) {
+                            for (int i = 0; i < groupSize; ++i) {
                                 PhantomEntity phantomEntity = EntityType.PHANTOM.create(serverWorld);
 
                                 if (phantomEntity != null) {

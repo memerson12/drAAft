@@ -21,9 +21,13 @@ import java.util.function.Supplier;
 
 @Mixin(ServerWorld.class)
 public abstract class ServerWorldMixin extends World implements ServerWorldAccess {
-    @Shadow @Final private ServerWorldProperties worldProperties;
+    @Shadow
+    @Final
+    private ServerWorldProperties worldProperties;
 
-    @Shadow @Final private MinecraftServer server;
+    @Shadow
+    @Final
+    private MinecraftServer server;
 
     @Unique
     boolean lastTickThunder = true;
@@ -46,7 +50,7 @@ public abstract class ServerWorldMixin extends World implements ServerWorldAcces
     }
 
     @ModifyArg(method = "tick",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/ServerWorldProperties;setThunderTime(I)V"))
+        at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/ServerWorldProperties;setThunderTime(I)V"))
     private int injectedThunder(int thunderTime) {
 
 
@@ -88,7 +92,7 @@ public abstract class ServerWorldMixin extends World implements ServerWorldAcces
     }
 
     @ModifyArg(method = "tick",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/ServerWorldProperties;setRainTime(I)V"))
+        at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/ServerWorldProperties;setRainTime(I)V"))
     private int injectedRain(int rainTime) {
         // if we are waiting for a 'valid' rain time, simply chillax. it'll come when it comes.
         if (this.isIllegalRain(rainTime)) {

@@ -5,12 +5,8 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.PersistentState;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.util.EnumMap; // Use EnumMap for better performance with enum keys
+import java.io.*;
+import java.util.EnumMap;
 import java.util.Map;
 import java.util.Random;
 
@@ -61,13 +57,14 @@ public class WorldState extends PersistentState {
 
     /**
      * Gets or creates the persistent WorldState for the given server world.
+     *
      * @param world The server world.
      * @return The WorldState instance.
      */
     public static WorldState getServerState(ServerWorld world) {
         return world.getPersistentStateManager().getOrCreate(
-                () -> new WorldState("draaft_world_state"),
-                "draaft_world_state");
+            () -> new WorldState("draaft_world_state"),
+            "draaft_world_state");
     }
 
     @Override
@@ -102,7 +99,7 @@ public class WorldState extends PersistentState {
         } else {
             // Neither key found; RNG will be initialized lazily if requested via getOrCreateRng
             draaft.LOGGER.debug("Neither primary key '{}' nor fallback key '{}' found for RNG type {}.",
-                    randomState.getNbtKey(), fallbackKey, randomState.getType().name());
+                randomState.getNbtKey(), fallbackKey, randomState.getType().name());
         }
     }
 

@@ -22,8 +22,8 @@ public abstract class TitleScreenMixin extends Screen {
     }
 
     @Inject(
-            method = "init",
-            at = @At("TAIL")
+        method = "init",
+        at = @At("TAIL")
     )
     private void addDraaftLoginButton(CallbackInfo info) {
         int singlePlayerButtonHalfWidth = 100;
@@ -39,26 +39,26 @@ public abstract class TitleScreenMixin extends Screen {
         };
 
         this.addButton(new LoginButton(
-                btnX,
-                baseBtnY,
-                Items.WATER_BUCKET,
-                () -> ServerClient.getInstanceOrNull() != null,
-                tooltipSupplier,
-                DraaftServices.DEFAULT,
-                this
+            btnX,
+            baseBtnY,
+            Items.WATER_BUCKET,
+            () -> ServerClient.getInstanceOrNull() != null,
+            tooltipSupplier,
+            DraaftServices.DEFAULT,
+            this
         ));
 
         var altDraaftServices = DraaftServices.fromJvmArgs();
 
         if (altDraaftServices != null) {
             this.addButton(new LoginButton(
-                    btnX,
-                    baseBtnY + 24,
-                    Items.LAVA_BUCKET,
-                    () -> ServerClient.getInstanceOrNull() != null,
-                    tooltipSupplier,
-                    altDraaftServices,
-                    this
+                btnX,
+                baseBtnY + 24,
+                Items.LAVA_BUCKET,
+                () -> ServerClient.getInstanceOrNull() != null,
+                tooltipSupplier,
+                altDraaftServices,
+                this
             ));
         }
     }

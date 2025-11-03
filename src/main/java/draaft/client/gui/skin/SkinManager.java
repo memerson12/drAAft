@@ -45,22 +45,22 @@ public class SkinManager {
         if (userCache == null) {
             LOGGER.info("Initializing user cache... (was NULL)");
             synchronized (userCacheLock) {
-            if (userCache == null) {
-                System.out.println("Initializing UserCache");
-                MinecraftClient client = MinecraftClient.getInstance();
-                Proxy proxy = client.netProxy;
-                LOGGER.info("Using proxy for UserCache: {}", proxy);
-                YggdrasilAuthenticationService yggdrasilAuthenticationService = new YggdrasilAuthenticationService(
-                    proxy,
-                    UUID.randomUUID().toString());
+                if (userCache == null) {
+                    System.out.println("Initializing UserCache");
+                    MinecraftClient client = MinecraftClient.getInstance();
+                    Proxy proxy = client.netProxy;
+                    LOGGER.info("Using proxy for UserCache: {}", proxy);
+                    YggdrasilAuthenticationService yggdrasilAuthenticationService = new YggdrasilAuthenticationService(
+                        proxy,
+                        UUID.randomUUID().toString());
 
-                GameProfileRepository gameProfileRepository = yggdrasilAuthenticationService
-                    .createProfileRepository();
+                    GameProfileRepository gameProfileRepository = yggdrasilAuthenticationService
+                        .createProfileRepository();
 
-                // Use the same cache file location as Minecraft
-                File cacheFile = new File(client.runDirectory, MinecraftServer.USER_CACHE_FILE.getName());
-                userCache = new UserCache(gameProfileRepository, cacheFile);
-            }
+                    // Use the same cache file location as Minecraft
+                    File cacheFile = new File(client.runDirectory, MinecraftServer.USER_CACHE_FILE.getName());
+                    userCache = new UserCache(gameProfileRepository, cacheFile);
+                }
             }
         } else {
             LOGGER.info("User cache already initialized.");
