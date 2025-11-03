@@ -4,23 +4,33 @@
   "version": "${version}",
   "name": "drAAft",
   "description": "Mod for Pac's awesome AA Event",
-  "authors": ["Memerson", "PacManMVC"],
+  "authors": [
+    "DesktopFolder",
+    "me_nx",
+    "Memerson",
+    "PacManMVC"
+  ],
   "contact": {
-    "homepage": "https://fabricmc.net/",
-    "sources": "https://github.com/FabricMC/fabric-example-mod"
+    "homepage": "https://disrespec.tech/draaft/",
+    "sources": "https://github.com/memerson12/drAAft"
   },
   "license": "CC0-1.0",
   "icon": "assets/draaft/logo.png",
   "environment": "*",
   "entrypoints": {
-    "main": ["draaft.draaft"]
+    "main": [
+      "draaft.draaft"
+    ]
   },
-  "mixins": ["draaft.mixins.json"],
+  "mixins": [
+    "draaft.mixins.json"
+  ],
   "accessWidener": "draaft.accesswidener",
   "depends": {
     "fabricloader": ">=0.16.13",
     "minecraft": "~1.16.1",
-    "java": ">=16"
+    "java": ">=16",
+    "speedrunapi": ">=2.0+1.16.1"
   },
   "custom": {
     "speedrunapi": {
