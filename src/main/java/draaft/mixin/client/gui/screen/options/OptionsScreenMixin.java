@@ -19,7 +19,7 @@ import java.util.Objects;
 @Mixin(OptionsScreen.class)
 public abstract class OptionsScreenMixin extends Screen {
     @Unique
-    private final OptionsScreenAccessor self = (OptionsScreenAccessor)this;
+    private final OptionsScreenAccessor self = (OptionsScreenAccessor) this;
 
     @Unique
     private Difficulty originalDifficulty;

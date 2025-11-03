@@ -1,6 +1,5 @@
 package draaft.client;
 
-import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
@@ -8,7 +7,6 @@ import com.sun.net.httpserver.HttpServer;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.URI;
 import java.nio.charset.StandardCharsets;
 
 /**
@@ -50,7 +48,8 @@ public class AuthTokenServer {
         return this.server.getAddress().getPort();
     }
 
-    record Response(String token) {}
+    record Response(String token) {
+    }
 
     class Handler implements HttpHandler {
         @Override

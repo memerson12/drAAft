@@ -78,7 +78,8 @@ public class DraaftAuth {
     }
 
     // GSON can't deserialize to method-local classes
-    private record LoginRequest(String serverID, String username) {}
+    private record LoginRequest(String serverID, String username) {
+    }
 
     // Minecraft's version of GSON can't deserialize to records
     @SuppressWarnings("unused") // assigned by GSON

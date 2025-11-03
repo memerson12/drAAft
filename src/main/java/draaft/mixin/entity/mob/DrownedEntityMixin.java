@@ -92,9 +92,9 @@ public abstract class DrownedEntityMixin extends ZombieEntity implements RangedA
             if (itemStack.getItem().equals(Items.TRIDENT)) {
                 float f = 0.125F;
                 if (!itemStack.isEmpty()
-                        && !EnchantmentHelper.hasVanishingCurse(itemStack)
-                        && (allowDrops)
-                        && Math.max(draaftTridentRng.nextFloat() - (float)lootingMultiplier * 0.02F, 0.0F) < f) {
+                    && !EnchantmentHelper.hasVanishingCurse(itemStack)
+                    && (allowDrops)
+                    && Math.max(draaftTridentRng.nextFloat() - (float) lootingMultiplier * 0.02F, 0.0F) < f) {
                     if (itemStack.isDamageable()) {
                         itemStack.setDamage(Math.min(itemStack.getMaxDamage() - draaftTridentRng.nextInt(1 + draaftTridentRng.nextInt(Math.max(itemStack.getMaxDamage() - 3, 1))), itemStack.getMaxDamage() - 2));
                     }
@@ -104,9 +104,9 @@ public abstract class DrownedEntityMixin extends ZombieEntity implements RangedA
                 float f = this.getDropChance(equipmentSlot);
                 boolean bl = f > 1.0F;
                 if (!itemStack.isEmpty()
-                        && !EnchantmentHelper.hasVanishingCurse(itemStack)
-                        && (allowDrops || bl)
-                        && Math.max(this.random.nextFloat() - (float)lootingMultiplier * 0.02F, 0.0F) < f) {
+                    && !EnchantmentHelper.hasVanishingCurse(itemStack)
+                    && (allowDrops || bl)
+                    && Math.max(this.random.nextFloat() - (float) lootingMultiplier * 0.02F, 0.0F) < f) {
                     if (!bl && itemStack.isDamageable()) {
                         itemStack.setDamage(Math.min(itemStack.getMaxDamage() - this.random.nextInt(1 + this.random.nextInt(Math.max(itemStack.getMaxDamage() - 3, 1))), itemStack.getMaxDamage() - 2));
                     }

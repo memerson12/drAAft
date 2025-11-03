@@ -36,16 +36,16 @@ public class DefaultBiomeFeaturesMixin {
     @Overwrite
     public static void addAncientDebris(Biome biome) {
         biome.addFeature(
-                GenerationStep.Feature.UNDERGROUND_DECORATION,
-                Feature.NO_SURFACE_ORE
-                        .configure(new OreFeatureConfig(OreFeatureConfig.Target.NETHER_ORE_REPLACEABLES, Blocks.ANCIENT_DEBRIS.getDefaultState(), 5))
-                        .createDecoratedFeature(Decorator.COUNT_DEPTH_AVERAGE.configure(new CountDepthDecoratorConfig(1, 16, 8)))
+            GenerationStep.Feature.UNDERGROUND_DECORATION,
+            Feature.NO_SURFACE_ORE
+                .configure(new OreFeatureConfig(OreFeatureConfig.Target.NETHER_ORE_REPLACEABLES, Blocks.ANCIENT_DEBRIS.getDefaultState(), 5))
+                .createDecoratedFeature(Decorator.COUNT_DEPTH_AVERAGE.configure(new CountDepthDecoratorConfig(1, 16, 8)))
         );
         biome.addFeature(
-                GenerationStep.Feature.UNDERGROUND_DECORATION,
-                Feature.NO_SURFACE_ORE
-                        .configure(new OreFeatureConfig(OreFeatureConfig.Target.NETHER_ORE_REPLACEABLES, Blocks.ANCIENT_DEBRIS.getDefaultState(), 4))
-                        .createDecoratedFeature(Decorator.COUNT_DEPTH_AVERAGE.configure(new CountDepthDecoratorConfig(1, 16, 8)))
+            GenerationStep.Feature.UNDERGROUND_DECORATION,
+            Feature.NO_SURFACE_ORE
+                .configure(new OreFeatureConfig(OreFeatureConfig.Target.NETHER_ORE_REPLACEABLES, Blocks.ANCIENT_DEBRIS.getDefaultState(), 4))
+                .createDecoratedFeature(Decorator.COUNT_DEPTH_AVERAGE.configure(new CountDepthDecoratorConfig(1, 16, 8)))
         );
     }
 
@@ -56,40 +56,40 @@ public class DefaultBiomeFeaturesMixin {
     @Overwrite
     public static void addDefaultOres(Biome biome) {
         biome.addFeature(
-                GenerationStep.Feature.UNDERGROUND_ORES,
-                Feature.ORE
-                        .configure(new OreFeatureConfig(OreFeatureConfig.Target.NATURAL_STONE, COAL_ORE, 17))
-                        .createDecoratedFeature(Decorator.COUNT_RANGE.configure(new RangeDecoratorConfig(20, 0, 0, 128)))
+            GenerationStep.Feature.UNDERGROUND_ORES,
+            Feature.ORE
+                .configure(new OreFeatureConfig(OreFeatureConfig.Target.NATURAL_STONE, COAL_ORE, 17))
+                .createDecoratedFeature(Decorator.COUNT_RANGE.configure(new RangeDecoratorConfig(20, 0, 0, 128)))
         );
         biome.addFeature(
-                GenerationStep.Feature.UNDERGROUND_ORES,
-                Feature.ORE
-                        .configure(new OreFeatureConfig(OreFeatureConfig.Target.NATURAL_STONE, IRON_ORE, 9))
-                        .createDecoratedFeature(Decorator.COUNT_RANGE.configure(new RangeDecoratorConfig(20, 0, 0, 64)))
+            GenerationStep.Feature.UNDERGROUND_ORES,
+            Feature.ORE
+                .configure(new OreFeatureConfig(OreFeatureConfig.Target.NATURAL_STONE, IRON_ORE, 9))
+                .createDecoratedFeature(Decorator.COUNT_RANGE.configure(new RangeDecoratorConfig(20, 0, 0, 64)))
         );
         biome.addFeature(
-                GenerationStep.Feature.UNDERGROUND_ORES,
-                Feature.ORE
-                        .configure(new OreFeatureConfig(OreFeatureConfig.Target.NATURAL_STONE, GOLD_ORE, 9))
-                        .createDecoratedFeature(Decorator.COUNT_RANGE.configure(new RangeDecoratorConfig(2, 0, 0, 32)))
+            GenerationStep.Feature.UNDERGROUND_ORES,
+            Feature.ORE
+                .configure(new OreFeatureConfig(OreFeatureConfig.Target.NATURAL_STONE, GOLD_ORE, 9))
+                .createDecoratedFeature(Decorator.COUNT_RANGE.configure(new RangeDecoratorConfig(2, 0, 0, 32)))
         );
         biome.addFeature(
-                GenerationStep.Feature.UNDERGROUND_ORES,
-                Feature.ORE
-                        .configure(new OreFeatureConfig(OreFeatureConfig.Target.NATURAL_STONE, REDSTONE_ORE, 8))
-                        .createDecoratedFeature(Decorator.COUNT_RANGE.configure(new RangeDecoratorConfig(8, 0, 0, 16)))
+            GenerationStep.Feature.UNDERGROUND_ORES,
+            Feature.ORE
+                .configure(new OreFeatureConfig(OreFeatureConfig.Target.NATURAL_STONE, REDSTONE_ORE, 8))
+                .createDecoratedFeature(Decorator.COUNT_RANGE.configure(new RangeDecoratorConfig(8, 0, 0, 16)))
         );
         biome.addFeature(
-                GenerationStep.Feature.UNDERGROUND_ORES,
-                Feature.ORE
-                        .configure(new OreFeatureConfig(OreFeatureConfig.Target.NATURAL_STONE, DIAMOND_ORE, 8))
-                        .createDecoratedFeature(Decorator.COUNT_RANGE.configure(new RangeDecoratorConfig(1, 0, 0, 16)))
+            GenerationStep.Feature.UNDERGROUND_ORES,
+            Feature.ORE
+                .configure(new OreFeatureConfig(OreFeatureConfig.Target.NATURAL_STONE, DIAMOND_ORE, 8))
+                .createDecoratedFeature(Decorator.COUNT_RANGE.configure(new RangeDecoratorConfig(1, 0, 0, 16)))
         );
         biome.addFeature(
-                GenerationStep.Feature.UNDERGROUND_ORES,
-                Feature.ORE
-                        .configure(new OreFeatureConfig(OreFeatureConfig.Target.NATURAL_STONE, LAPIS_ORE, 9))
-                        .createDecoratedFeature(Decorator.COUNT_DEPTH_AVERAGE.configure(new CountDepthDecoratorConfig(4, 16, 16)))
+            GenerationStep.Feature.UNDERGROUND_ORES,
+            Feature.ORE
+                .configure(new OreFeatureConfig(OreFeatureConfig.Target.NATURAL_STONE, LAPIS_ORE, 9))
+                .createDecoratedFeature(Decorator.COUNT_DEPTH_AVERAGE.configure(new CountDepthDecoratorConfig(4, 16, 16)))
         );
     }
 }
