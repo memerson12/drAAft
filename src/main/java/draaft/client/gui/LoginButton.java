@@ -33,7 +33,11 @@ public class LoginButton extends ButtonWidget {
         super(x, y, 20, 20, LiteralText.EMPTY, (btn) -> {
             ServerClient.login(draaftServices);
 
-            // todo it feels kind of weird for this logic to be here in the button class
+            if (ServerClient.getInstanceOrNull() == null) {
+                return;
+            }
+
+            // TODO: remove when a room join event is sent through a websocket
             MinecraftClient minecraftClient = MinecraftClient.getInstance();
             DraaftState draaftState = DraaftState.getInstance();
             draaftState.setCurrentState(DraaftState.STATE.WAITING_FOR_ROOM);
