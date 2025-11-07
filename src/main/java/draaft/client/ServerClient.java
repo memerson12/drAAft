@@ -6,8 +6,11 @@ import draaft.client.gui.DraaftToast;
 import draaft.client.models.Room;
 import draaft.client.models.RoomDeserializer;
 import draaft.client.ws.DraaftWebSocketClient;
-import draaft.client.ws.RoomEventDispatcher;
-import draaft.client.ws.RoomEventListener;
+import draaft.client.ws.EventBus;
+import draaft.client.ws.EventListener;
+import draaft.client.ws.events.DraftPickEvents;
+import draaft.client.ws.events.RoomMemberEvents;
+import draaft.client.ws.events.RoomStateEvents;
 import draaft.draaft;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
@@ -31,7 +34,7 @@ public class ServerClient {
     private final HttpClient httpClient;
     private final String token;
     private final DraaftServices draaftServices;
-    private final RoomEventDispatcher wsDispatcher;
+    private final EventBus eventBus;
     private DraaftWebSocketClient wsClient;
 
     private static final Logger logger = draaft.LOGGER;
@@ -55,7 +58,8 @@ public class ServerClient {
         this.httpClient = httpClient;
         this.token = token;
         this.draaftServices = draaftServices;
-        this.wsDispatcher = new RoomEventDispatcher();
+        this.eventBus = new EventBus();
+
         this.startWs();
     }
 
@@ -102,7 +106,7 @@ public class ServerClient {
     public void startWs() {
         if (this.wsClient != null)
             return;
-        this.wsClient = new DraaftWebSocketClient(this.httpClient, this.draaftServices, this.token, this.wsDispatcher);
+        this.wsClient = new DraaftWebSocketClient(this.httpClient, this.draaftServices, this.token, this.eventBus);
         this.wsClient.start();
     }
 
@@ -113,12 +117,28 @@ public class ServerClient {
         }
     }
 
-    public void addRoomEventListener(RoomEventListener listener) {
-        this.wsDispatcher.addListener(listener);
+    public void addRoomMemberEventListener(EventListener<RoomMemberEvents> listener) {
+        this.eventBus.register(RoomMemberEvents.class, listener);
     }
 
-    public void removeRoomEventListener(RoomEventListener listener) {
-        this.wsDispatcher.removeListener(listener);
+    public void removeRoomMemberEventListener(EventListener<RoomMemberEvents> listener) {
+        this.eventBus.unregister(RoomMemberEvents.class, listener);
+    }
+
+    public void addPickEventListener(EventListener<DraftPickEvents> listener) {
+        this.eventBus.register(DraftPickEvents.class, listener);
+    }
+
+    public void removePickEventListener(EventListener<DraftPickEvents> listener) {
+        this.eventBus.unregister(DraftPickEvents.class, listener);
+    }
+
+    public void addRoomStateEventListener(EventListener<RoomStateEvents> listener) {
+        this.eventBus.register(RoomStateEvents.class, listener);
+    }
+
+    public void removeRoomStateEventListener(EventListener<RoomStateEvents> listener) {
+        this.eventBus.unregister(RoomStateEvents.class, listener);
     }
 
     // thanks menx :)
