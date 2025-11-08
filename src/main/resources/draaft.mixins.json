@@ -3,6 +3,7 @@
   "package": "draaft.mixin",
   "compatibilityLevel": "JAVA_11",
   "mixins": [
+    "block.ChestBlockMixin",
     "enchantment.EnchantmentsMixin",
     "entity.boss.dragon.EnderDragonEntityMixin",
     "entity.boss.dragon.phase.HoldingPatternPhaseMixin",
@@ -19,6 +20,8 @@
     "screen.slot.TradeOutputSlotMixin",
     "server.world.ServerWorldMixin",
     "structure.IglooGeneratorMixin",
+    "structure.StructurePieceMixin",
+    "world.SpawnHelperMixin",
     "world.WanderingTraderManagerMixin",
     "world.biome.BambooJungleBiomeMixin",
     "world.biome.BambooJungleHillsBiomeMixin",
@@ -28,7 +31,8 @@
     "world.gen.decorator.BeehiveTreeDecoratorMixin",
     "world.gen.decorator.EndGatewayDecoratorMixin",
     "world.gen.decorator.LavaLakeDecoratorMixin",
-    "world.gen.feature.DefaultBiomeFeaturesMixin"
+    "world.gen.feature.DefaultBiomeFeaturesMixin",
+    "world.poi.PointOfInterestTypeAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

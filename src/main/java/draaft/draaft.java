@@ -1,5 +1,6 @@
 package draaft;
 
+import draaft.world.PyramidChest;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
 import org.apache.logging.log4j.Level;
@@ -28,6 +29,8 @@ public class draaft implements ModInitializer {
             Configurator.setLevel(MOD_ID, Level.DEBUG);
         }
         LOGGER.info("Draaft version: {}", DRAAFT_VERSION);
+
+        PyramidChest.registerPoi();
     }
 
     public static String getDraaftVersion() {
