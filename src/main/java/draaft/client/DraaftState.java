@@ -2,7 +2,7 @@ package draaft.client;
 
 import draaft.client.models.DraaftPlayer;
 import draaft.client.models.Room;
-import draaft.client.ws.RoomEvent;
+import draaft.client.ws.events.RoomMemberEvents;
 import draaft.draaft;
 import org.apache.logging.log4j.Logger;
 
@@ -19,14 +19,14 @@ public class DraaftState {
     private Room room;
 
     private DraaftState() {
-        serverClient.addRoomEventListener(event -> {
-            RoomEvent.RoomEventType eventType = RoomEvent.RoomEventType.valueOf(event.type().toUpperCase());
+        serverClient.addRoomMemberEventListener(event -> {
+            RoomMemberEvents.RoomEventType eventType = event.type();
             logger.info("DraaftScreen received event of type {}: ", eventType);
             ArrayList<DraaftPlayer> players = this.room.members();
             switch (eventType) {
                 // Add new player
                 case JOINED -> {
-                    RoomEvent.PlayerJoined playerJoined = (RoomEvent.PlayerJoined) event;
+                    RoomMemberEvents.PlayerJoined playerJoined = (RoomMemberEvents.PlayerJoined) event;
                     logger.info(playerJoined.playerUuid());
                     DraaftPlayer newPlayer = new DraaftPlayer(playerJoined.playerUuid());
                     players.add(newPlayer);
@@ -34,13 +34,13 @@ public class DraaftState {
 
                 // Remove player
                 case LEFT -> {
-                    RoomEvent.PlayerLeft playerLeft = (RoomEvent.PlayerLeft) event;
+                    RoomMemberEvents.PlayerLeft playerLeft = (RoomMemberEvents.PlayerLeft) event;
                     players.removeIf(player -> player.getUuid().equals(playerLeft.playerUuid()));
                 }
 
                 // Remove kicked player
                 case KICK -> {
-                    RoomEvent.PlayerKick playerKick = (RoomEvent.PlayerKick) event;
+                    RoomMemberEvents.PlayerKick playerKick = (RoomMemberEvents.PlayerKick) event;
                     players.removeIf(player -> player.getUuid().equals(playerKick.playerUuid()));
                 }
                 default -> logger.warn("Unhandled event type in DraaftScreen: {}", event.type());

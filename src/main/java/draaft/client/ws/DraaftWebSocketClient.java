@@ -26,7 +26,7 @@ public class DraaftWebSocketClient {
     private final DraaftServices services;
     private final String token;
     private final ScheduledExecutorService scheduler;
-    private final RoomEventDispatcher dispatcher;
+    private final EventBus eventBus;
     private final Gson gson;
 
     private final AtomicReference<WebSocket> wsRef = new AtomicReference<>();
@@ -40,11 +40,11 @@ public class DraaftWebSocketClient {
     private ScheduledFuture<?> pingTask;
 
     public DraaftWebSocketClient(HttpClient httpClient, DraaftServices services, String token,
-                                 RoomEventDispatcher dispatcher) {
+                                 EventBus eventBus) {
         this.httpClient = Objects.requireNonNull(httpClient);
         this.services = Objects.requireNonNull(services);
         this.token = Objects.requireNonNull(token);
-        this.dispatcher = Objects.requireNonNull(dispatcher);
+        this.eventBus = Objects.requireNonNull(eventBus);
         this.gson = ServerClient.GSON; // reuse configured Gson
         this.scheduler = Executors.newSingleThreadScheduledExecutor(r -> {
             Thread t = new Thread(r, "draaft-ws");
@@ -75,20 +75,12 @@ public class DraaftWebSocketClient {
         scheduler.shutdownNow();
     }
 
-    public void addListener(RoomEventListener listener) {
-        dispatcher.addListener(listener);
-    }
-
-    public void removeListener(RoomEventListener listener) {
-        dispatcher.removeListener(listener);
-    }
-
     private void connect() {
         String listenUrl = Utils.buildListenUri(services.apiBase().toString(), token);
         URI uri = URI.create(listenUrl);
         LOGGER.info("WS: connecting to {}", uri);
 
-        DraaftWebSocketListener listener = new DraaftWebSocketListener(dispatcher, gson, this::scheduleReconnect);
+        DraaftWebSocketListener listener = new DraaftWebSocketListener(eventBus, gson, this::scheduleReconnect);
         httpClient.newWebSocketBuilder()
             .connectTimeout(Duration.ofSeconds(10))
             .buildAsync(uri, listener)
@@ -140,4 +132,3 @@ public class DraaftWebSocketClient {
         scheduler.schedule(this::connect, delayMs, TimeUnit.MILLISECONDS);
     }
 }
-
