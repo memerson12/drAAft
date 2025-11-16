@@ -4,6 +4,7 @@
   "compatibilityLevel": "JAVA_11",
   "mixins": [
     "block.ChestBlockMixin",
+    "block.entity.LootableContainerBlockEntityMixin",
     "enchantment.EnchantmentsMixin",
     "entity.boss.dragon.EnderDragonEntityMixin",
     "entity.boss.dragon.phase.HoldingPatternPhaseMixin",
@@ -38,10 +39,10 @@
     "defaultRequire": 1
   },
   "client": [
-    "compat.InGameTimerMixin",
     "client.gui.DebugHudMixin",
     "client.gui.TitleScreenMixin",
     "client.gui.screen.options.OptionsScreenAccessor",
-    "client.gui.screen.options.OptionsScreenMixin"
+    "client.gui.screen.options.OptionsScreenMixin",
+    "compat.InGameTimerMixin"
   ]
 }

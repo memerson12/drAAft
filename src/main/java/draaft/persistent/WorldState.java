@@ -24,7 +24,8 @@ public class WorldState extends PersistentState {
         PHANTOM("phantom"),
         BLAZE("blaze"),
         SHULKER("shulker"),
-        RABBIT("rabbit");
+        RABBIT("rabbit"),
+        TEMPLE("temple");
 
         private final String keyName; // The base name used for NBT keys
 
