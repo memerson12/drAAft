@@ -28,7 +28,7 @@ dependencies {
 	mappings "dev.tildejustin:yarn:${project.yarn_mappings}:v2"
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 	modImplementation "com.github.contariaa:SpeedrunAPI:v2.1-1.16.1"
-    modImplementation "dev.menx:world-importer:0.1.0"
+    include(modImplementation "dev.menx:world-importer:0.1.0")
 
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	// modImplementation "com.github.KingContaria:SpeedrunAPI:a3e3998294"
