@@ -10,6 +10,7 @@
     "entity.boss.dragon.phase.HoldingPatternPhaseMixin",
     "entity.mob.BlazeEntityMixin",
     "entity.mob.DrownedEntityMixin",
+    "entity.mob.MobEntityMixin",
     "entity.mob.PiglinBrainMixin",
     "entity.mob.ShulkerEntityMixin",
     "entity.mob.WitherSkeletonEntityMixin",

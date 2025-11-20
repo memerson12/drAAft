@@ -168,6 +168,13 @@ public class WorldState extends PersistentState {
         return randomState.getUses();
     }
 
+    public void resetRng(RngType type) {
+        RandomState randomState = randomStates.get(type);
+
+        this.markDirty();
+        randomState.resetUses();
+    }
+
     private static class RandomState {
         private Random random;
         private final RngType type;
@@ -202,5 +209,7 @@ public class WorldState extends PersistentState {
         public int getUses() { return this.uses; }
 
         public void incrementUses() { this.uses++; }
+
+        public void resetUses() { this.uses = 0; }
     }
 }
