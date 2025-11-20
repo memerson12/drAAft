@@ -6,12 +6,15 @@ import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.block.entity.LockableContainerBlockEntity;
 import net.minecraft.block.entity.LootableContainerBlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.loot.LootTable;
 import net.minecraft.loot.context.LootContext;
 import net.minecraft.loot.context.LootContextParameters;
 import net.minecraft.loot.context.LootContextTypes;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.Nullable;
@@ -26,6 +29,9 @@ public abstract class LootableContainerBlockEntityMixin extends LockableContaine
     @Shadow
     @Nullable
     protected Identifier lootTableId;
+
+    @Shadow
+    public abstract void setStack(int slot, ItemStack stack);
 
     protected LootableContainerBlockEntityMixin(BlockEntityType<?> blockEntityType) {
         super(blockEntityType);
@@ -48,6 +54,10 @@ public abstract class LootableContainerBlockEntityMixin extends LockableContaine
             }
 
             lootTable.supplyInventory(this, builder.build(LootContextTypes.CHEST));
+            int chestsChecked = WorldState.getServerState((ServerWorld) this.world).incrementRng(WorldState.RngType.TEMPLE, (ServerWorld) this.world);
+            if ((chestsChecked > 16) && ((chestsChecked % 16) == 1)) {
+                this.setStack(0, new ItemStack(Items.ENCHANTED_GOLDEN_APPLE).setCustomName(Text.of("Pity Apple")));
+            }
             ci.cancel();
         }
     }

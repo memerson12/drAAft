@@ -154,13 +154,29 @@ public class WorldState extends PersistentState {
         return randomState.getRandom();
     }
 
+    public int incrementRng(RngType type, ServerWorld world) {
+        RandomState randomState = randomStates.get(type);
+
+        if (randomState.getRandom() == null) {
+            draaft.LOGGER.info("Initializing '{}' RNG state. Is Client: {}", type.name(), world.isClient);
+            long seed = world.getSeed();
+            randomState.setRandom(new Random(seed));
+        }
+
+        this.markDirty();
+        randomState.incrementUses();
+        return randomState.getUses();
+    }
+
     private static class RandomState {
         private Random random;
         private final RngType type;
+        private int uses;
 
         public RandomState(Random random, RngType type) {
             this.random = random;
             this.type = type;
+            this.uses = 0;
         }
 
         public Random getRandom() {
@@ -182,5 +198,9 @@ public class WorldState extends PersistentState {
         public RngType getType() {
             return type;
         }
+
+        public int getUses() { return this.uses; }
+
+        public void incrementUses() { this.uses++; }
     }
 }
