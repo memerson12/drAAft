@@ -24,7 +24,7 @@ public abstract class MobEntityMixin extends LivingEntity {
         super(entityType, world);
     }
 
-    @Inject(method = "dropLoot", at = @At("HEAD"))
+    @Inject(method = "dropLoot", at = @At("HEAD"), cancellable = true)
     void dropLoot(DamageSource source, boolean causedByPlayer, CallbackInfo ci) {
         if (this.getType().equals(EntityType.WITHER_SKELETON) && causedByPlayer) {
             if (source.getAttacker() == null) {
@@ -49,6 +49,7 @@ public abstract class MobEntityMixin extends LivingEntity {
             }
             if ((killed % timer) == 0) {
                 dropPitySkull();
+                ci.cancel();
             }
         }
     }
