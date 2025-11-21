@@ -13,6 +13,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -27,49 +28,34 @@ public abstract class MobEntityMixin extends LivingEntity {
     void dropLoot(DamageSource source, boolean causedByPlayer, CallbackInfo ci) {
         if (this.getType().equals(EntityType.WITHER_SKELETON) && causedByPlayer) {
             if (source.getAttacker() == null) {
-                LOGGER.info("Something went horribly wrong - causedByPlayer was true, getAttacker() was null");
+                LOGGER.warn("Something went horribly wrong - causedByPlayer was true, getAttacker() was null");
                 return;
             }
-            int i;
+            int looting;
             if (source.getAttacker() instanceof PlayerEntity) {
-                i = EnchantmentHelper.getLooting((LivingEntity) source.getAttacker());
+                looting = EnchantmentHelper.getLooting((LivingEntity) source.getAttacker());
             } else {
-                LOGGER.info("Something went horribly wrong - causedByPlayer was true, getAttacker() was not a PlayerEntity");
-                i = 0;
+                LOGGER.warn("Something went horribly wrong - causedByPlayer was true, getAttacker() was not a PlayerEntity");
+                looting = 0;
             }
             ServerWorld world = (ServerWorld) this.getEntityWorld();
             WorldState state = WorldState.getServerState(world);
-            int killed = state.incrementRng(WorldState.RngType.SKULL, world);
-            switch (i) {
-                case 0: {
-                    if ((killed > 0) && ((killed % 20) == 0)) {
-                        state.resetRng(WorldState.RngType.SKULL);
-                        this.dropStack(new ItemStack(Items.WITHER_SKELETON_SKULL).setCustomName(Text.of("Pity Skull")));
-                    }
-                    break;
-                }
-                case 1: {
-                    if ((killed > 0) && ((killed % 14) == 0)) {
-                        state.resetRng(WorldState.RngType.SKULL);
-                        this.dropStack(new ItemStack(Items.WITHER_SKELETON_SKULL).setCustomName(Text.of("Pity Skull")));
-                    }
-                    break;
-                }
-                case 2: {
-                    if ((killed > 0) && ((killed % 11) == 0)) {
-                        state.resetRng(WorldState.RngType.SKULL);
-                        this.dropStack(new ItemStack(Items.WITHER_SKELETON_SKULL).setCustomName(Text.of("Pity Skull")));
-                    }
-                    break;
-                }
-                case 3: {
-                    if ((killed > 0) && ((killed % 9) == 0)) {
-                        state.resetRng(WorldState.RngType.SKULL);
-                        this.dropStack(new ItemStack(Items.WITHER_SKELETON_SKULL).setCustomName(Text.of("Pity Skull")));
-                    }
-                    break;
-                }
+            WorldState.RandomState draaftSkullState = state.getOrCreateRng(WorldState.RngType.SKULL, world);
+            int killed = draaftSkullState.incrementUses();
+            int timer = 20;
+            while (looting > 0) {
+                timer -= (6 / looting);
+                looting--;
+            }
+            if ((killed % timer) == 0) {
+                dropPitySkull();
             }
         }
+    }
+
+    @Unique
+    private void dropPitySkull() {
+        WorldState.getServerState((ServerWorld) this.getEntityWorld()).getOrCreateRng(WorldState.RngType.SKULL, (ServerWorld) this.getEntityWorld()).resetUses();
+        this.dropStack(new ItemStack(Items.WITHER_SKELETON_SKULL).setCustomName(Text.of("Pity Skull")));
     }
 }
