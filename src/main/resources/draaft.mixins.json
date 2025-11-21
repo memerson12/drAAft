@@ -6,6 +6,7 @@
     "block.ChestBlockMixin",
     "block.entity.LootableContainerBlockEntityMixin",
     "enchantment.EnchantmentsMixin",
+    "entity.TntEntityMixin",
     "entity.boss.dragon.EnderDragonEntityMixin",
     "entity.boss.dragon.phase.HoldingPatternPhaseMixin",
     "entity.mob.BlazeEntityMixin",
