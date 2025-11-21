@@ -140,7 +140,7 @@ public class WorldState extends PersistentState {
      * @param world The ServerWorld instance.
      * @return The Random instance for the specified type.
      */
-    public Random getOrCreateRng(RngType type, ServerWorld world) {
+    public RandomState getOrCreateRng(RngType type, ServerWorld world) {
         // EnumMap guarantees the key exists if initialized correctly
         RandomState randomState = randomStates.get(type);
 
@@ -151,31 +151,10 @@ public class WorldState extends PersistentState {
         }
 
         this.markDirty();
-        return randomState.getRandom();
+        return randomState;
     }
 
-    public int incrementRng(RngType type, ServerWorld world) {
-        RandomState randomState = randomStates.get(type);
-
-        if (randomState.getRandom() == null) {
-            draaft.LOGGER.info("Initializing '{}' RNG state. Is Client: {}", type.name(), world.isClient);
-            long seed = world.getSeed();
-            randomState.setRandom(new Random(seed));
-        }
-
-        this.markDirty();
-        randomState.incrementUses();
-        return randomState.getUses();
-    }
-
-    public void resetRng(RngType type) {
-        RandomState randomState = randomStates.get(type);
-
-        this.markDirty();
-        randomState.resetUses();
-    }
-
-    private static class RandomState {
+    public static class RandomState {
         private Random random;
         private final RngType type;
         private int uses;
@@ -206,9 +185,8 @@ public class WorldState extends PersistentState {
             return type;
         }
 
-        public int getUses() { return this.uses; }
 
-        public void incrementUses() { this.uses++; }
+        public int incrementUses() { return ++this.uses; }
 
         public void resetUses() { this.uses = 0; }
     }

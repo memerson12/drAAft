@@ -81,7 +81,7 @@ public abstract class DrownedEntityMixin extends ZombieEntity implements RangedA
         super.dropEquipment(source, lootingMultiplier, false);
         ServerWorld world = (ServerWorld) this.getEntityWorld();
         WorldState state = WorldState.getServerState(world);
-        Random draaftTridentRng = state.getOrCreateRng(WorldState.RngType.TRIDENT, world);
+        Random draaftTridentRng = state.getOrCreateRng(WorldState.RngType.TRIDENT, world).getRandom();
 
         for (EquipmentSlot equipmentSlot : EquipmentSlot.values()) {
             ItemStack itemStack = this.getEquippedStack(equipmentSlot);

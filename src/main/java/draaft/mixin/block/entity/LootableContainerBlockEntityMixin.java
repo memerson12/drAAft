@@ -46,15 +46,16 @@ public abstract class LootableContainerBlockEntityMixin extends LockableContaine
             }
 
             this.lootTableId = null;
+            WorldState.RandomState randomState = WorldState.getServerState((ServerWorld) this.world).getOrCreateRng(WorldState.RngType.TEMPLE, (ServerWorld) this.world);
             LootContext.Builder builder = new LootContext.Builder((ServerWorld)this.world)
                 .parameter(LootContextParameters.POSITION, new BlockPos(this.pos))
-                .random(WorldState.getServerState((ServerWorld) this.world).getOrCreateRng(WorldState.RngType.TEMPLE, (ServerWorld) this.world));
+                .random(randomState.getRandom());
             if (player != null) {
                 builder.luck(player.getLuck()).parameter(LootContextParameters.THIS_ENTITY, player);
             }
 
             lootTable.supplyInventory(this, builder.build(LootContextTypes.CHEST));
-            int chestsChecked = WorldState.getServerState((ServerWorld) this.world).incrementRng(WorldState.RngType.TEMPLE, (ServerWorld) this.world);
+            int chestsChecked = randomState.incrementUses();
             if ((chestsChecked > 16) && ((chestsChecked % 16) == 1)) {
                 this.setStack(0, new ItemStack(Items.ENCHANTED_GOLDEN_APPLE).setCustomName(Text.of("Pity Apple")));
             }
