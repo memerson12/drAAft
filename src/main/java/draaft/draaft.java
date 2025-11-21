@@ -25,7 +25,7 @@ public class draaft implements ModInitializer {
     @Override
     public void onInitialize() {
         if (IS_DEBUG) {
-            LOGGER.info(MOD_ID + " is running on debug mode");
+            LOGGER.warn(MOD_ID + " is running on debug mode");
             Configurator.setLevel(MOD_ID, Level.DEBUG);
         }
         LOGGER.info("Draaft version: {}", DRAAFT_VERSION);
