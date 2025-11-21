@@ -42,8 +42,8 @@ public class WorldState extends PersistentState {
             return keyName + "_rng";
         }
 
-        public String getFallbackNbtKey() {
-            return keyName + "_seed";
+        public String getCounterNbtKey() {
+            return keyName + "_uses";
         }
     }
 
@@ -64,9 +64,7 @@ public class WorldState extends PersistentState {
      * @return The WorldState instance.
      */
     public static WorldState getServerState(ServerWorld world) {
-        return world.getPersistentStateManager().getOrCreate(
-            () -> new WorldState("draaft_world_state"),
-            "draaft_world_state");
+        return world.getPersistentStateManager().getOrCreate(() -> new WorldState("draaft_world_state"), "draaft_world_state");
     }
 
     @Override
@@ -78,30 +76,16 @@ public class WorldState extends PersistentState {
 
     private void deserializeFromTag(CompoundTag tag, RandomState randomState) {
         String primaryKey = randomState.getNbtKey();
+        String counterKey = randomState.getCounterNbtKey();
         if (tag.contains(primaryKey)) {
-            try (ByteArrayInputStream bais = new ByteArrayInputStream(tag.getByteArray(primaryKey));
-                 ObjectInputStream ois = new ObjectInputStream(bais)) {
+            try (ByteArrayInputStream bais = new ByteArrayInputStream(tag.getByteArray(primaryKey)); ObjectInputStream ois = new ObjectInputStream(bais)) {
                 randomState.setRandom((Random) ois.readObject());
+                randomState.setUses(tag.getInt(counterKey));
             } catch (IOException | ClassNotFoundException e) {
-                // If deserialization fails, attempt to fall back to using the stored seed
-                draaft.LOGGER.warn("Unable to deserialize RNG state for key '{}', attempting fallback.", primaryKey, e);
-                tryFallbackSeed(tag, randomState);
+                draaft.LOGGER.warn("Unable to deserialize RNG state for key '{}', will create new random.", primaryKey, e);
             }
         } else {
-            // If primary key doesn't exist, try the fallback seed key directly
-            tryFallbackSeed(tag, randomState);
-        }
-    }
-
-    private void tryFallbackSeed(CompoundTag tag, RandomState randomState) {
-        String fallbackKey = randomState.getFallbackNbtKey();
-        if (tag.contains(fallbackKey)) {
-            draaft.LOGGER.info("Falling back to seed for RNG state key '{}'", fallbackKey);
-            randomState.setRandom(new Random(tag.getLong(fallbackKey)));
-        } else {
-            // Neither key found; RNG will be initialized lazily if requested via getOrCreateRng
-            draaft.LOGGER.debug("Neither primary key '{}' nor fallback key '{}' found for RNG type {}.",
-                randomState.getNbtKey(), fallbackKey, randomState.getType().name());
+            draaft.LOGGER.warn("No existing RNG state found for key '{}', will create new random.", primaryKey);
         }
     }
 
@@ -116,30 +100,24 @@ public class WorldState extends PersistentState {
     private void serializeToTag(CompoundTag nbt, RandomState randomState) {
         if (randomState.getRandom() != null) {
             String primaryKey = randomState.getNbtKey();
-            String fallbackKey = randomState.getFallbackNbtKey();
-            try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                 ObjectOutputStream oos = new ObjectOutputStream(baos)) {
+            String counterKey = randomState.getCounterNbtKey();
+            try (ByteArrayOutputStream baos = new ByteArrayOutputStream(); ObjectOutputStream oos = new ObjectOutputStream(baos)) {
                 oos.writeObject(randomState.getRandom());
                 nbt.putByteArray(primaryKey, baos.toByteArray());
-                // Clean up the old fallback key if full serialization is successful
-                nbt.remove(fallbackKey);
+                nbt.putInt(counterKey, randomState.getUses());
             } catch (IOException e) {
-                // If full serialization fails, fall back to storing only the seed
-                draaft.LOGGER.warn("Unable to serialize RNG state for key '{}', falling back to storing seed.", primaryKey, e);
-                nbt.putLong(fallbackKey, randomState.getRandom().nextLong());
-                // Clean up the primary key if fallback seed is used
-                nbt.remove(primaryKey);
+                draaft.LOGGER.warn("Unable to serialize RNG state for key '{}'", primaryKey, e);
             }
         }
     }
 
     /**
-     * Gets the Random instance for the specified type, creating it based on the
+     * Gets the RandomState instance for the specified type, creating it based on the
      * world seed if it doesn't exist yet in this session.
      *
      * @param type  The RngType enum constant representing the desired RNG.
      * @param world The ServerWorld instance.
-     * @return The Random instance for the specified type.
+     * @return The RandomState instance for the specified type.
      */
     public RandomState getOrCreateRng(RngType type, ServerWorld world) {
         // EnumMap guarantees the key exists if initialized correctly
@@ -178,17 +156,28 @@ public class WorldState extends PersistentState {
             return type.getNbtKey();
         }
 
-        public String getFallbackNbtKey() {
-            return type.getFallbackNbtKey();
+        public String getCounterNbtKey() {
+            return type.getCounterNbtKey();
         }
 
         public RngType getType() {
             return type;
         }
 
+        public int getUses() {
+            return uses;
+        }
 
-        public int incrementUses() { return ++this.uses; }
+        public void setUses(int uses) {
+            this.uses = uses;
+        }
 
-        public void resetUses() { this.uses = 0; }
+        public int incrementUses() {
+            return ++this.uses;
+        }
+
+        public void resetUses() {
+            this.uses = 0;
+        }
     }
 }
