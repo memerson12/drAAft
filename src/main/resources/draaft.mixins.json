@@ -3,6 +3,7 @@
   "package": "draaft.mixin",
   "compatibilityLevel": "JAVA_11",
   "mixins": [
+    "block.BlockMixin",
     "block.ChestBlockMixin",
     "block.entity.LootableContainerBlockEntityMixin",
     "enchantment.EnchantmentsMixin",
