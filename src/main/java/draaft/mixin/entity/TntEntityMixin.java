@@ -25,43 +25,50 @@ public abstract class TntEntityMixin extends Entity {
 
     @Inject(method = "explode", at = @At("HEAD"))
     void explode(CallbackInfo ci) {
-        if (this.world.getDimension().isUltrawarm() && (this.getBlockPos().getY() >= 10 && this.getBlockPos().getY() <= 20)) {
+        if (this.world.getDimension().isUltrawarm() && (this.getBlockPos().getY() >= 5 && this.getBlockPos().getY() <= 25)) {
             ServerWorld world = (ServerWorld) this.getEntityWorld();
             WorldState state = WorldState.getServerState(world);
             WorldState.RandomState draaftTntState = state.getOrCreateRng(WorldState.RngType.TNT, world);
             int tnt = draaftTntState.incrementUses();
-            float chance = Math.abs(this.getBlockPos().getY() - 15) < 3 ? 0.12F : 0.1F; // y13-17 12% otherwise 10%, to incentivize mining at correct y-height
+            float chance = Math.abs(this.getBlockPos().getY() - 15) < 3 ? 0.125F : 0.1F; // y13-17 12% otherwise 10%, to incentivize mining at correct y-height
+            float timer = Math.abs(this.getBlockPos().getY() - 15) < 3 ? 6 : 8;
 
-            if (draaftTntState.getRandom().nextFloat() < chance || (tnt % 5) == 0) {
-                placeDebrisBlob(draaftTntState.getRandom(), this.getBlockPos());
+            if (draaftTntState.getRandom().nextFloat() < chance || (tnt % timer) == 0) {
+                placeDebrisBlob(draaftTntState.getRandom(), this.getBlockPos(), 10);
                 draaftTntState.resetUses();
             }
         }
     }
 
     @Unique
-    private void placeDebrisBlob(Random random, BlockPos pos) {
-        int count = random.nextInt(4);
-        if (count > 0) {
-            int x = 0, y = 0, z = 0;
+    private void placeDebrisBlob(Random random, BlockPos pos, int depth) {
+        if (depth <= 0) {
+            return;
+        }
+        int count = 2 + random.nextInt(2);
+        int x = 0, y = 0, z = 0;
 
-            while ((x == 0 && z == 0) && (y == 0 || y == 1)) {
-                x = pos.getX() + random.nextInt(6) - random.nextInt(6);
-                y = pos.getY() + random.nextInt(6) - random.nextInt(6);
-                z = pos.getZ() + random.nextInt(6) - random.nextInt(6);
-            }
-            BlockPos start = new BlockPos(x, y, z);
-            if (placeDebrisBlock(start)) {
-                count--;
+        while ((x == 0 && z == 0) && (y == 0 || y == 1)) {
+            x = random.nextInt(6) - random.nextInt(6);
+            y = random.nextInt(6) - random.nextInt(6);
+            z = random.nextInt(6) - random.nextInt(6);
+        }
+        BlockPos start = new BlockPos(pos.getX() + x, pos.getY() + y, pos.getZ() + z);
+        if (placeDebrisBlock(start)) {
+            count--;
+            int fails = 0;
 
-                while (count > 0) {
-                    Direction direction = Direction.random(random);
-                    start = start.offset(direction);
-                    if (placeDebrisBlock(start)) {
-                        count--;
-                    }
+            while (count > 0 && fails < 10) {
+                Direction direction = Direction.random(random);
+                start = start.offset(direction);
+                if (placeDebrisBlock(start)) {
+                    count--;
+                } else {
+                    fails++;
                 }
             }
+        } else {
+            placeDebrisBlob(random, pos, depth - 1);
         }
     }
 

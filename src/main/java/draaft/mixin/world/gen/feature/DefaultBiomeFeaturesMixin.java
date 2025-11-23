@@ -31,6 +31,14 @@ public class DefaultBiomeFeaturesMixin {
 
     /**
      * @author pacmanmvc
+     * @reason no natural debris
+     */
+    @Overwrite
+    public static void addAncientDebris(Biome biome) {
+    }
+
+    /**
+     * @author pacmanmvc
      * @reason more lapis
      */
     @Overwrite
