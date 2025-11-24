@@ -50,7 +50,11 @@ public abstract class BlockMixin extends AbstractBlock {
     private void placeDebris(BlockPos pos, PlayerEntity player, World world) {
         Direction direction = Direction.getEntityFacingOrder(player)[0];
         BlockPos newPos = pos.offset(direction, 2);
+<<<<<<< HEAD
         if (!world.getBlockState(newPos).isAir() && world.getBlockState(newPos).getFluidState().isEmpty()) {
+=======
+        if (world.getBlockState(newPos).isAir() && world.getBlockState(newPos).getFluidState().isEmpty()) {
+>>>>>>> origin/draaft-v2
             world.setBlockState(newPos, Blocks.ANCIENT_DEBRIS.getDefaultState());
         }
     }
