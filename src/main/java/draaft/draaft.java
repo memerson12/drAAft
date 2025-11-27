@@ -24,6 +24,7 @@ public class draaft implements ModInitializer {
 
     public static final boolean ENCHANTED_BUCKET = true;
     public static final boolean LEVEL_ONE_ENCHANTS = true;
+    public static final boolean ALL_ENTITIES_SPEED = true;
 
     @Override
     public void onInitialize() {
