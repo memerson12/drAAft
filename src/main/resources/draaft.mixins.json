@@ -5,6 +5,8 @@
   "mixins": [
     "block.BlockMixin",
     "block.ChestBlockMixin",
+    "block.entity.AbstractFurnaceBlockEntityMixin",
+    "block.entity.BrewingStandBlockEntityMixin",
     "block.entity.LootableContainerBlockEntityMixin",
     "enchantment.DamageEnchantmentMixin",
     "enchantment.DepthStriderEnchantmentMixin",
