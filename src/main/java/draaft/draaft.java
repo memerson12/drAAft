@@ -23,6 +23,7 @@ public class draaft implements ModInitializer {
     public static final URI API_BASE_URI = URI.create("http://localhost:8000/");
 
     public static final boolean ENCHANTED_BUCKET = true;
+    public static final boolean LEVEL_ONE_ENCHANTS = true;
 
     @Override
     public void onInitialize() {
