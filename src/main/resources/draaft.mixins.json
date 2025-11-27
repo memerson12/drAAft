@@ -20,6 +20,7 @@
     "entity.passive.CatEntityMixin",
     "entity.passive.RabbitEntityMixin",
     "entity.projectile.thrown.EnderPearlEntityMixin",
+    "item.ItemMixin",
     "item.ItemsMixin",
     "screen.slot.TradeOutputSlotMixin",
     "server.world.ServerWorldMixin",
