@@ -66,6 +66,7 @@
     "defaultRequire": 1
   },
   "client": [
+    "client.KeyboardMixin",
     "client.gui.DebugHudMixin",
     "client.gui.TitleScreenMixin",
     "client.gui.screen.options.OptionsScreenAccessor",
