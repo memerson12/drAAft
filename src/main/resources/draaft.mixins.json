@@ -45,6 +45,7 @@
     "entity.projectile.thrown.EnderPearlEntityMixin",
     "item.ItemMixin",
     "item.ItemsMixin",
+    "item.ItemStackMixin",
     "screen.slot.TradeOutputSlotMixin",
     "server.world.ServerWorldMixin",
     "structure.IglooGeneratorMixin",
