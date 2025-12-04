@@ -31,22 +31,10 @@ public class DefaultBiomeFeaturesMixin {
 
     /**
      * @author pacmanmvc
-     * @reason more debris
+     * @reason no natural debris
      */
     @Overwrite
     public static void addAncientDebris(Biome biome) {
-        biome.addFeature(
-            GenerationStep.Feature.UNDERGROUND_DECORATION,
-            Feature.NO_SURFACE_ORE
-                .configure(new OreFeatureConfig(OreFeatureConfig.Target.NETHER_ORE_REPLACEABLES, Blocks.ANCIENT_DEBRIS.getDefaultState(), 5))
-                .createDecoratedFeature(Decorator.COUNT_DEPTH_AVERAGE.configure(new CountDepthDecoratorConfig(1, 16, 8)))
-        );
-        biome.addFeature(
-            GenerationStep.Feature.UNDERGROUND_DECORATION,
-            Feature.NO_SURFACE_ORE
-                .configure(new OreFeatureConfig(OreFeatureConfig.Target.NETHER_ORE_REPLACEABLES, Blocks.ANCIENT_DEBRIS.getDefaultState(), 4))
-                .createDecoratedFeature(Decorator.COUNT_DEPTH_AVERAGE.configure(new CountDepthDecoratorConfig(1, 16, 8)))
-        );
     }
 
     /**

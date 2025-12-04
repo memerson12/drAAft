@@ -22,6 +22,12 @@ public class draaft implements ModInitializer {
     public static final URI FRONTEND_BASE_URI = URI.create(FRONTEND_ORIGIN + "/draaft/");
     public static final URI API_BASE_URI = URI.create("http://localhost:8000/");
 
+    public static final boolean ENCHANTED_BUCKET = true;
+    public static final boolean LEVEL_ONE_ENCHANTS = true;
+    public static final boolean ALL_ENTITIES_SPEED = true;
+    public static final boolean FASTER_BLOCK_ENTITIES = true;
+    public static final boolean NOF3 = true;
+
     @Override
     public void onInitialize() {
         if (IS_DEBUG) {

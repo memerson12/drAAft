@@ -48,8 +48,12 @@ public abstract class EnderPearlEntityMixin extends ThrownItemEntity {
         }
         ServerWorld world = (ServerWorld) this.getEntityWorld();
         WorldState state = WorldState.getServerState(world);
-        Random draaftPearlRng = state.getOrCreateRng(WorldState.RngType.PEARL, world);
+        WorldState.RandomState draaftPearlState = state.getOrCreateRng(WorldState.RngType.PEARL, world);
 
-        return draaftPearlRng.nextFloat();
+        if ((draaftPearlState.incrementUses() % 24) == 0) {
+            draaftPearlState.resetUses();
+            return 0.0F;
+        }
+        return draaftPearlState.getRandom().nextFloat();
     }
 }
