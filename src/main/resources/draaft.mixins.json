@@ -69,6 +69,8 @@
     "client.KeyboardMixin",
     "client.gui.DebugHudMixin",
     "client.gui.TitleScreenMixin",
+    "client.gui.hud.InGameHudMixin",
+    "client.gui.hud.PlayerListHudMixin",
     "client.gui.screen.options.OptionsScreenAccessor",
     "client.gui.screen.options.OptionsScreenMixin",
     "compat.InGameTimerMixin"

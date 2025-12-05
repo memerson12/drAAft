@@ -2,15 +2,30 @@ package draaft.mixin.client.gui.hud;
 
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.mojang.authlib.GameProfile;
+import draaft.client.DraaftState;
+import draaft.client.RenderUtils;
+import draaft.client.gui.skin.SkinManager;
+import draaft.client.models.DraaftPlayer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.gui.hud.PlayerListHud;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.scoreboard.ScoreboardObjective;
+import net.minecraft.util.Identifier;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import java.security.Identity;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 @Mixin(PlayerListHud.class)
 public class PlayerListHudMixin extends DrawableHelper {
@@ -19,53 +34,77 @@ public class PlayerListHudMixin extends DrawableHelper {
     @Final
     private MinecraftClient client;
 
+//    @Unique
+//    private static final DraaftPlayer[] players = new DraaftPlayer[]{
+//        new DraaftPlayer("Memerson", MinecraftClient.getInstance()),
+//        new DraaftPlayer("DesktopFolder", MinecraftClient.getInstance()),
+//        new DraaftPlayer("me_nx", MinecraftClient.getInstance()),
+//        new DraaftPlayer("PacManMVC", MinecraftClient.getInstance())
+//    };
+//    private static final HashMap<String, Identifier> skins = new HashMap<>();
+
+//    @Inject(method = "<init>", at = @At(value = "RETURN", target = "Lnet/minecraft/client/gui/hud/PlayerListHud;<init>(Lnet/minecraft/client/MinecraftClient;Lnet/minecraft/client/gui/hud/InGameHud;)V"))
+//    private static void init(MinecraftClient client, InGameHud inGameHud, CallbackInfo ci) {
+//        for(String playerName : players) {
+//            assert client.getServer() != null;
+//            GameProfile profile = client.getServer().getUserCache().findByName(playerName);
+//            SkinManager.fetchPlayerSkin(profile).thenAccept((skinId) -> {
+//                skins.put(playerName, skinId);
+//            }).exceptionally(throwable -> {
+//                System.out.println(throwable.getMessage());
+//                return null;
+//            });
+//        }
+//    }
+    @Unique
+
     @WrapMethod(method = "render")
     private void renderOverride(MatrixStack matrices, int scaleWidth, Scoreboard scoreboard, ScoreboardObjective scoreboardObjective, Operation<Void> original) {
-        // Simple demo UI: 4 stacked boxes each showing draft1..draft5 for hard-coded players
-        int left = 10;
-        int boxWidth = 200;
-        int boxHeight = 36; // enough to hold 5 small lines
-        int spacing = 8;
-        int baseTop = 30;
+        ArrayList<DraaftPlayer> players = DraaftState.getInstance().getRoom().members();
 
-        String[] players = new String[]{"player1", "player2", "player3", "player4"};
+        final int cornerRadius = 10;
+        final int margin = 10;
+        final int boxColor = 0x90D5D5D5;
 
-        for (int i = 0; i < players.length; i++) {
-            int top = baseTop + i * (boxHeight + spacing);
-            int right = left + boxWidth;
-            int bottom = top + boxHeight;
+        double guiScale = this.client.getWindow().getScaleFactor();
+        int screenHeight = this.client.getWindow().getScaledHeight();
+        int screenWidth = this.client.getWindow().getScaledWidth();
 
-            // Background gradient for each box
-            fillGradient(matrices, left, top, right, bottom, 0xFF2b2b2b, 0xFF1f1f1f);
+        int boxX = margin;
+        int boxWidth = (int) (screenWidth * 0.20);
+        int boxHeight = (int) (screenHeight * 0.90);
+        int boxY = (screenHeight / 2) - (boxHeight / 2);
 
-            // Slight highlight at top
-            fillGradient(matrices, left, top, right, top + 6, 0x66ffffff, 0x00000000);
+        // Draw the background box
+        RenderUtils.drawRoundedRect(matrices, boxX, boxY, boxWidth, boxHeight, cornerRadius, boxColor);
 
-            // Border lines
-            drawHorizontalLine(matrices, left, right, top, 0xFF000000);
-            drawHorizontalLine(matrices, left, right, bottom, 0xFF000000);
-            drawVerticalLine(matrices, left, top, bottom, 0xFF000000);
-            drawVerticalLine(matrices, right, top, bottom, 0xFF000000);
+        // Draw header
+        String headerText = "Advancement Counts";
+        int headerX = boxX + 10;
+        int headerY = boxY + 10;
+        this.client.textRenderer.drawWithShadow(matrices, headerText, headerX, headerY, 0xFFFFFFFF);
 
-            // Player name header
-            this.client.textRenderer.drawWithShadow(matrices, players[i], left + 8, top + 4, 0xFFD9D9D9);
+        // Player entry settings
+        final int playerHeadSize = 24;
+        final int entryHeight = 40;
+        final int entryStartY = headerY + 20;
+        final int headX = boxX + 10;
+        final int textX = headX + playerHeadSize + 8;
 
-            // Draft items (draft1 .. draft5)
-            int textStartY = top + 14;
-            int lineHeight = 4 + this.client.textRenderer.fontHeight; // small spacing
-            for (int j = 1; j <= 5; j++) {
-                String draftLine = "draft" + j;
-                int y = textStartY + (j - 1) * lineHeight;
-                this.client.textRenderer.drawWithShadow(matrices, draftLine, left + 12, y, 0xFFCCCCCC);
-            }
+        // Draw each player entry
+        for (int i = 0; i < players.size(); i++) {
+            int entryY = entryStartY + (i * entryHeight);
+            int headY = entryY;
+            int textY = entryY + (playerHeadSize / 2) - (this.client.textRenderer.fontHeight / 2);
+
+            // Draw player head
+            RenderUtils.drawPlayerHead(matrices, headX, headY, playerHeadSize, players.get(i));
+//            RenderUtils.drawPlayerHead(matrices, headX, headY, playerHeadSize, skins.get(players[i]));
+
+            // Draw player name and advancement count
+            String playerText = players.get(i).getUsername() + ": 22";
+            this.client.textRenderer.drawWithShadow(matrices, playerText, textX, textY, 0xFFFFFFFF);
         }
-
-        // Optionally call original to preserve vanilla rendering; if you want to replace, comment this out
-//        try {
-//            original.call(matrices, scaleWidth, scoreboard, scoreboardObjective);
-//        } catch (Throwable t) {
-//            // ignore any errors from calling the original so our demo overlay still displays
-//        }
     }
 
 
