@@ -19,6 +19,15 @@
   "draaft.draaftingScreen.button.nextStage": "Next Stage",
   "draaft.waiting_for_room_screen.title": "Draaft",
   "draaft.game.options.pseudoPeaceful": "Peaceless",
+  "draaft.game.reducedDebugInfo.C": "C: nuh uh",
+  "draaft.game.reducedDebugInfo.E": "E: nuh uh",
+  "draaft.game.reducedDebugInfo.PT": "P: nuh. T: uh",
+  "draaft.game.reducedDebugInfo.debugOpts.0": "Remember when you could e-ray? I remember.",
+  "draaft.game.reducedDebugInfo.debugOpts.1": "pepperidge farm remembers",
+  "draaft.game.reducedDebugInfo.debugOpts.2": "Stop trying. It won’t work.",
+  "draaft.game.reducedDebugInfo.debugOpts.3": "Coordinates: “Yep, still not here”",
+  "draaft.game.reducedDebugInfo.debugOpts.4": "E counter? More like Elp, I can’t see my coords!",
+  "draaft.game.reducedDebugInfo.debugOpts.5": "Wahhh, Minecraft is too hard without cheaty debug info — that’s you, that’s what you sound like",
 
   "speedrunapi.config.draaft.option.disablePeaceful": "Disable Peaceful",
   "speedrunapi.config.draaft.option.disablePeaceful.description": "Prevents accidentally switching to peaceful in game options."

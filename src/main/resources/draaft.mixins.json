@@ -29,7 +29,6 @@
     "enchantment.SweepingEnchantmentMixin",
     "enchantment.ThornsEnchantmentMixin",
     "enchantment.UnbreakingEnchantmentMixin",
-    "entity.LivingEntityMixin",
     "entity.TntEntityMixin",
     "entity.boss.dragon.EnderDragonEntityMixin",
     "entity.boss.dragon.phase.HoldingPatternPhaseMixin",
@@ -47,11 +46,14 @@
     "item.ItemsMixin",
     "item.ItemStackMixin",
     "screen.slot.TradeOutputSlotMixin",
+    "server.MinecraftServerAccessor",
+    "server.PlayerManagerMixin",
     "server.world.ServerWorldMixin",
     "structure.IglooGeneratorMixin",
     "structure.StructurePieceMixin",
     "world.SpawnHelperMixin",
     "world.WanderingTraderManagerMixin",
+    "world.WorldMixin",
     "world.biome.BambooJungleBiomeMixin",
     "world.biome.BambooJungleHillsBiomeMixin",
     "world.biome.PlainsBiomeMixin",
@@ -68,10 +70,12 @@
   },
   "client": [
     "client.KeyboardMixin",
+    "client.MinecraftClientMixin",
     "client.gui.DebugHudMixin",
     "client.gui.TitleScreenMixin",
     "client.gui.screen.options.OptionsScreenAccessor",
     "client.gui.screen.options.OptionsScreenMixin",
+    "client.network.ClientPlayNetworkHandlerMixin",
     "compat.InGameTimerMixin"
   ]
 }
