@@ -112,6 +112,17 @@ public class DraaftWebSocketClient {
         }, pingInterval.toSeconds(), pingInterval.toSeconds(), TimeUnit.SECONDS);
     }
 
+    public <T> void sendMessage(T object) {
+        WebSocket ws = wsRef.get();
+        if (ws == null) {
+            // LOGGER.debug("No websocket existed to send text to!");
+            return;
+        }
+        String s = gson.toJson(object, object.getClass());
+        // LOGGER.debug("Sending information to server: {}", s);
+        ws.sendText(s, true);
+    }
+
     private void cancelPing() {
         if (pingTask != null) {
             pingTask.cancel(true);

@@ -5,10 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.util.UUIDTypeAdapter;
 import draaft.client.models.RoomConfig;
-import draaft.client.ws.events.DraftPickEvents;
-import draaft.client.ws.events.RawEvents;
-import draaft.client.ws.events.RoomMemberEvents;
-import draaft.client.ws.events.RoomStateEvents;
+import draaft.client.ws.events.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -102,6 +99,13 @@ public class DraaftWebSocketListener implements WebSocket.Listener {
                             UUID pickerUuid = UUIDTypeAdapter.fromString(pickerRawUuid);
                             eventBus.post(new DraftPickEvents.Pick(pickerUuid, pickKey, index));
                         }
+                        case "PlayerAdvancementUpdate" -> {
+                            String uuid = getOrElse(obj, "uuid", null);
+                            int count = getAsInteger(obj, "count");
+                            if (uuid == null) break; // just ignore this error for now
+                            UUID pickerUuid = UUIDTypeAdapter.fromString(uuid);
+                            eventBus.post(new GameEvent.AdvancementCount(pickerUuid, count));
+                        }
                         default -> eventBus.post(new RawEvents.raw(variant, obj));
                     }
                 } else {
@@ -117,6 +121,10 @@ public class DraaftWebSocketListener implements WebSocket.Listener {
 
     private String getOrElse(JsonObject obj, String key, String defaultValue) {
         return obj.has(key) ? obj.get(key).getAsString() : defaultValue;
+    }
+
+    private int getAsInteger(JsonObject obj, String key) {
+        return obj.has(key) ? obj.get(key).getAsInt() : 0;
     }
 
     @Override
