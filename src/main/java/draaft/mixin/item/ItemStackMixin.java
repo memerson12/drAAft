@@ -1,6 +1,6 @@
 package draaft.mixin.item;
 
-import draaft.draaft;
+import draaft.world.EnchantUtils;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.item.ItemConvertible;
@@ -25,7 +25,7 @@ public abstract class ItemStackMixin {
 
     @Inject(method = "<init>(Lnet/minecraft/item/ItemConvertible;I)V", at = @At("TAIL"))
     void ItemStack(ItemConvertible item, int count, CallbackInfo ci) {
-        if (!draaft.LEVEL_ONE_ENCHANTS) {
+        if (!EnchantUtils.levelOneEnchants()) {
             return;
         }
 
@@ -43,9 +43,9 @@ public abstract class ItemStackMixin {
         List<Enchantment> crossbowEnchants = List.of(Enchantments.PIERCING, Enchantments.MENDING, Enchantments.QUICK_CHARGE, Enchantments.UNBREAKING);
         Map<String, List<Enchantment>> enchantmentMap = Map.ofEntries(Map.entry("pickaxe", pickaxeshovelEnchants), Map.entry("shovel", pickaxeshovelEnchants), Map.entry("_axe", axehoeEnchants), Map.entry("hoe", axehoeEnchants), Map.entry("shears", axehoeEnchants), Map.entry("sword", swordEnchants), Map.entry("helmet", helmetEnchants), Map.entry("chestplate", chestplateleggingsEnchants), Map.entry("leggings", chestplateleggingsEnchants), Map.entry("boots", bootsEnchants), Map.entry("compass", compassEnchants), Map.entry("flint_and_steel", fnsoasEnchants), Map.entry("_on_a_stick", fnsoasEnchants), Map.entry("shield", fnsoasEnchants), Map.entry("elytra", fnsoasEnchants), Map.entry("fishing_rod", rodEnchants), Map.entry("bow", bowEnchants), Map.entry("trident", tridentEnchants), Map.entry("crossbow", crossbowEnchants));
 
-        if (item != null && !item.asItem().getName().toString().equals("bowl")) {
+        if (item != null && !item.asItem().getTranslationKey().contains("bowl")) {
             for (String id : enchantmentMap.keySet()) {
-                if (item.asItem().getName().toString().contains(id)) {
+                if (item.asItem().getTranslationKey().contains(id)) {
                     ListTag listTag = new ListTag();
                     for (Enchantment enchantment : enchantmentMap.get(id)) {
                         CompoundTag compoundTag = new CompoundTag();

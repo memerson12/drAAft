@@ -43,7 +43,6 @@
     "entity.passive.CatEntityMixin",
     "entity.passive.RabbitEntityMixin",
     "entity.projectile.thrown.EnderPearlEntityMixin",
-    "item.ItemMixin",
     "item.ItemsMixin",
     "item.ItemStackMixin",
     "screen.slot.TradeOutputSlotMixin",
@@ -78,6 +77,7 @@
     "client.gui.screen.options.OptionsScreenMixin",
     "client.network.ClientPlayNetworkHandlerMixin",
     "client.resource.SplashTextResourceSupplierMixin",
+    "item.ItemClientMixin",
     "compat.InGameTimerMixin"
   ]
 }

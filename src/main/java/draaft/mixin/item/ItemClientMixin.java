@@ -8,18 +8,31 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.Rarity;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Item.class)
-public abstract class ItemMixin implements ItemConvertible {
+public abstract class ItemClientMixin implements ItemConvertible {
+    @Unique
+    private static boolean isBucket(Item item) {
+        return item.equals(Items.BUCKET)
+            || item.equals(Items.LAVA_BUCKET)
+            || item.equals(Items.WATER_BUCKET)
+            || item.equals(Items.TROPICAL_FISH_BUCKET)
+            || item.equals(Items.PUFFERFISH_BUCKET)
+            || item.equals(Items.COD_BUCKET)
+            || item.equals(Items.SALMON_BUCKET)
+            || item.equals(Items.MILK_BUCKET);
+    }
+
     @Inject(method = "hasGlint", at = @At("HEAD"), cancellable = true)
     void hasGlint(ItemStack stack, CallbackInfoReturnable<Boolean> cir) {
         var world = MinecraftClient.getInstance().world;
 
         if (world != null && WorldClientInfo.get(world).enchantedBucket()) {
-            if (stack.getItem().equals(Items.BUCKET) || stack.getItem().equals(Items.LAVA_BUCKET) || stack.getItem().equals(Items.WATER_BUCKET) || stack.getItem().equals(Items.TROPICAL_FISH_BUCKET) || stack.getItem().equals(Items.PUFFERFISH_BUCKET) || stack.getItem().equals(Items.COD_BUCKET) || stack.getItem().equals(Items.SALMON_BUCKET) || stack.getItem().equals(Items.MILK_BUCKET)) {
+            if (isBucket(stack.getItem())) {
                 cir.setReturnValue(true);
             }
         }
@@ -30,7 +43,7 @@ public abstract class ItemMixin implements ItemConvertible {
         var world = MinecraftClient.getInstance().world;
 
         if (world != null && WorldClientInfo.get(world).enchantedBucket()) {
-            if (stack.getItem().equals(Items.BUCKET) || stack.getItem().equals(Items.LAVA_BUCKET) || stack.getItem().equals(Items.WATER_BUCKET) || stack.getItem().equals(Items.TROPICAL_FISH_BUCKET) || stack.getItem().equals(Items.PUFFERFISH_BUCKET) || stack.getItem().equals(Items.COD_BUCKET) || stack.getItem().equals(Items.SALMON_BUCKET) || stack.getItem().equals(Items.MILK_BUCKET)) {
+            if (isBucket(stack.getItem())) {
                 cir.setReturnValue(Rarity.EPIC);
             }
         }
