@@ -70,7 +70,7 @@ public class SkinManager {
 
     public static Identifier getSkin(UUID uuid) {
         Identifier skin = SKIN_CACHE.getIfPresent(uuid.toString());
-       return skin != null ? skin : getDefaultSkin();
+        return skin != null ? skin : getDefaultSkin();
     }
 
     /**
@@ -93,7 +93,6 @@ public class SkinManager {
                 // Load skin using the built-in system
                 CompletableFuture<Identifier> skinFuture = new CompletableFuture<>();
                 skinProvider.loadSkin(profile, (type, identifier, texture) -> {
-                    System.out.println("type=" + type + ", identifier=" + identifier + ", texture=" + texture);
                     if (type == MinecraftProfileTexture.Type.SKIN) {
                         SKIN_CACHE.put(uuid, identifier);
                         skinFuture.complete(identifier);
@@ -121,7 +120,7 @@ public class SkinManager {
             // Initialize UserCache if needed
             initializeUserCache();
 
-            if(userCache.getByUuid(uuid) != null) {
+            if (userCache.getByUuid(uuid) != null) {
                 return userCache.getByUuid(uuid);
             }
 

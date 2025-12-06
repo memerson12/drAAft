@@ -25,30 +25,6 @@ public class PlayerListHudMixin extends DrawableHelper {
     @Final
     private MinecraftClient client;
 
-//    @Unique
-//    private static final DraaftPlayer[] players = new DraaftPlayer[]{
-//        new DraaftPlayer("Memerson", MinecraftClient.getInstance()),
-//        new DraaftPlayer("DesktopFolder", MinecraftClient.getInstance()),
-//        new DraaftPlayer("me_nx", MinecraftClient.getInstance()),
-//        new DraaftPlayer("PacManMVC", MinecraftClient.getInstance())
-//    };
-//    private static final HashMap<String, Identifier> skins = new HashMap<>();
-
-//    @Inject(method = "<init>", at = @At(value = "RETURN", target = "Lnet/minecraft/client/gui/hud/PlayerListHud;<init>(Lnet/minecraft/client/MinecraftClient;Lnet/minecraft/client/gui/hud/InGameHud;)V"))
-//    private static void init(MinecraftClient client, InGameHud inGameHud, CallbackInfo ci) {
-//        for(String playerName : players) {
-//            assert client.getServer() != null;
-//            GameProfile profile = client.getServer().getUserCache().findByName(playerName);
-//            SkinManager.fetchPlayerSkin(profile).thenAccept((skinId) -> {
-//                skins.put(playerName, skinId);
-//            }).exceptionally(throwable -> {
-//                System.out.println(throwable.getMessage());
-//                return null;
-//            });
-//        }
-//    }
-    @Unique
-
     @WrapMethod(method = "render")
     private void renderOverride(MatrixStack matrices, int scaleWidth, Scoreboard scoreboard, ScoreboardObjective scoreboardObjective, Operation<Void> original) {
         ArrayList<DraaftPlayer> players = DraaftState.getInstance().getRoom().members();
@@ -72,7 +48,7 @@ public class PlayerListHudMixin extends DrawableHelper {
 
         // Draw header
         String headerText = "Advancement Counts";
-        float headerX = (boxX + (float) boxWidth / 2) - (this.client.textRenderer.getWidth(headerText) * (scale * 1.2f )) / 2;
+        float headerX = (boxX + (float) boxWidth / 2) - (this.client.textRenderer.getWidth(headerText) * (scale * 1.2f)) / 2;
         int headerY = boxY + (int) (10 * scale);
 
         matrices.push();
@@ -82,7 +58,7 @@ public class PlayerListHudMixin extends DrawableHelper {
         matrices.pop();
 
         // Draw divider line
-        fill(matrices, boxX, headerY + (int) (20 * scale), boxX + boxWidth, headerY + (int) (20 * scale) + Math.max(1, (int) (1 * scale)),  0xA0FFFFFF);
+        fill(matrices, boxX, headerY + (int) (20 * scale), boxX + boxWidth, headerY + (int) (20 * scale) + Math.max(1, (int) (1 * scale)), 0xA0FFFFFF);
 
         // Player entry settings
         final int playerHeadSize = (int) (24 * scale);

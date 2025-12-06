@@ -54,10 +54,8 @@ public class RenderUtils {
         RenderSystem.enableBlend();
         RenderSystem.disableTexture();
         RenderSystem.defaultBlendFunc();
-        // IMPORTANT: Disable culling because the triangle fan winding order might be considered "back-facing"
         RenderSystem.disableCull();
 
-        // 6 is GL_TRIANGLE_FAN
         bufferBuilder.begin(GL11.GL_TRIANGLE_FAN, VertexFormats.POSITION_COLOR);
         bufferBuilder.vertex(matrix, (float) x, (float) y, 0.0F).color(g, h, k, f).next();
 

@@ -60,37 +60,6 @@ public abstract class TitleScreenMixin extends Screen {
                 altDraaftServices,
                 this
             ));
-//            this.addButton(new ButtonWidget(
-//                this.width - 100, this.height - 80, 80, 20,
-//                new LiteralText("Start Game"),
-//                button -> {
-//                    //debug set to correct state
-////                    draaftState.setCurrentState(DraaftState.STATE.PREPARING_GAME);
-////
-////                    if (draaftState.getCurrentState() != DraaftState.STATE.PREPARING_GAME) {
-////                        logger.error("Tried to start game when not in PREPARING_GAME state!");
-////                        return;
-////                    }
-//
-//                    this.client.setScreenAndRender(new SaveLevelScreen(new TranslatableText("createWorld.preparing")));
-//
-//                    LevelInfo levelInfo = new LevelInfo(
-//                        "Draaft Game",
-//                        GameMode.SURVIVAL,
-//                        false,
-//                        Difficulty.EASY,
-//                        false,
-//                        new GameRules(),
-//                        DataPackSettings.SAFE_MODE
-//                    );
-//
-//                    long seed = "asdf".hashCode();
-//                    GeneratorOptions generatorOptions = new GeneratorOptions(
-//                        seed, true, true, getRegistryWithReplacedOverworldGenerator(DimensionType.createDefaultDimensionOptions(seed), createOverworldGenerator(seed)));
-//                    MoreOptionsDialog moreOptionsDialog = new MoreOptionsDialog(RegistryTracker.create(), generatorOptions);
-//
-//                    this.client.createWorld(this.saveDirectoryName, levelInfo, moreOptionsDialog.getRegistryManager(), generatorOptions);
-//                }));
         }
     }
 }
