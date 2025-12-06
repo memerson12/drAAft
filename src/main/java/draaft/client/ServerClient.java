@@ -52,6 +52,10 @@ public class ServerClient {
         return INSTANCE;
     }
 
+    public static boolean hasInstance() {
+        return INSTANCE == null;
+    }
+
     public static @Nullable ServerClient getInstanceOrNull() {
         return INSTANCE;
     }

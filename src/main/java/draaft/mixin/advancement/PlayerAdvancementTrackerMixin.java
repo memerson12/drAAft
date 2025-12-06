@@ -12,6 +12,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class PlayerAdvancementTrackerMixin {
     @Inject(method = "grantCriterion", at = @At(value = "INVOKE", target = "Lnet/minecraft/advancement/AdvancementRewards;apply(Lnet/minecraft/server/network/ServerPlayerEntity;)V"))
     private void injectAdvancementUpload(Advancement advancement, String criterionName, CallbackInfoReturnable<Boolean> cir) {
-        DraaftState.getInstance().addAdvancement(advancement.getId().toString());
+        DraaftState.with((ds) -> ds.addAdvancement(advancement.getId().toString()));
     }
 }

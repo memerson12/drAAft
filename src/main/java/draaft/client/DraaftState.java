@@ -7,6 +7,7 @@ import draaft.draaft;
 import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
+import java.util.function.Consumer;
 
 public class DraaftState {
 
@@ -78,6 +79,13 @@ public class DraaftState {
             INSTANCE = new DraaftState();
         }
         return INSTANCE;
+    }
+
+    public static void with(Consumer<DraaftState> func) {
+        if (INSTANCE == null && !ServerClient.hasInstance()) {
+            return;
+        }
+        func.accept(getInstance());
     }
 
     public STATE getCurrentState() {
