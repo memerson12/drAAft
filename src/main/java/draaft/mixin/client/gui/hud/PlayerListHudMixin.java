@@ -2,30 +2,21 @@ package draaft.mixin.client.gui.hud;
 
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-import com.mojang.authlib.GameProfile;
 import draaft.client.DraaftState;
 import draaft.client.RenderUtils;
-import draaft.client.gui.skin.SkinManager;
 import draaft.client.models.DraaftPlayer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
-import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.gui.hud.PlayerListHud;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.scoreboard.ScoreboardObjective;
-import net.minecraft.util.Identifier;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.security.Identity;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 @Mixin(PlayerListHud.class)
 public class PlayerListHudMixin extends DrawableHelper {
@@ -67,6 +58,7 @@ public class PlayerListHudMixin extends DrawableHelper {
         final int boxColor = 0x90D5D5D5;
 
         double guiScale = this.client.getWindow().getScaleFactor();
+
         int screenHeight = this.client.getWindow().getScaledHeight();
         int screenWidth = this.client.getWindow().getScaledWidth();
 
@@ -105,6 +97,7 @@ public class PlayerListHudMixin extends DrawableHelper {
             String playerText = players.get(i).getUsername() + ": 22";
             this.client.textRenderer.drawWithShadow(matrices, playerText, textX, textY, 0xFFFFFFFF);
         }
+        matrices.pop();
     }
 
 
