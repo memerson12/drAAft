@@ -18,6 +18,8 @@ public class DraaftState {
     private final ServerClient serverClient = ServerClient.getInstance();
     private Room room;
 
+    public int advancementCount = 0;
+
     private DraaftState() {
         serverClient.addRoomMemberEventListener(event -> {
             RoomMemberEvents.RoomEventType eventType = event.type();
@@ -64,6 +66,11 @@ public class DraaftState {
         IN_GAME,
         SPECTATING,
         GAME_OVER
+    }
+
+    public void addAdvancement(String advancementName) {
+        serverClient.addAdvancement(advancementName);
+        this.advancementCount++;
     }
 
     public static DraaftState getInstance() {
