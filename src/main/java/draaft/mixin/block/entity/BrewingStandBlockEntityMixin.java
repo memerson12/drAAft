@@ -1,9 +1,11 @@
 package draaft.mixin.block.entity;
 
 import draaft.draaft;
+import draaft.persistent.WorldManifest;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.block.entity.BrewingStandBlockEntity;
 import net.minecraft.block.entity.LockableContainerBlockEntity;
+import net.minecraft.server.world.ServerWorld;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.ModifyConstant;
@@ -16,7 +18,12 @@ public abstract class BrewingStandBlockEntityMixin extends LockableContainerBloc
 
     @ModifyConstant(method = "tick", constant = @Constant(intValue = 400))
     private int injected(int constant) {
-        if (draaft.FASTER_BLOCK_ENTITIES) return 1;
-        return constant;
+        var serverWorld = (ServerWorld) world;
+
+        assert serverWorld != null;
+
+        return WorldManifest.get(serverWorld.getServer()).on(WorldManifest.Feature.FASTER_BLOCK_ENTITIES)
+            ? 1
+            : constant;
     }
 }

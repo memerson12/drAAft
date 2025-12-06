@@ -7,6 +7,7 @@ import draaft.draaft;
 import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
+import java.util.function.Consumer;
 
 public class DraaftState {
 
@@ -17,6 +18,8 @@ public class DraaftState {
     private STATE currentState = STATE.WAITING_FOR_ROOM;
     private final ServerClient serverClient = ServerClient.getInstance();
     private Room room;
+
+    public int advancementCount = 0;
 
     private DraaftState() {
         serverClient.addRoomMemberEventListener(event -> {
@@ -66,11 +69,23 @@ public class DraaftState {
         GAME_OVER
     }
 
+    public void addAdvancement(String advancementName) {
+        serverClient.addAdvancement(advancementName);
+        this.advancementCount++;
+    }
+
     public static DraaftState getInstance() {
         if (INSTANCE == null) {
             INSTANCE = new DraaftState();
         }
         return INSTANCE;
+    }
+
+    public static void with(Consumer<DraaftState> func) {
+        if (INSTANCE == null && !ServerClient.hasInstance()) {
+            return;
+        }
+        func.accept(getInstance());
     }
 
     public STATE getCurrentState() {

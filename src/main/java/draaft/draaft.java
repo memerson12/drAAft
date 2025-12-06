@@ -9,7 +9,6 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.config.Configurator;
 
 import java.io.InputStream;
-import java.net.URI;
 import java.util.Properties;
 
 public class draaft implements ModInitializer {
@@ -18,15 +17,9 @@ public class draaft implements ModInitializer {
     public static final String DRAAFT_VERSION = getDraaftVersion();
     public static final boolean IS_DEBUG = isDebugMode();
 
-    public static final String FRONTEND_ORIGIN = "http://localhost:8080";
-    public static final URI FRONTEND_BASE_URI = URI.create(FRONTEND_ORIGIN + "/draaft/");
-    public static final URI API_BASE_URI = URI.create("http://localhost:8000/");
-
-    public static final boolean ENCHANTED_BUCKET = true;
     public static final boolean LEVEL_ONE_ENCHANTS = true;
-    public static final boolean ALL_ENTITIES_SPEED = true;
-    public static final boolean FASTER_BLOCK_ENTITIES = true;
-    public static final boolean NOF3 = true;
+
+    public static int currentF3Taunt = 0;
 
     @Override
     public void onInitialize() {
