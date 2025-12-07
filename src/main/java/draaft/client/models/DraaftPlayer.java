@@ -1,8 +1,10 @@
 package draaft.client.models;
 
 import com.mojang.authlib.GameProfile;
+import draaft.client.ServerClient;
 import draaft.client.gui.skin.SkinManager;
 import draaft.draaft;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.Identifier;
 import org.apache.logging.log4j.Logger;
 
@@ -21,7 +23,7 @@ public class DraaftPlayer {
     public DraaftPlayer(UUID uuid) {
         this.uuid = uuid;
         this.readyStatus = ReadyStatus.DRAAFTING; // Default to Draafting
-        loadSkin(); // Automatically start loading skin on instantiation
+        loadPlayerData(); // Automatically start loading skin on instantiation
     }
 
     public UUID getUuid() {
@@ -53,17 +55,10 @@ public class DraaftPlayer {
         this.readyStatus = readyStatus;
     }
 
-    public void loadSkin() {
+    private void loadPlayerData() {
         if (!skinLoading && !skinLoaded) {
             skinLoading = true;
-            // The Minecraft code base has no way of fetching username from UUID. We should get username from backend instead.
-//            GameProfile profile;
-//            profile = SkinManager.getPlayerProfile(this.uuid);
-//            if (profile == null) {
-//                logger.warn("Skin loading failed for {} (failed to fetch profile). Falling back to incomplete profile", Utils.getLoggableUuid(this.uuid));
-//                profile = new GameProfile(UUID.fromString(this.uuid), null);
-//            }
-            GameProfile profile = new GameProfile(this.uuid, "Temp Names");
+            GameProfile profile = SkinManager.getPlayerProfile(uuid);
             this.username = profile.getName();
             SkinManager.fetchPlayerSkin(profile).thenAccept(skinId -> {
                 logger.info("Skin loaded for {}", this.username);

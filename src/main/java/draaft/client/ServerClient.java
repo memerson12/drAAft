@@ -2,6 +2,8 @@ package draaft.client;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import draaft.client.gui.DraaftToast;
 import draaft.client.models.Room;
 import draaft.client.models.RoomDeserializer;
@@ -27,6 +29,7 @@ import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.UUID;
 import java.nio.charset.StandardCharsets;
 
 public class ServerClient {
@@ -111,6 +114,25 @@ public class ServerClient {
             return room;
         } catch (Throwable e) {
             logger.error("Failed getting room: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    public String getUsernameFromUUID(UUID uuid) {
+        try {
+            final URI remote = URI.create("https://api.minecraftservices.com/minecraft/profile/lookup/" + uuid.toString());
+            HttpRequest req = HttpRequest.newBuilder(remote)
+                .setHeader("Content-Type", "application/json")
+                .GET()
+                .build();
+
+            HttpResponse<String> resp = httpClient.send(req, HttpResponse.BodyHandlers.ofString());
+
+            JsonObject jsonObject = new JsonParser().parse(resp.body()).getAsJsonObject();
+            return jsonObject.get("name").getAsString();
+
+        } catch (Throwable e) {
+            logger.error("Failed getting username from UUID: {}", e.getMessage());
             return null;
         }
     }

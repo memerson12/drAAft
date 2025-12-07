@@ -9,15 +9,30 @@ import draaft.draaft;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.gui.screen.SaveLevelScreen;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.world.MoreOptionsDialog;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.resource.DataPackSettings;
+import net.minecraft.text.LiteralText;
 import net.minecraft.text.TranslatableText;
+import net.minecraft.util.FileNameUtil;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.RegistryTracker;
+import net.minecraft.world.Difficulty;
+import net.minecraft.world.GameMode;
+import net.minecraft.world.GameRules;
+import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.gen.GeneratorOptions;
+import net.minecraft.world.level.LevelInfo;
 import org.apache.logging.log4j.Logger;
 
 import java.util.List;
 import java.util.Random;
+
+import static net.minecraft.world.gen.GeneratorOptions.createOverworldGenerator;
+import static net.minecraft.world.gen.GeneratorOptions.getRegistryWithReplacedOverworldGenerator;
 
 // Enum for game stages
 enum Stage {
@@ -70,6 +85,7 @@ public class DraaftScreen extends Screen {
     private boolean roomCodeRevealed = false;
     private ButtonWidget copyButton;
     private int roomCodeFieldX, roomCodeFieldY, roomCodeFieldWidth, roomCodeFieldHeight;
+    private String saveDirectoryName = "Draaft-World";
 
 
     public DraaftScreen(Screen parent) {
@@ -108,6 +124,42 @@ public class DraaftScreen extends Screen {
             this.roomCodeFieldX + this.roomCodeFieldWidth + 5, this.roomCodeFieldY, 50, 20,
             new TranslatableText("draaft.draaftingScreen.button.copy"),
             button -> copyRoomCode()));
+
+        // Add Next Stage button above Ready button
+        this.addButton(new ButtonWidget(
+            this.width - 100, this.height - 80, 80, 20,
+            new LiteralText("Start Game"),
+            button -> {
+                //debug set to correct state
+                draaftState.setCurrentState(DraaftState.STATE.PREPARING_GAME);
+
+                if (draaftState.getCurrentState() != DraaftState.STATE.PREPARING_GAME) {
+                    logger.error("Tried to start game when not in PREPARING_GAME state!");
+                    return;
+                }
+
+                this.client.setScreenAndRender(new SaveLevelScreen(new TranslatableText("createWorld.preparing")));
+
+                LevelInfo levelInfo = new LevelInfo(
+                    "Draaft Game",
+                    GameMode.SURVIVAL,
+                    false,
+                    Difficulty.EASY,
+                    false,
+                    new GameRules(),
+                    DataPackSettings.SAFE_MODE
+                );
+
+                long seed = "asdf".hashCode();
+                GeneratorOptions generatorOptions = new GeneratorOptions(
+                    seed, true, false, getRegistryWithReplacedOverworldGenerator(DimensionType.createDefaultDimensionOptions(seed), createOverworldGenerator(seed)));
+                MoreOptionsDialog moreOptionsDialog = new MoreOptionsDialog(RegistryTracker.create(), generatorOptions);
+
+                updateSaveFolderName();
+
+                this.client.createWorld(this.saveDirectoryName, levelInfo, moreOptionsDialog.getRegistryManager(), generatorOptions);
+                draaftState.setCurrentState(DraaftState.STATE.IN_GAME);
+            }));
 
         // Add Next Stage button above Ready button
         this.addButton(new ButtonWidget(
@@ -362,6 +414,27 @@ public class DraaftScreen extends Screen {
     private void copyRoomCode() {
         if (this.client != null && this.client.keyboard != null) {
             this.client.keyboard.setClipboard(this.roomCode);
+        }
+    }
+
+    /*
+     Stolen from [[net.minecraft.client.gui.screen.world.CreateWorldScreen.updateSaveFolderName]]
+     */
+    private void updateSaveFolderName() {
+        if (this.saveDirectoryName.isEmpty()) {
+            this.saveDirectoryName = "Draaft-World";
+        }
+
+        try {
+            this.saveDirectoryName = FileNameUtil.getNextUniqueName(this.client.getLevelStorage().getSavesDirectory(), this.saveDirectoryName, "");
+        } catch (Exception var4) {
+            this.saveDirectoryName = "World";
+
+            try {
+                this.saveDirectoryName = FileNameUtil.getNextUniqueName(this.client.getLevelStorage().getSavesDirectory(), this.saveDirectoryName, "");
+            } catch (Exception var3) {
+                throw new RuntimeException("Could not create save folder", var3);
+            }
         }
     }
 
