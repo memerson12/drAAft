@@ -77,7 +77,7 @@ public class PlayerListHudMixin extends DrawableHelper {
             RenderUtils.drawPlayerHead(matrices, headX, headY, playerHeadSize, players.get(i));
 
             // Draw player name and advancement count
-            String playerText = players.get(i).getUsername() + ": 22";
+            String playerText = players.get(i).getUsername() + ": " + DraaftState.getInstance().advancementCounts.getOrDefault(players.get(i).getUuid().toString(), 0).toString();
 
             matrices.push();
             matrices.translate(textX, textY, 0);
