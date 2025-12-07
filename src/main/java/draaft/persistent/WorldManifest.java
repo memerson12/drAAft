@@ -3,11 +3,13 @@ package draaft.persistent;
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 import draaft.mixin.server.MinecraftServerAccessor;
+import draaft.world.ServerWorldInterface;
 import draaft.world.WorldClientInfo;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.resource.Resource;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -32,14 +34,29 @@ public class WorldManifest {
     }
 
     public WorldClientInfo toClientInfo() {
-        return new WorldClientInfo(this.on(Feature.ENCHANTED_BUCKET));
+        return new WorldClientInfo(
+            this.on(Feature.ENCHANTED_BUCKET),
+            this.on(Feature.SHOW_COORDS)
+        );
     }
 
-    public static WorldManifest get(MinecraftServer server) {
+    public static WorldManifest get(ServerWorld serverWorld) {
+        var world = serverWorld.getServer().getOverworld();
+
         if (FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER) {
             return new WorldManifest();
         }
 
+        var swi = (ServerWorldInterface) world;
+
+        if (swi.draaft$getWorldManifest() == null) {
+            swi.draaft$setWorldManifest(loadFromDataPack(world.getServer()));
+        }
+
+        return swi.draaft$getWorldManifest();
+    }
+
+    private static WorldManifest loadFromDataPack(MinecraftServer server) {
         //noinspection resource
         var resxManager = ((MinecraftServerAccessor) server)
             .draaft$serverResourceManager()
@@ -70,6 +87,9 @@ public class WorldManifest {
 
         @SerializedName("AllEnchanted")
         LEVEL_ONE_ENCHANTS,
+
+        @SerializedName("ShowCoords")
+        SHOW_COORDS,
 
         @SerializedName("NoInventory")
         NO_INVENTORY,

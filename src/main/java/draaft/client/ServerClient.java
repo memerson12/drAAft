@@ -56,7 +56,7 @@ public class ServerClient {
     }
 
     public static boolean hasInstance() {
-        return INSTANCE == null;
+        return INSTANCE != null;
     }
 
     public static @Nullable ServerClient getInstanceOrNull() {
