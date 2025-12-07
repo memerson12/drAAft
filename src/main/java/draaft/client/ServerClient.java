@@ -11,6 +11,7 @@ import draaft.client.ws.DraaftWebSocketClient;
 import draaft.client.ws.EventBus;
 import draaft.client.ws.EventListener;
 import draaft.client.ws.events.DraftPickEvents;
+import draaft.client.ws.events.GameEvent;
 import draaft.client.ws.events.RoomMemberEvents;
 import draaft.client.ws.events.RoomStateEvents;
 import draaft.client.ws.outgoing.GameUpdate;
@@ -173,6 +174,14 @@ public class ServerClient {
 
     public void removeRoomStateEventListener(EventListener<RoomStateEvents> listener) {
         this.eventBus.unregister(RoomStateEvents.class, listener);
+    }
+
+    public void addGameStateEventListener(EventListener<GameEvent> listener) {
+        this.eventBus.register(GameEvent.class, listener);
+    }
+
+    public void removeGameStateEventListener(EventListener<GameEvent> listener) {
+        this.eventBus.unregister(GameEvent.class, listener);
     }
 
     // thanks menx :)
