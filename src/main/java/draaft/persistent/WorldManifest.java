@@ -4,6 +4,8 @@ import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 import draaft.mixin.server.MinecraftServerAccessor;
 import draaft.world.WorldClientInfo;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.resource.Resource;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Identifier;
@@ -34,6 +36,10 @@ public class WorldManifest {
     }
 
     public static WorldManifest get(MinecraftServer server) {
+        if (FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER) {
+            return new WorldManifest();
+        }
+
         //noinspection resource
         var resxManager = ((MinecraftServerAccessor) server)
             .draaft$serverResourceManager()
