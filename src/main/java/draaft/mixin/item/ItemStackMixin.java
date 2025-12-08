@@ -1,8 +1,13 @@
 package draaft.mixin.item;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import com.llamalad7.mixinextras.sugar.Local;
 import draaft.world.EnchantUtils;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.Enchantments;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemConvertible;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
@@ -10,11 +15,15 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.util.Lazy;
 import net.minecraft.util.registry.Registry;
+import net.minecraft.world.World;
+import org.apache.logging.log4j.Logger;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.List;
@@ -61,11 +70,94 @@ public abstract class ItemStackMixin {
     @Shadow
     public abstract void putSubTag(String key, Tag tag);
 
+    @Shadow
+    @Final
+    private static Logger LOGGER;
+
+    @Shadow
+    public abstract Item getItem();
+
+    @Shadow
+    private CompoundTag tag;
+
     @Inject(method = "<init>(Lnet/minecraft/item/ItemConvertible;I)V", at = @At("TAIL"))
     void ItemStack(ItemConvertible item, int count, CallbackInfo ci) {
         if (!EnchantUtils.levelOneEnchants()) {
             return;
         }
+
+        if (item != null && !item.asItem().getTranslationKey().contains("bowl")) {
+            for (String id : enchantmentMap.get().keySet()) {
+                if (item.asItem().getTranslationKey().contains(id)) {
+                    ListTag listTag = new ListTag();
+                    for (Enchantment enchantment : enchantmentMap.get().get(id)) {
+                        CompoundTag compoundTag = new CompoundTag();
+                        compoundTag.putString("id", String.valueOf(Registry.ENCHANTMENT.getId(enchantment)));
+                        compoundTag.putShort("lvl", (short) 1);
+                        listTag.add(compoundTag);
+                    }
+                    this.putSubTag("Enchantments", listTag);
+                }
+            }
+        }
+    }
+
+    @Inject(method = "<init>(Lnet/minecraft/nbt/CompoundTag;)V", at = @At("TAIL"))
+    void ItemStack(CompoundTag tag, CallbackInfo ci) {
+        if (!EnchantUtils.levelOneEnchants()) {
+            return;
+        }
+
+        Item item = this.getItem();
+
+        if (item != null && !item.asItem().getTranslationKey().contains("bowl")) {
+            for (String id : enchantmentMap.get().keySet()) {
+                if (item.asItem().getTranslationKey().contains(id)) {
+                    ListTag listTag = new ListTag();
+                    for (Enchantment enchantment : enchantmentMap.get().get(id)) {
+                        CompoundTag compoundTag = new CompoundTag();
+                        compoundTag.putString("id", String.valueOf(Registry.ENCHANTMENT.getId(enchantment)));
+                        compoundTag.putShort("lvl", (short) 1);
+                        listTag.add(compoundTag);
+                    }
+                    this.putSubTag("Enchantments", listTag);
+                }
+            }
+        }
+    }
+
+    @WrapOperation(method = "copy", at = @At(value = "INVOKE", target = "Lnet/minecraft/nbt/CompoundTag;copy()Lnet/minecraft/nbt/CompoundTag;"))
+    CompoundTag copyInject(CompoundTag instance, Operation<CompoundTag> original, @Local(ordinal = 1) ItemStack itemStack) {
+        CompoundTag copyresult = original.call(instance);
+
+        if (!EnchantUtils.levelOneEnchants() || !itemStack.hasTag()) {
+            return copyresult;
+        }
+
+        CompoundTag newTag = itemStack.getTag();
+        if (newTag == null) {
+            return copyresult;
+        }
+
+        Tag newEnchants = newTag.get("Enchantments");
+
+        if (newEnchants == null) {
+            return copyresult;
+        }
+
+        // copy the tag
+        copyresult.put("Enchantments", newEnchants);
+
+        return copyresult;
+    }
+
+    @Inject(method = "onCraft", at = @At("HEAD"))
+    void onCraftInject(World world, PlayerEntity player, int amount, CallbackInfo ci) {
+        if (!EnchantUtils.levelOneEnchants()) {
+            return;
+        }
+
+        final Item item = this.getItem();
 
         if (item != null && !item.asItem().getTranslationKey().contains("bowl")) {
             for (String id : enchantmentMap.get().keySet()) {
