@@ -2,11 +2,13 @@ package draaft.client;
 
 import draaft.client.models.DraaftPlayer;
 import draaft.client.models.Room;
+import draaft.client.ws.events.GameEvent;
 import draaft.client.ws.events.RoomMemberEvents;
 import draaft.draaft;
 import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.function.Consumer;
 
 public class DraaftState {
@@ -21,7 +23,22 @@ public class DraaftState {
 
     public int advancementCount = 0;
 
+    public HashMap<String, Integer> advancementCounts = new HashMap<String, Integer>();
+
     private DraaftState() {
+        serverClient.addGameStateEventListener(event -> {
+            GameEvent.GameEventType eventType = event.type();
+            logger.info("Draaft Game received event of type {}: ", eventType);
+            switch (eventType) {
+                case ADVANCEMENTCOUNT -> {
+                    GameEvent.AdvancementCount advCount = (GameEvent.AdvancementCount) event;
+                    advancementCounts.put(advCount.playerUuid().toString(), advCount.count());
+                }
+
+                default -> logger.warn("Unhandled event type in Draaft Game: {}", event.type());
+            }
+        });
+
         serverClient.addRoomMemberEventListener(event -> {
             RoomMemberEvents.RoomEventType eventType = event.type();
             logger.info("DraaftScreen received event of type {}: ", eventType);
