@@ -1,5 +1,6 @@
 package draaft.mixin.block;
 
+import draaft.persistent.WorldManifest;
 import draaft.persistent.WorldState;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
@@ -31,6 +32,8 @@ public abstract class BlockMixin extends AbstractBlock {
         if (world.isClient()) {
             return;
         }
+        final float DEBRIS_CHANCE = WorldManifest.get((ServerWorld) world).on(WorldManifest.Feature.DEBRIS_RATES) ? 0.2F : 0.01F;
+
         if (!(world.getDimension().isUltrawarm() && (pos.getY() >= 5 && pos.getY() <= 25))) {
             return;
         }
@@ -39,7 +42,7 @@ public abstract class BlockMixin extends AbstractBlock {
             WorldState.RandomState draaftMinedState = worldState.getOrCreateRng(WorldState.RngType.MINED, (ServerWorld) world);
             int mined = draaftMinedState.incrementUses();
 
-            if (draaftMinedState.getRandom().nextFloat() < 0.01F || (mined % 100) == 0) {
+            if (draaftMinedState.getRandom().nextFloat() < DEBRIS_CHANCE || (mined % 100) == 0) {
                 placeDebris(pos, player, world);
                 draaftMinedState.resetUses();
             }

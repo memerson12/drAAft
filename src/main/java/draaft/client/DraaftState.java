@@ -76,6 +76,10 @@ public class DraaftState {
         });
     }
 
+    public boolean inDraaftWorld() {
+        return true; // TODO - We need to know if the world we're in is a draaft world
+    }
+
     public enum STATE {
         WAITING_FOR_ROOM,
         IN_ROOM,
@@ -103,6 +107,10 @@ public class DraaftState {
             return;
         }
         func.accept(getInstance());
+    }
+
+    public static boolean isAccessible() {
+        return INSTANCE != null || ServerClient.hasInstance();
     }
 
     public STATE getCurrentState() {
