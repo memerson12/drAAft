@@ -23,7 +23,7 @@ public abstract class AbstractFurnaceBlockEntityMixin extends LockableContainerB
 
         assert serverWorld != null;
 
-        if (WorldManifest.get(serverWorld.getServer()).on(WorldManifest.Feature.FASTER_BLOCK_ENTITIES)) {
+        if (WorldManifest.get(serverWorld).on(WorldManifest.Feature.FASTER_BLOCK_ENTITIES)) {
             cir.setReturnValue(1);
         }
     }

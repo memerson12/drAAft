@@ -4,7 +4,7 @@ import draaft.persistent.WorldManifest;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.world.ServerWorld;
 import org.jetbrains.annotations.Nullable;
 
 public abstract class EnchantUtils {
@@ -12,23 +12,28 @@ public abstract class EnchantUtils {
         if (
             FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT
                 && MinecraftClientWrapper.available()
-                && MinecraftClientWrapper.getServer() != null
+                && MinecraftClientWrapper.getWorld() != null
         ) {
-            var server = MinecraftClientWrapper.getServer();
+            var world = MinecraftClientWrapper.getWorld();
 
-            return WorldManifest.get(server).on(WorldManifest.Feature.LEVEL_ONE_ENCHANTS);
+            return WorldManifest.get(world).on(WorldManifest.Feature.LEVEL_ONE_ENCHANTS);
         } else {
             return false;
         }
     }
 
+    // Wrapper to avoid class loading issues on dedicated servers
     private static class MinecraftClientWrapper {
         static boolean available() {
-            return MinecraftClient.getInstance() != null;
+            var client = MinecraftClient.getInstance();
+
+            return client != null && client.getServer() != null;
         }
 
-        static @Nullable MinecraftServer getServer() {
-            return MinecraftClient.getInstance().getServer();
+        static @Nullable ServerWorld getWorld() {
+            assert MinecraftClient.getInstance().getServer() != null;
+
+            return MinecraftClient.getInstance().getServer().getOverworld();
         }
     }
 }
