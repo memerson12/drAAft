@@ -49,6 +49,7 @@
     "screen.slot.TradeOutputSlotMixin",
     "server.MinecraftServerAccessor",
     "server.PlayerManagerMixin",
+    "server.function.CommandFunctionManagerMixin",
     "server.world.ServerWorldMixin",
     "structure.IglooGeneratorMixin",
     "structure.StructurePieceMixin",

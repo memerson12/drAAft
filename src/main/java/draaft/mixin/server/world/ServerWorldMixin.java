@@ -1,7 +1,9 @@
 package draaft.mixin.server.world;
 
+import draaft.command.CommandFunctionManagerInterface;
 import draaft.persistent.WorldManifest;
 import draaft.world.ServerWorldInterface;
+import net.minecraft.entity.Entity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.profiler.Profiler;
@@ -17,7 +19,10 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.Random;
 import java.util.function.Supplier;
@@ -140,6 +145,18 @@ public abstract class ServerWorldMixin extends World implements ServerWorldAcces
         }
 
         return rainTime;
+    }
+
+    @Inject(method = "addEntity", at = @At("TAIL"))
+    void afterSpawnEntity(Entity entity, CallbackInfoReturnable<Boolean> cir) {
+        // note: this injection point can cause some spurious draaft:entity_spawn triggers, but that's fine (?)
+        if (cir.getReturnValue()) {
+            var server = entity.getServer();
+
+            assert server != null;
+
+            ((CommandFunctionManagerInterface) server.getCommandFunctionManager()).draaft$entitySpawn(entity);
+        }
     }
 
     @Override
