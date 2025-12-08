@@ -1,5 +1,7 @@
 package draaft.mixin.server.world;
 
+import draaft.persistent.WorldManifest;
+import draaft.world.ServerWorldInterface;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.profiler.Profiler;
@@ -9,6 +11,7 @@ import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.level.ServerWorldProperties;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -20,7 +23,7 @@ import java.util.Random;
 import java.util.function.Supplier;
 
 @Mixin(ServerWorld.class)
-public abstract class ServerWorldMixin extends World implements ServerWorldAccess {
+public abstract class ServerWorldMixin extends World implements ServerWorldAccess, ServerWorldInterface {
     @Shadow
     @Final
     private ServerWorldProperties worldProperties;
@@ -33,6 +36,9 @@ public abstract class ServerWorldMixin extends World implements ServerWorldAcces
     boolean lastTickThunder = true;
     @Unique
     boolean lastTickRain = true;
+
+    @Unique
+    private @Nullable WorldManifest worldManifest = null;
 
     @Unique
     private boolean isIllegalRain(int timer) {
@@ -134,5 +140,15 @@ public abstract class ServerWorldMixin extends World implements ServerWorldAcces
         }
 
         return rainTime;
+    }
+
+    @Override
+    public WorldManifest draaft$getWorldManifest() {
+        return this.worldManifest;
+    }
+
+    @Override
+    public void draaft$setWorldManifest(WorldManifest worldManifest) {
+        this.worldManifest = worldManifest;
     }
 }

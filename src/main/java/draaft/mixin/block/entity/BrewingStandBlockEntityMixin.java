@@ -22,7 +22,7 @@ public abstract class BrewingStandBlockEntityMixin extends LockableContainerBloc
 
         assert serverWorld != null;
 
-        return WorldManifest.get(serverWorld.getServer()).on(WorldManifest.Feature.FASTER_BLOCK_ENTITIES)
+        return WorldManifest.get(serverWorld).on(WorldManifest.Feature.FASTER_BLOCK_ENTITIES)
             ? 1
             : constant;
     }
