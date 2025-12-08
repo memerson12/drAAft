@@ -29,7 +29,7 @@ public class ExplodingShellsCommand {
                         if (shellRng.getRandom().nextFloat() < 0.5F) {
                             player.giveItemStack(new ItemStack(Items.NAUTILUS_SHELL));
                         } else {
-                            TntEntity tntEntity = new TntEntity(world, player.getX(), player.getY() + 1, player.getZ(), null);
+                            TntEntity tntEntity = new TntEntity(world, player.getX(), player.getY() + 1, player.getZ(), player);
                             world.spawnEntity(tntEntity);
                             world.playSound(null, tntEntity.getX(), tntEntity.getY(), tntEntity.getZ(), SoundEvents.ENTITY_TNT_PRIMED, SoundCategory.BLOCKS, 1.0F, 1.0F);
                         }
