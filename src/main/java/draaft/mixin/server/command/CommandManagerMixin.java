@@ -1,6 +1,7 @@
 package draaft.mixin.server.command;
 
 import com.mojang.brigadier.CommandDispatcher;
+import draaft.command.ExplodingShellsCommand;
 import draaft.command.RandomItemCommand;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
@@ -18,5 +19,6 @@ public abstract class CommandManagerMixin {
     @Inject(method = "<init>(Lnet/minecraft/server/command/CommandManager$RegistrationEnvironment;)V", at = @At("RETURN"))
     public void CommandManager(CommandManager.RegistrationEnvironment environment, CallbackInfo ci) {
         RandomItemCommand.register(dispatcher);
+        ExplodingShellsCommand.register(dispatcher);
     }
 }
