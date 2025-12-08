@@ -27,7 +27,11 @@ public class PlayerListHudMixin extends DrawableHelper {
 
     @WrapMethod(method = "render")
     private void renderOverride(MatrixStack matrices, int scaleWidth, Scoreboard scoreboard, ScoreboardObjective scoreboardObjective, Operation<Void> original) {
-        ArrayList<DraaftPlayer> players = DraaftState.getInstance().getRoom().members();
+        if (!DraaftState.isAccessible()) return;
+        final DraaftState draaftState = DraaftState.getInstance();
+        if (!draaftState.inDraaftWorld()) return; // does nothing at present
+
+        ArrayList<DraaftPlayer> players = draaftState.getRoom().members();
 
         int screenHeight = this.client.getWindow().getScaledHeight();
         int screenWidth = this.client.getWindow().getScaledWidth();
@@ -77,7 +81,7 @@ public class PlayerListHudMixin extends DrawableHelper {
             RenderUtils.drawPlayerHead(matrices, headX, headY, playerHeadSize, players.get(i));
 
             // Draw player name and advancement count
-            String playerText = players.get(i).getUsername() + ": " + DraaftState.getInstance().advancementCounts.getOrDefault(players.get(i).getUuid().toString(), 0).toString();
+            String playerText = players.get(i).getUsername() + ": " + draaftState.advancementCounts.getOrDefault(players.get(i).getUuid().toString(), 0).toString();
 
             matrices.push();
             matrices.translate(textX, textY, 0);

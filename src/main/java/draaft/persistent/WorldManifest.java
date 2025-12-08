@@ -91,6 +91,9 @@ public class WorldManifest {
         @SerializedName("ShowCoords")
         SHOW_COORDS,
 
+        @SerializedName("DebrisRates")
+        DEBRIS_RATES,
+
         @SerializedName("NoInventory")
         NO_INVENTORY,
     }

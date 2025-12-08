@@ -3,6 +3,7 @@
   "package": "draaft.mixin",
   "compatibilityLevel": "JAVA_11",
   "mixins": [
+    "server.command.CommandManagerMixin",
     "advancement.PlayerAdvancementTrackerMixin",
     "block.BlockMixin",
     "block.ChestBlockMixin",
@@ -79,7 +80,7 @@
     "client.gui.screen.options.OptionsScreenMixin",
     "client.network.ClientPlayNetworkHandlerMixin",
     "client.resource.SplashTextResourceSupplierMixin",
-    "item.ItemClientMixin",
-    "compat.InGameTimerMixin"
+    "compat.InGameTimerMixin",
+    "item.ItemClientMixin"
   ]
 }
