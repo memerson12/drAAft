@@ -94,6 +94,9 @@ public class WorldManifest {
         @SerializedName("DebrisRates")
         DEBRIS_RATES,
 
+        @SerializedName("DangerousPearls")
+        DANGEROUS_PEARLS,
+
         @SerializedName("NoInventory")
         NO_INVENTORY,
     }

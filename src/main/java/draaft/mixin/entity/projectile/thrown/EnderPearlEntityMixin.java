@@ -1,6 +1,7 @@
 package draaft.mixin.entity.projectile.thrown;
 
 import draaft.draaft;
+import draaft.persistent.WorldManifest;
 import draaft.persistent.WorldState;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -11,10 +12,7 @@ import net.minecraft.world.World;
 import org.apache.logging.log4j.Logger;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Constant;
-import org.spongepowered.asm.mixin.injection.ModifyConstant;
-import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.*;
 
 import java.util.Random;
 
@@ -55,5 +53,14 @@ public abstract class EnderPearlEntityMixin extends ThrownItemEntity {
             return 0.0F;
         }
         return draaftPearlState.getRandom().nextFloat();
+    }
+
+    @ModifyArg(method = "onCollision", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;damage(Lnet/minecraft/entity/damage/DamageSource;F)Z"), index = 1)
+    float removeFallDamage(float amount) {
+        if (!world.isClient() && WorldManifest.get((ServerWorld) world).on(WorldManifest.Feature.DANGEROUS_PEARLS))
+        {
+            return 0;
+        }
+        return amount;
     }
 }
