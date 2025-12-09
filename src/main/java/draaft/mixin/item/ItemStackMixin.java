@@ -104,7 +104,7 @@ public abstract class ItemStackMixin {
 
     @Inject(method = "<init>(Lnet/minecraft/nbt/CompoundTag;)V", at = @At("TAIL"))
     void ItemStack(CompoundTag tag, CallbackInfo ci) {
-        if (!EnchantUtils.levelOneEnchants()) {
+        if (!EnchantUtils.levelOneEnchants() || tag.contains("_d2i")) {
             return;
         }
 
@@ -130,7 +130,7 @@ public abstract class ItemStackMixin {
     CompoundTag copyInject(CompoundTag instance, Operation<CompoundTag> original, @Local(ordinal = 1) ItemStack itemStack) {
         CompoundTag copyresult = original.call(instance);
 
-        if (!EnchantUtils.levelOneEnchants() || !itemStack.hasTag()) {
+        if (!EnchantUtils.levelOneEnchants() || !itemStack.hasTag() || copyresult.contains("_d2i")) {
             return copyresult;
         }
 
