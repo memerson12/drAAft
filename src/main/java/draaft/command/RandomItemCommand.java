@@ -38,6 +38,7 @@ public class RandomItemCommand {
             new ItemStack(Items.MAGENTA_CONCRETE_POWDER),
             new ItemStack(Items.MULE_SPAWN_EGG),
             new ItemStack(Items.POLAR_BEAR_SPAWN_EGG),
+            new ItemStack(Items.BAT_SPAWN_EGG),
             new ItemStack(Items.SQUID_SPAWN_EGG),
             new ItemStack(Items.EXPERIENCE_BOTTLE),
             new ItemStack(Items.SKELETON_SKULL),
