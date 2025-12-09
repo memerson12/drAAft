@@ -62,7 +62,7 @@ public abstract class DebugHudMixin extends DrawableHelper {
 
         WorldClientInfo worldClientInfo = WorldClientInfo.get(client.world);
 
-        if (client.getCameraEntity() != null) {
+        if (client.hasReducedDebugInfo() && client.getCameraEntity() != null) {
             lines.add(String.format(Locale.ROOT, "Y: %.5f", client.getCameraEntity().getY()));
         }
 
@@ -92,7 +92,7 @@ public abstract class DebugHudMixin extends DrawableHelper {
         }
 
 
-        if (MinecraftClient.getInstance().hasReducedDebugInfo()) {
+        if (client.hasReducedDebugInfo()) {
             return lines.add(I18n.translate("draaft.game.reducedDebugInfo.debugOpts." + draaft.currentF3Taunt % 6));
         } else {
             return lines.add((String) e);
