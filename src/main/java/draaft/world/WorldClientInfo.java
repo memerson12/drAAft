@@ -42,9 +42,14 @@ public record WorldClientInfo(
         buf.writeString(annotations.badlands != null ? annotations.badlands : "");
         buf.writeString(annotations.bastion != null ? annotations.bastion : "");
         buf.writeString(annotations.fortress != null ? annotations.fortress : "");
-        buf.writeInt(annotations.strongholds != null ? annotations.strongholds.size() : 0);
-        for (int i = 0; i < annotations.strongholds.size(); i++) {
-            buf.writeString(annotations.strongholds.get(i));
+
+        if (annotations.strongholds != null) {
+            buf.writeInt(annotations.strongholds.size());
+            for (int i = 0; i < annotations.strongholds.size(); i++) {
+                buf.writeString(annotations.strongholds.get(i));
+            }
+        } else {
+            buf.writeInt(0);
         }
 
         return new CustomPayloadS2CPacket(CHANNEL, buf);
