@@ -3,9 +3,6 @@ package draaft.world;
 import draaft.persistent.WorldManifest;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.server.world.ServerWorld;
-import org.jetbrains.annotations.Nullable;
 
 public abstract class EnchantUtils {
     public static boolean levelOneEnchants() {
@@ -22,18 +19,4 @@ public abstract class EnchantUtils {
         }
     }
 
-    // Wrapper to avoid class loading issues on dedicated servers
-    private static class MinecraftClientWrapper {
-        static boolean available() {
-            var client = MinecraftClient.getInstance();
-
-            return client != null && client.getServer() != null;
-        }
-
-        static @Nullable ServerWorld getWorld() {
-            assert MinecraftClient.getInstance().getServer() != null;
-
-            return MinecraftClient.getInstance().getServer().getOverworld();
-        }
-    }
 }

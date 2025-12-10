@@ -18,6 +18,7 @@ public record WorldClientInfo(
     // when adding fields remember to serialize them in buildPacket
     boolean enchantedBucket,
     boolean showCoords,
+    boolean noInventory,
     WorldManifest.Annotations annotations
 ) {
     public static final Identifier CHANNEL = new Identifier("draaft", "world_client_info");
@@ -27,7 +28,7 @@ public record WorldClientInfo(
 
         return saved != null
             ? saved
-            : new WorldClientInfo(false, false, new WorldManifest.Annotations());
+            : new WorldClientInfo(false, false, false, new WorldManifest.Annotations());
     }
 
     public CustomPayloadS2CPacket buildPacket() {
@@ -35,6 +36,7 @@ public record WorldClientInfo(
 
         buf.writeBoolean(enchantedBucket);
         buf.writeBoolean(showCoords);
+        buf.writeBoolean(noInventory);
         buf.writeString(annotations.mushroomIsland != null ? annotations.mushroomIsland : "");
         buf.writeString(annotations.jungle != null ? annotations.jungle : "");
         buf.writeString(annotations.megaTaiga != null ? annotations.megaTaiga : "");
@@ -57,6 +59,7 @@ public record WorldClientInfo(
 
     public static WorldClientInfo fromBuffer(PacketByteBuf buffer) {
         return new WorldClientInfo(
+            buffer.readBoolean(),
             buffer.readBoolean(),
             buffer.readBoolean(),
             readAnnotations(buffer)
