@@ -11,6 +11,7 @@
   "draaft.login.failed.unsupportedVersion": "Unsupported version, try updating the mod.",
   "draaft.login.failed.unexpectedResponse": "Unexpected drAAft server response.",
   "draaft.login.failed.errorContactingDraaft": "Error contacting the drAAft server.",
+  "draaft.draaftingScreen.admin": "Admin Player",
   "draaft.draaftingScreen.title": "Draafting",
   "draaft.draaftingScreen.button.back": "Back",
   "draaft.draaftingScreen.tooltip.revealRoomCode": "Click to reveal room code",

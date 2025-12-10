@@ -54,11 +54,8 @@ enum Stage {
 }
 
 /// TODO(s) (non-exhaustive):
-/// - Figure out how to get player usernames from UUIDs
 /// - Show room config setting somewhere
 ///   - Editable by admin?
-/// - Make clear which player is the admin
-///   - Some symbol next to their name/profile? Command Block?
 /// - Make scaling work better
 ///   - Check GUI scale? MC might handle this for us already
 /// - Give admin power to remove player?
@@ -202,7 +199,7 @@ public class DraaftScreen extends Screen {
         this.drawVerticalLine(matrices, leftPanelWidth, 0, this.height, 0xFFFFFFFF);
 
         // Draw player list
-        this.renderPlayerList(matrices);
+        this.renderPlayerList(matrices, mouseX, mouseY);
 
         // Draw room code field
         this.renderRoomCodeField(matrices, mouseX, mouseY);
@@ -210,11 +207,12 @@ public class DraaftScreen extends Screen {
         super.render(matrices, mouseX, mouseY, delta);
     }
 
-    private void renderPlayerList(MatrixStack matrices) {
+    private void renderPlayerList(MatrixStack matrices, int mouseX, int mouseY) {
         int startY = 20;
         int leftPanelWidth = getLeftPanelWidth();
         int visiblePlayers = (this.height - startY) / PLAYER_ENTRY_HEIGHT;
         List<DraaftPlayer> players = draaftState.getRoom().members();
+        DraaftPlayer admin = draaftState.getRoom().admin();
 
         for (int i = 0; i < Math.min(visiblePlayers, players.size() - scrollOffset); i++) {
             int playerIndex = i + scrollOffset;
@@ -247,6 +245,22 @@ public class DraaftScreen extends Screen {
                 (PLAYER_FACE_SIZE + this.textRenderer.getWidth("Status: ")) / 0.75f, (y + 22) / 0.75f,
                 statusColor);
             matrices.pop();
+
+            // Draw admin label if player is admin
+            if (player.getUuid().equals(admin.getUuid())) {
+                matrices.push();
+                matrices.scale(0.75f, 0.75f, 1.0f);
+                int textureX = (int) ((PLAYER_FACE_SIZE + 4) / 0.75 + (this.textRenderer.getWidth(player.getUsername() + 4) / 0.75));
+                int textureY = (int) ((y + 6) / 0.75);
+                this.client.getTextureManager().bindTexture(new Identifier("textures/block/command_block_front.png"));
+                drawTexture(matrices, textureX, textureY, 0, 0, 16, 16, 16, 64);
+                matrices.pop();
+                if (mouseX >= textureX * 0.75 && mouseX <= textureX * 0.75 + 16 * 0.75 && mouseY >= textureY * 0.75 && mouseY <= textureY * 0.75 + 16) {
+                    renderTooltip(matrices, new TranslatableText("draaft.draaftingScreen.admin"), (int) (textureX * 0.75), (int) (textureY * 0.75) - 2);
+                }
+            }
+
+
         }
 
         // Draw scrollbar if needed
