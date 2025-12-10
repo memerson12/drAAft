@@ -42,33 +42,34 @@ public class PlayerListHudMixin extends DrawableHelper {
         final int margin = (int) (10 * scale);
         final int boxColor = 0x90D5D5D5;
 
-        int boxX = margin;
         int boxWidth = (int) (screenWidth * 0.20);
-        int boxHeight = (int) (screenHeight * 0.90);
+
+        double boxHeightPercentage = Math.min(0.90, draaftState.getRoom().members().size() * 0.15);
+
+        int boxHeight = (int) (screenHeight * boxHeightPercentage);
         int boxY = (screenHeight / 2) - (boxHeight / 2);
 
+        drawAdvancementCountsPanel(matrices, players, margin, boxY, boxWidth, boxHeight, cornerRadius, scale, boxColor);
+    }
+
+    @Unique
+    private void drawAdvancementCountsPanel(MatrixStack matrices, ArrayList<DraaftPlayer> players, int x, int y, int width, int height, int cornerRadius, float scale, int boxColor) {
         // Draw the background box
-        RenderUtils.drawRoundedRect(matrices, boxX, boxY, boxWidth, boxHeight, cornerRadius, boxColor);
+        RenderUtils.drawRoundedRect(matrices, x, y, width, height, cornerRadius, boxColor);
 
         // Draw header
         String headerText = "Advancement Counts";
-        float headerX = (boxX + (float) boxWidth / 2) - (this.client.textRenderer.getWidth(headerText) * (scale * 1.2f)) / 2;
-        int headerY = boxY + (int) (10 * scale);
-
-        matrices.push();
-        matrices.translate(headerX, headerY, 0);
-        matrices.scale(scale * 1.2f, scale * 1.2f, 1.0f);
-        this.client.textRenderer.draw(matrices, headerText, 0, 0, 0xFFFFFFFF);
-        matrices.pop();
+        int headerY = y + (int) (10 * scale);
+        drawHeader(matrices, x, headerY, (float) width, scale, headerText);
 
         // Draw divider line
-        fill(matrices, boxX, headerY + (int) (20 * scale), boxX + boxWidth, headerY + (int) (20 * scale) + Math.max(1, (int) (1 * scale)), 0xA0FFFFFF);
+        fill(matrices, x, headerY + (int) (20 * scale), x + width, headerY + (int) (20 * scale) + Math.max(1, (int) (1 * scale)), 0xA0FFFFFF);
 
         // Player entry settings
-        final int playerHeadSize = (int) (24 * scale);
-        final int entryHeight = (int) (40 * scale);
-        final int entryStartY = headerY + (int) (40 * scale);
-        final int headX = boxX + (int) (10 * scale);
+        final int playerHeadSize = (int) (28 * scale);
+        final int entryHeight = (int) (44 * scale);
+        final int entryStartY = headerY + (int) (30 * scale);
+        final int headX = x + (int) (10 * scale);
         final int textX = headX + playerHeadSize + (int) (6 * scale);
 
         // Draw each player entry
@@ -81,16 +82,24 @@ public class PlayerListHudMixin extends DrawableHelper {
             RenderUtils.drawPlayerHead(matrices, headX, headY, playerHeadSize, players.get(i));
 
             // Draw player name and advancement count
-            String playerText = players.get(i).getUsername() + ": " + draaftState.advancementCounts.getOrDefault(players.get(i).getUuid().toString(), 0).toString();
+            String playerText = players.get(i).getUsername() + ": " + DraaftState.getInstance().advancementCounts.getOrDefault(players.get(i).getUuid().toString(), 0).toString();
 
             matrices.push();
             matrices.translate(textX, textY, 0);
-            matrices.scale(scale, scale, 1.0f);
+            matrices.scale(scale * 1.1f, scale * 1.1f, 1.0f);
             this.client.textRenderer.drawWithShadow(matrices, playerText, 0, 0, 0xFFFFFFFF);
             matrices.pop();
         }
-        matrices.pop();
     }
 
+    @Unique
+    private void drawHeader(MatrixStack matrices, int boxX, int headerY, float boxWidth, float scale, String headerText) {
+        float headerX = (boxX + boxWidth / 2) - (this.client.textRenderer.getWidth(headerText) * (scale * 1.2f)) / 2;
 
+        matrices.push();
+        matrices.translate(headerX, headerY, 0);
+        matrices.scale(scale * 1.2f, scale * 1.2f, 1.0f);
+        this.client.textRenderer.draw(matrices, headerText, 0, 0, 0xFFFFFFFF);
+        matrices.pop();
+    }
 }
