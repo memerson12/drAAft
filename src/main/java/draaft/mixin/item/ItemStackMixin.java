@@ -80,6 +80,19 @@ public abstract class ItemStackMixin {
     @Shadow
     private CompoundTag tag;
 
+    private static boolean isDraftedItemTag(CompoundTag tag) {
+        if (tag.contains("_d2i")) {
+            return true;
+        }
+        if (tag.contains("tag")) {
+            Tag innerTag = tag.get("tag");
+            if (CompoundTag.class.isAssignableFrom(innerTag.getClass())) {
+                return ((CompoundTag) innerTag).contains("_d2i");
+            }
+        }
+        return false;
+    }
+
     @Inject(method = "<init>(Lnet/minecraft/item/ItemConvertible;I)V", at = @At("TAIL"))
     void ItemStack(ItemConvertible item, int count, CallbackInfo ci) {
         if (!EnchantUtils.levelOneEnchants()) {
@@ -104,7 +117,7 @@ public abstract class ItemStackMixin {
 
     @Inject(method = "<init>(Lnet/minecraft/nbt/CompoundTag;)V", at = @At("TAIL"))
     void ItemStack(CompoundTag tag, CallbackInfo ci) {
-        if (!EnchantUtils.levelOneEnchants() || tag.contains("_d2i")) {
+        if (!EnchantUtils.levelOneEnchants() || isDraftedItemTag(tag)) {
             return;
         }
 
@@ -130,7 +143,7 @@ public abstract class ItemStackMixin {
     CompoundTag copyInject(CompoundTag instance, Operation<CompoundTag> original, @Local(ordinal = 1) ItemStack itemStack) {
         CompoundTag copyresult = original.call(instance);
 
-        if (!EnchantUtils.levelOneEnchants() || !itemStack.hasTag() || copyresult.contains("_d2i")) {
+        if (!EnchantUtils.levelOneEnchants() || !itemStack.hasTag() || isDraftedItemTag(copyresult)) {
             return copyresult;
         }
 
@@ -151,6 +164,7 @@ public abstract class ItemStackMixin {
         return copyresult;
     }
 
+    /*
     @Inject(method = "onCraft", at = @At("HEAD"))
     void onCraftInject(World world, PlayerEntity player, int amount, CallbackInfo ci) {
         if (!EnchantUtils.levelOneEnchants()) {
@@ -174,4 +188,5 @@ public abstract class ItemStackMixin {
             }
         }
     }
+    */
 }
