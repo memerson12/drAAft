@@ -41,6 +41,7 @@ public class WorldManifest {
         return new WorldClientInfo(
             this.on(Feature.ENCHANTED_BUCKET),
             this.on(Feature.SHOW_COORDS),
+            this.on(Feature.NO_INVENTORY),
             this.annotations
         );
     }
