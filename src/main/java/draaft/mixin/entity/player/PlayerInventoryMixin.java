@@ -94,7 +94,7 @@ public abstract class PlayerInventoryMixin {
 
     @Redirect(method = "clone", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerInventory;setStack(ILnet/minecraft/item/ItemStack;)V"))
     void setCloneIndex(PlayerInventory instance, int slot, ItemStack stack) {
-        if (slot > 0 && slot < 14) {
+        if (slot > 8 && slot < 14) {
             slot = slot + 27;
         }
         instance.setStack(slot, stack);
@@ -102,7 +102,7 @@ public abstract class PlayerInventoryMixin {
 
     @Redirect(method = "clone", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerInventory;getStack(I)Lnet/minecraft/item/ItemStack;"))
     ItemStack setCloneIndex2(PlayerInventory instance, int slot) {
-        if (slot > 0 && slot < 14) {
+        if (slot > 8 && slot < 14) {
             slot = slot + 27;
         }
         return instance.getStack(slot);
