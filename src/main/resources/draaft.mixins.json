@@ -42,12 +42,15 @@
     "entity.passive.AnimalEntityMixin",
     "entity.passive.CatEntityMixin",
     "entity.passive.RabbitEntityMixin",
+    "entity.player.PlayerEntityMixin",
     "entity.projectile.thrown.EnderPearlEntityMixin",
+    "item.EnderPearlItemMixin",
     "item.ItemsMixin",
     "item.ItemStackMixin",
     "screen.slot.TradeOutputSlotMixin",
     "server.MinecraftServerAccessor",
     "server.PlayerManagerMixin",
+    "server.command.CommandManagerMixin",
     "server.world.ServerWorldMixin",
     "structure.IglooGeneratorMixin",
     "structure.StructurePieceMixin",
@@ -78,8 +81,10 @@
     "client.gui.screen.options.OptionsScreenAccessor",
     "client.gui.screen.options.OptionsScreenMixin",
     "client.network.ClientPlayNetworkHandlerMixin",
+    "client.render.debug.DebugRendererMixin",
+    "client.render.entity.EntityRenderDispatcherMixin",
     "client.resource.SplashTextResourceSupplierMixin",
-    "item.ItemClientMixin",
-    "compat.InGameTimerMixin"
+    "compat.InGameTimerMixin",
+    "item.ItemClientMixin"
   ]
 }

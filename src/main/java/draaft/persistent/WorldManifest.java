@@ -13,10 +13,12 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.EnumSet;
+import java.util.List;
 
 import static draaft.draaft.MOD_ID;
 
@@ -29,6 +31,8 @@ public class WorldManifest {
 
     private EnumSet<Feature> features = EnumSet.noneOf(Feature.class);
 
+    private final Annotations annotations = new Annotations();
+
     public Boolean on(Feature feature) {
         return this.features.contains(feature);
     }
@@ -36,7 +40,8 @@ public class WorldManifest {
     public WorldClientInfo toClientInfo() {
         return new WorldClientInfo(
             this.on(Feature.ENCHANTED_BUCKET),
-            this.on(Feature.SHOW_COORDS)
+            this.on(Feature.SHOW_COORDS),
+            this.annotations
         );
     }
 
@@ -91,7 +96,32 @@ public class WorldManifest {
         @SerializedName("ShowCoords")
         SHOW_COORDS,
 
+        @SerializedName("DebrisRates")
+        DEBRIS_RATES,
+
+        @SerializedName("DangerousPearls")
+        DANGEROUS_PEARLS,
+
         @SerializedName("NoInventory")
         NO_INVENTORY,
+    }
+
+    public static class Annotations {
+        @SerializedName("mushroom_island")
+        @Nullable public String mushroomIsland;
+        @SerializedName("jungle")
+        @Nullable public String jungle;
+        @SerializedName("mega_taiga")
+        @Nullable public String megaTaiga;
+        @SerializedName("snowy")
+        @Nullable public String snowy;
+        @SerializedName("badlands")
+        @Nullable public String badlands;
+        @SerializedName("bastion")
+        @Nullable public String bastion;
+        @SerializedName("fortress")
+        @Nullable public String fortress;
+        @SerializedName("strongholds")
+        @Nullable public List<String> strongholds;
     }
 }

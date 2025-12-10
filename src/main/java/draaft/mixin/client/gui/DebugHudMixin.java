@@ -4,12 +4,14 @@ import com.google.common.collect.Lists;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import draaft.draaft;
+import draaft.world.WorldClientInfo;
 import net.minecraft.SharedConstants;
 import net.minecraft.client.ClientBrandRetriever;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.hud.DebugHud;
 import net.minecraft.client.resource.language.I18n;
+import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -17,6 +19,8 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
 
 import static draaft.draaft.getDraaftVersion;
 
@@ -52,7 +56,43 @@ public abstract class DebugHudMixin extends DrawableHelper {
 
     @Redirect(method = "renderLeftText", at = @At(value = "INVOKE", ordinal = 1, target = "Ljava/util/List;add(Ljava/lang/Object;)Z", remap = false))
     private boolean modifyDebugOptsText(List<String> lines, Object e) {
-        if (MinecraftClient.getInstance().hasReducedDebugInfo()) {
+        var client = MinecraftClient.getInstance();
+
+        assert client.world != null;
+
+        WorldClientInfo worldClientInfo = WorldClientInfo.get(client.world);
+
+        if (client.hasReducedDebugInfo() && client.getCameraEntity() != null) {
+            lines.add(String.format(Locale.ROOT, "Y: %.5f", client.getCameraEntity().getY()));
+        }
+
+        if (worldClientInfo.showCoords() && client.world.getRegistryKey().equals(World.OVERWORLD)) {
+            lines.add("Mushroom Island: " + WorldClientInfo.get(client.world).annotations().mushroomIsland);
+            lines.add("Jungle: " + WorldClientInfo.get(client.world).annotations().jungle);
+            lines.add("Mega Taiga: " + WorldClientInfo.get(client.world).annotations().megaTaiga);
+            lines.add("Snowy: " + WorldClientInfo.get(client.world).annotations().snowy);
+            lines.add("Badlands: " + WorldClientInfo.get(client.world).annotations().badlands);
+            lines.add("");
+        } else if (worldClientInfo.showCoords() && client.world.getRegistryKey().equals(World.NETHER)) {
+            lines.add("Bastion: " + WorldClientInfo.get(client.world).annotations().bastion);
+            lines.add("Fortress: " + WorldClientInfo.get(client.world).annotations().fortress);
+
+            List<String> strongholds = WorldClientInfo.get(client.world).annotations().strongholds;
+            if (strongholds != null) {
+                String strongholdsString = "";
+                for (int i = 0; i < Objects.requireNonNull(strongholds).size(); i++) {
+                    strongholdsString = strongholdsString.concat(strongholds.get(i));
+                    if (i < strongholds.size() - 1) {
+                        strongholdsString = strongholdsString.concat(" / ");
+                    }
+                }
+                lines.add("Strongholds: " + strongholdsString);
+            }
+            lines.add("");
+        }
+
+
+        if (client.hasReducedDebugInfo()) {
             return lines.add(I18n.translate("draaft.game.reducedDebugInfo.debugOpts." + draaft.currentF3Taunt % 6));
         } else {
             return lines.add((String) e);

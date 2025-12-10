@@ -27,7 +27,9 @@ public class WorldState extends PersistentState {
         RABBIT("rabbit"),
         TEMPLE("temple"),
         TNT("tnt"),
-        MINED("mined");
+        MINED("mined"),
+        JUNK("junk"),
+        EXPLODING_SHELLS("exploding_shells");
 
         private final String keyName; // The base name used for NBT keys
 
