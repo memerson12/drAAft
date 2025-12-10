@@ -81,6 +81,8 @@
     "client.gui.screen.options.OptionsScreenAccessor",
     "client.gui.screen.options.OptionsScreenMixin",
     "client.network.ClientPlayNetworkHandlerMixin",
+    "client.render.debug.DebugRendererMixin",
+    "client.render.entity.EntityRenderDispatcherMixin",
     "client.resource.SplashTextResourceSupplierMixin",
     "compat.InGameTimerMixin",
     "item.ItemClientMixin"
