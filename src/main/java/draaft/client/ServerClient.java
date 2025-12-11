@@ -16,6 +16,7 @@ import draaft.client.ws.events.RoomMemberEvents;
 import draaft.client.ws.events.RoomStateEvents;
 import draaft.client.ws.outgoing.GameUpdate;
 import draaft.draaft;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.TranslatableText;
@@ -200,14 +201,23 @@ public class ServerClient {
             .version(HttpClient.Version.HTTP_1_1) // HTTP 2 is not supported by fastapi
             .build();
 
-        logger.info("Contacting Minecraft auth server...");
-        var serverID = MojangAuth.joinDraaftServer();
-        if (serverID == null) {
-            return;
+        String clientToken;
+
+        if (FabricLoader.getInstance().isDevelopmentEnvironment() && draaftServices.supportsDevAuth()) {
+            var username = System.getProperty("DRAAFT_USERNAME", MinecraftClient.getInstance().getSession().getUsername());
+
+            clientToken = DraaftAuth.authenticateDevMode(draaftServices, httpClient, username);
+        } else {
+            logger.info("Contacting Minecraft auth server...");
+            var serverID = MojangAuth.joinDraaftServer();
+            if (serverID == null) {
+                return;
+            }
+
+            logger.info("Contacting drAAft server...");
+            clientToken = DraaftAuth.authenticate(draaftServices, httpClient, serverID);
         }
 
-        logger.info("Contacting drAAft server...");
-        String clientToken = DraaftAuth.authenticate(draaftServices, httpClient, serverID);
         if (clientToken == null) {
             return;
         }
