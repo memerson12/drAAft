@@ -7,6 +7,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.IOException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -23,21 +24,7 @@ public class DraaftAuth {
 
         String clientToken;
         try {
-            var versionReq = HttpRequest.newBuilder(draaftServices.apiBase().resolve("/version"))
-                .GET()
-                .build();
-
-            var versionResp = http.send(versionReq, HttpResponse.BodyHandlers.ofString());
-            var version = ServerClient.GSON.fromJson(versionResp.body(), int.class);
-
-            if (version != DraaftServices.API_VERSION) {
-                LOGGER.error("drAAft server version not supported (expected {}, got {}).", DraaftServices.API_VERSION, version);
-
-                DraaftToast.showError(
-                    new TranslatableText("draaft.login.failed.title"),
-                    new TranslatableText("draaft.login.failed.unsupportedVersion")
-                );
-
+            if (!verifyServerVersion(draaftServices, http)) {
                 return null;
             }
 
@@ -75,6 +62,55 @@ public class DraaftAuth {
         }
 
         return clientToken;
+    }
+
+    public static @Nullable String authenticateDevMode(DraaftServices draaftServices, HttpClient http, String username) {
+        try {
+            assert draaftServices.supportsDevAuth();
+
+            if (!verifyServerVersion(draaftServices, http)) {
+                return null;
+            }
+
+            var req = HttpRequest.newBuilder(draaftServices.apiBase().resolve("/dev/becomeuser?username=" + username))
+                .POST(HttpRequest.BodyPublishers.noBody())
+                .build();
+
+            var resp = http.send(req, HttpResponse.BodyHandlers.ofString());
+
+            return ServerClient.GSON.fromJson(resp.body(), LoginResponse.class).token;
+        } catch (InterruptedException | IOException e) {
+            LOGGER.error("Could not contact drAAft server (dev mode)", e);
+
+            DraaftToast.showError(
+                new TranslatableText("draaft.login.failed.title"),
+                new TranslatableText("draaft.login.failed.errorContactingDraaft")
+            );
+
+            return null;
+        }
+    }
+
+    private static boolean verifyServerVersion(DraaftServices draaftServices, HttpClient http) throws IOException, InterruptedException {
+        var versionReq = HttpRequest.newBuilder(draaftServices.apiBase().resolve("/version"))
+            .GET()
+            .build();
+
+        var versionResp = http.send(versionReq, HttpResponse.BodyHandlers.ofString());
+        var version = ServerClient.GSON.fromJson(versionResp.body(), int.class);
+
+        if (version != DraaftServices.API_VERSION) {
+            LOGGER.error("drAAft server version not supported (expected {}, got {}).", DraaftServices.API_VERSION, version);
+
+            DraaftToast.showError(
+                new TranslatableText("draaft.login.failed.title"),
+                new TranslatableText("draaft.login.failed.unsupportedVersion")
+            );
+
+            return false;
+        } else {
+            return true;
+        }
     }
 
     // GSON can't deserialize to method-local classes
