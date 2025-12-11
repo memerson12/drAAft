@@ -80,6 +80,10 @@ public class DraaftState {
         return true; // TODO - We need to know if the world we're in is a draaft world
     }
 
+    public boolean isTournament() {
+        return true; // TODO - We need to know if the world we're in is a tournament'
+    }
+
     public enum STATE {
         WAITING_FOR_ROOM,
         IN_ROOM,

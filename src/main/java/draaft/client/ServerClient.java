@@ -15,23 +15,21 @@ import draaft.client.ws.events.GameEvent;
 import draaft.client.ws.events.RoomMemberEvents;
 import draaft.client.ws.events.RoomStateEvents;
 import draaft.client.ws.outgoing.GameUpdate;
+import draaft.client.ws.outgoing.PositionUpdate;
 import draaft.draaft;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Util;
-import org.apache.http.client.utils.URIBuilder;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.net.URI;
-import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.UUID;
-import java.nio.charset.StandardCharsets;
 
 public class ServerClient {
     public static final Gson GSON = new GsonBuilder()
@@ -89,6 +87,10 @@ public class ServerClient {
 
     public void addAdvancement(String advancement) {
         this.wsClient.sendMessage(new GameUpdate.Advance(advancement));
+    }
+
+    public void uploadPosition(PositionUpdate.PositionUpdateEvent event) {
+        this.wsClient.sendMessage(event);
     }
 
     public Room getRoom() {
