@@ -11,21 +11,30 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.hud.DebugHud;
 import net.minecraft.client.resource.language.I18n;
+import net.minecraft.util.math.ChunkPos;
+import net.minecraft.world.Heightmap;
 import net.minecraft.world.World;
+import net.minecraft.world.chunk.WorldChunk;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
+import java.util.*;
 
 import static draaft.draaft.getDraaftVersion;
 
 @Mixin(DebugHud.class)
 public abstract class DebugHudMixin extends DrawableHelper {
+    @Shadow
+    @Nullable
+    protected abstract WorldChunk getChunk();
+
+    @Shadow
+    private @Nullable ChunkPos pos;
+
     @ModifyReturnValue(method = "getRightText", at = @At("RETURN"))
     private List<String> modifyRightText(List<String> original) {
         original.add("drAAft v" + getDraaftVersion());
@@ -63,7 +72,20 @@ public abstract class DebugHudMixin extends DrawableHelper {
         WorldClientInfo worldClientInfo = WorldClientInfo.get(client.world);
 
         if (client.hasReducedDebugInfo() && client.getCameraEntity() != null) {
-            lines.add(String.format(Locale.ROOT, "Y: %.5f", client.getCameraEntity().getY()));
+            var blockPos = client.getCameraEntity().getBlockPos();
+
+            this.pos = new ChunkPos(blockPos);
+            var chunk = this.getChunk();
+
+            var o = "";
+
+            if (client.world.isChunkLoaded(this.pos.x, this.pos.z) && chunk != null && !chunk.isEmpty()) {
+                var type = Heightmap.Type.OCEAN_FLOOR;
+
+                o = " O: " + chunk.sampleHeightmap(type, blockPos.getX(), blockPos.getZ());
+            }
+
+            lines.add(String.format(Locale.ROOT, "Y: %.5f%s", client.getCameraEntity().getY(), o));
         }
 
         if (worldClientInfo.showCoords() && client.world.getRegistryKey().equals(World.OVERWORLD)) {
