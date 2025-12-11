@@ -49,6 +49,7 @@ public class WorldManifest {
     public static WorldManifest get(ServerWorld serverWorld) {
         var world = serverWorld.getServer().getOverworld();
 
+        // gets if we are an actual jar server
         if (FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER) {
             return new WorldManifest();
         }
@@ -102,6 +103,9 @@ public class WorldManifest {
 
         @SerializedName("DangerousPearls")
         DANGEROUS_PEARLS,
+
+        @SerializedName("PoorView")
+        POOR_VIEW,
 
         @SerializedName("NoInventory")
         NO_INVENTORY,
