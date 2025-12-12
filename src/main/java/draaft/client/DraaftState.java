@@ -1,12 +1,23 @@
 package draaft.client;
 
+import com.google.gson.JsonElement;
+import com.mojang.util.UUIDTypeAdapter;
+import dev.menx.worldimporter.RegionId;
+import draaft.client.gui.DraaftToast;
 import draaft.client.models.DraaftPlayer;
 import draaft.client.models.Room;
+import draaft.client.world.DraaftWorldSpec;
+import draaft.client.world.Worlds;
 import draaft.client.ws.events.GameEvent;
 import draaft.client.ws.events.RoomMemberEvents;
 import draaft.draaft;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 import org.apache.logging.log4j.Logger;
 
+import java.io.IOException;
+import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.function.Consumer;
@@ -74,6 +85,15 @@ public class DraaftState {
                 this.room.config()
             );
         });
+
+        serverClient.addRoomStateEventListener(event -> {
+            switch (event.type()) {
+                case CLOSED, COMMENCED, CONFIG -> {
+                    // TODO?
+                }
+                case DRAFT_COMPLETE -> createWorld();
+            }
+        });
     }
 
     public boolean inDraaftWorld() {
@@ -137,4 +157,38 @@ public class DraaftState {
         this.room = room;
     }
 
+    private void createWorld() {
+        HttpResponse<JsonElement> response;
+
+        try {
+            response = this.serverClient.httpSend(
+                this.serverClient.authenticatedHttpRequestBuilder("draft/worldgen")
+                    .GET()
+                    .build(),
+
+                Utils.jsonBody(JsonElement.class)
+            );
+        } catch (IOException | InterruptedException e) {
+            this.logger.error("failed to get worldgen settings");
+            DraaftToast.showError(
+                new TranslatableText("draaft.preparing.worldGenLoadError"),
+                Text.of(e.toString())
+            );
+            return;
+        }
+
+        var room = this.getRoom();
+
+        var ownUuid = UUIDTypeAdapter.fromString(MinecraftClient.getInstance().getSession().getUuid());
+
+        var otherPlayers = room.members()
+            .stream()
+            .filter(player -> !player.getUuid().equals(ownUuid))
+            .map(DraaftPlayer::getUsername)
+            .toList();
+
+        var world = DraaftWorldSpec.fromJson(response.body(), new RegionId[0], null);
+
+        MinecraftClient.getInstance().execute(() -> Worlds.create(world, room.code(), otherPlayers));
+    }
 }

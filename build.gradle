@@ -12,9 +12,7 @@ base {
 
 repositories {
 	maven { url "https://jitpack.io" }
-    maven {
-        url = uri("https://s.menx.dev/artifacts/")
-    }
+	maven { url "https://s.menx.dev/artifacts/" }
 	// Add repositories to retrieve artifacts from in here.
 	// You should only use this when depending on other mods because
 	// Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
@@ -28,7 +26,7 @@ dependencies {
 	mappings "dev.tildejustin:yarn:${project.yarn_mappings}:v2"
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 	modImplementation "com.github.contariaa:SpeedrunAPI:v2.1-1.16.1"
-    include(modImplementation "dev.menx:world-importer:0.1.0")
+	include(modImplementation "dev.menx:world-importer:0.1.2")
 
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	// modImplementation "com.github.KingContaria:SpeedrunAPI:a3e3998294"

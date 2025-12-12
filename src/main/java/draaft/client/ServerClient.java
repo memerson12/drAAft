@@ -21,18 +21,15 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Util;
-import org.apache.http.client.utils.URIBuilder;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.net.URI;
-import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.UUID;
-import java.nio.charset.StandardCharsets;
 
 public class ServerClient {
     public static final Gson GSON = new GsonBuilder()
@@ -82,10 +79,9 @@ public class ServerClient {
         return this.httpClient.send(request, bodyPublisher);
     }
 
-    public HttpRequest.Builder authenticatedHttpRequestBuilder(URI uri) {
-        return HttpRequest.newBuilder(uri)
-            .header("token", this.token)
-            .setHeader("Content-Type", "application/json");
+    public HttpRequest.Builder authenticatedHttpRequestBuilder(String relativePath) {
+        return HttpRequest.newBuilder(this.draaftServices.apiBase().resolve(relativePath))
+            .header("token", this.token);
     }
 
     public void addAdvancement(String advancement) {
@@ -94,8 +90,7 @@ public class ServerClient {
 
     public Room getRoom() {
         try {
-            final URI remote = this.draaftServices.apiBase().resolve("room");
-            HttpRequest req = authenticatedHttpRequestBuilder(remote)
+            HttpRequest req = authenticatedHttpRequestBuilder("room")
                 .GET()
                 .build();
 

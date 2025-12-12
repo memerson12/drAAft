@@ -81,6 +81,7 @@ public class DraaftWebSocketListener implements WebSocket.Listener {
                                     eventBus.post(new RoomStateEvents.configUpdate(config));
                                 }
                                 case "commenced" -> eventBus.post(new RoomStateEvents.commenced());
+                                case "draft_complete" -> eventBus.post(new RoomStateEvents.draftCompleted());
                                 default -> {
                                     logger.warn("WS: unknown roomupdate update type: {}", updateType);
                                     eventBus.post(new RawEvents.raw(variant, obj));
