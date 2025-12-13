@@ -11,7 +11,7 @@ import net.minecraft.server.world.ServerWorld;
 
 import java.util.List;
 
-import static net.minecraft.command.arguments.EntityArgumentType.*;
+import static net.minecraft.command.arguments.EntityArgumentType.getPlayers;
 import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
 
@@ -20,8 +20,6 @@ public class RandomItemCommand {
 
     private static void initializeItemStacks() {
         itemStacks = List.of(
-            // TODO - sign with asd prewritten
-            // TODO - prewritten book from the mod authors, wishing you good luck on your first aa steps :)
             new ItemStack(Items.SNOWBALL, 5),
             new ItemStack(Items.CARROT_ON_A_STICK),
             new ItemStack(Items.TIPPED_ARROW),
@@ -47,10 +45,18 @@ public class RandomItemCommand {
             new ItemStack(Items.FURNACE_MINECART),
             new ItemStack(Items.LINGERING_POTION),
             new ItemStack(Items.COMMAND_BLOCK),
+            new ItemStack(Items.CHAIN_COMMAND_BLOCK),
+            new ItemStack(Items.REPEATING_COMMAND_BLOCK),
+            new ItemStack(Items.COMMAND_BLOCK, 3),
             new ItemStack(Items.MUSIC_DISC_MELLOHI),
             new ItemStack(Items.FLETCHING_TABLE),
-            new ItemStack(Items.RESPAWN_ANCHOR),
-            new ItemStack(Items.GRINDSTONE)
+            new ItemStack(Items.GRINDSTONE),
+            new ItemStack(Items.COMPARATOR, 2),
+            new ItemStack(Items.REPEATER),
+            new ItemStack(Items.DAYLIGHT_DETECTOR),
+            new ItemStack(Items.BARRIER),
+            new ItemStack(Items.BARRIER, 10),
+            new ItemStack(Items.LIGHT_GRAY_STAINED_GLASS_PANE)
         );
     }
 
