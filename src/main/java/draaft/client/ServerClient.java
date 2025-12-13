@@ -226,7 +226,10 @@ public class ServerClient {
 
         logger.info("Successfully authenticated with the server, received {} long client token", clientToken.length());
 
-        var authTokenServer = new AuthTokenServer(draaftServices, clientToken);
+        // See if we can log in through OTP first, which is more reliable due to chrome network permissions, if possible
+        var otp = DraaftAuth.getOTP(draaftServices, httpClient, clientToken);
+
+        var authTokenServer = new AuthTokenServer(draaftServices, clientToken, otp);
 
         INSTANCE = new ServerClient(authTokenServer, httpClient, clientToken, draaftServices);
 

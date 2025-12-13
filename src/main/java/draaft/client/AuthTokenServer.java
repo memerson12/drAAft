@@ -3,6 +3,7 @@ package draaft.client;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -16,29 +17,39 @@ public class AuthTokenServer {
     private final HttpServer server;
     private final DraaftServices draaftServices;
     private final String token;
+    private final @Nullable String otp;
 
-    public AuthTokenServer(DraaftServices draaftServices, String token) {
+    public AuthTokenServer(DraaftServices draaftServices, String token, String otp) {
         this.draaftServices = draaftServices;
         this.token = token;
+        this.otp = otp;
 
-        // Bind to any ephemeral free port, listen only for local connections
-        var bindAddr = new InetSocketAddress(InetAddress.getLoopbackAddress(), 0);
+        if (otp == null) {
+            // Bind to any ephemeral free port, listen only for local connections
+            var bindAddr = new InetSocketAddress(InetAddress.getLoopbackAddress(), 0);
 
-        try {
-            // 0 indicates the default backlog size
-            this.server = HttpServer.create(bindAddr, 0);
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to create an HTTP server for auth token passing", e);
+            try {
+                // 0 indicates the default backlog size
+                this.server = HttpServer.create(bindAddr, 0);
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to create an HTTP server for auth token passing", e);
+            }
+
+            this.server.createContext("/", new Handler());
+
+            this.server.setExecutor(null);
+            this.server.start();
         }
-
-        this.server.createContext("/", new Handler());
-
-        this.server.setExecutor(null);
-        this.server.start();
+        else {
+            this.server = null;
+        }
     }
 
     public String webLoginUri() {
-        return "%s?auth_port=%d".formatted(this.draaftServices.webBase().toString(), this.port());
+        if (this.otp == null) {
+            return "%s?auth_port=%d".formatted(this.draaftServices.webBase().toString(), this.port());
+        }
+        return "%s?otp=%s".formatted(this.draaftServices.webBase().toString(), this.otp);
     }
 
     /**
