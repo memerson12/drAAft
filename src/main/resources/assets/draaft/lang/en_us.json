@@ -19,6 +19,7 @@
   "draaft.draaftingScreen.button.nextStage": "Next Stage",
   "draaft.waiting_for_room_screen.title": "Draaft",
   "draaft.preparing.worldGenLoadError": "Failed to fetch world data",
+  "draaft.preparing.datapackDownloadError": "Failed to download the datapack",
   "draaft.preparing.worldCreationError": "Failed to create a world",
   "draaft.game.options.pseudoPeaceful": "Peaceless",
   "draaft.game.reducedDebugInfo.C": "C: nuh uh",

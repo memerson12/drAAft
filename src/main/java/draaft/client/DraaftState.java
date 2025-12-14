@@ -17,6 +17,7 @@ import net.minecraft.text.TranslatableText;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -162,10 +163,10 @@ public class DraaftState {
     }
 
     private void createWorld() {
-        HttpResponse<JsonElement> response;
+        HttpResponse<JsonElement> worldGen;
 
         try {
-            response = this.serverClient.httpSend(
+            worldGen = this.serverClient.httpSend(
                 this.serverClient.authenticatedHttpRequestBuilder("draft/worldgen")
                     .GET()
                     .build(),
@@ -181,6 +182,24 @@ public class DraaftState {
             return;
         }
 
+        HttpResponse<InputStream> datapackResponse;
+
+        try {
+            datapackResponse = this.serverClient.httpSend(
+                this.serverClient.authenticatedHttpRequestBuilder("draft/download")
+                    .GET()
+                    .build(),
+                HttpResponse.BodyHandlers.ofInputStream()
+            );
+        } catch (IOException | InterruptedException e) {
+            this.logger.error("failed to download the datapack", e);
+            DraaftToast.showError(
+                new TranslatableText("draaft.preparing.datapackDownloadError"),
+                Text.of(e.toString())
+            );
+            return;
+        }
+
         var room = this.getRoom();
 
         var ownUuid = UUIDTypeAdapter.fromString(MinecraftClient.getInstance().getSession().getUuid());
@@ -191,7 +210,7 @@ public class DraaftState {
             .map(DraaftPlayer::getUsername)
             .toList();
 
-        var world = DraaftWorldSpec.fromJson(response.body(), new RegionId[0], null);
+        var world = DraaftWorldSpec.fromJson(worldGen.body(), new RegionId[0], datapackResponse.body());
 
         MinecraftClient.getInstance().execute(() -> Worlds.create(world, room.code(), otherPlayers));
     }
