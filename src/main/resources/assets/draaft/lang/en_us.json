@@ -21,6 +21,8 @@
   "draaft.preparing.worldGenLoadError": "Failed to fetch world data",
   "draaft.preparing.worldCreationError": "Failed to create a world",
   "draaft.game.options.pseudoPeaceful": "Peaceless",
+  "draaft.game.command.seeds.header": "Seeds:",
+  "draaft.game.command.seeds.seed": "%s: %s",
   "draaft.game.reducedDebugInfo.C": "C: nuh uh",
   "draaft.game.reducedDebugInfo.E": "E: nuh uh",
   "draaft.game.reducedDebugInfo.PT": "P: nuh. T: uh",
