@@ -9,6 +9,7 @@ public interface RoomStateEvents {
         CLOSED,
         CONFIG,
         COMMENCED,
+        DRAFT_COMPLETE,
     }
 
     record closed() implements RoomStateEvents {
@@ -29,6 +30,13 @@ public interface RoomStateEvents {
         @Override
         public RoomEventType type() {
             return RoomEventType.COMMENCED;
+        }
+    }
+
+    record draftCompleted() implements RoomStateEvents {
+        @Override
+        public RoomEventType type() {
+            return RoomEventType.DRAFT_COMPLETE;
         }
     }
 }

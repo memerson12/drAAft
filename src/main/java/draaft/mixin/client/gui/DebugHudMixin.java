@@ -37,6 +37,7 @@ public abstract class DebugHudMixin extends DrawableHelper {
 
     @ModifyReturnValue(method = "getRightText", at = @At("RETURN"))
     private List<String> modifyRightText(List<String> original) {
+        original.add("");
         original.add("drAAft v" + getDraaftVersion());
         return original;
     }

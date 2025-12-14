@@ -80,10 +80,9 @@ public class ServerClient {
         return this.httpClient.send(request, bodyPublisher);
     }
 
-    public HttpRequest.Builder authenticatedHttpRequestBuilder(URI uri) {
-        return HttpRequest.newBuilder(uri)
-            .header("token", this.token)
-            .setHeader("Content-Type", "application/json");
+    public HttpRequest.Builder authenticatedHttpRequestBuilder(String relativePath) {
+        return HttpRequest.newBuilder(this.draaftServices.apiBase().resolve(relativePath))
+            .header("token", this.token);
     }
 
     public void addAdvancement(String advancement) {
@@ -96,8 +95,7 @@ public class ServerClient {
 
     public Room getRoom() {
         try {
-            final URI remote = this.draaftServices.apiBase().resolve("room");
-            HttpRequest req = authenticatedHttpRequestBuilder(remote)
+            HttpRequest req = authenticatedHttpRequestBuilder("room")
                 .GET()
                 .build();
 

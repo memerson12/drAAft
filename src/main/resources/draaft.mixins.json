@@ -68,6 +68,7 @@
     "world.gen.decorator.EndGatewayDecoratorMixin",
     "world.gen.decorator.LavaLakeDecoratorMixin",
     "world.gen.feature.DefaultBiomeFeaturesMixin",
+    "world.level.LevelPropertiesMixin",
     "world.poi.PointOfInterestTypeAccessor"
   ],
   "injectors": {
@@ -75,6 +76,7 @@
   },
   "client": [
     "client.KeyboardMixin",
+    "client.MinecraftClientAccessor",
     "client.MinecraftClientMixin",
     "client.gui.DebugHudMixin",
     "client.gui.TitleScreenMixin",

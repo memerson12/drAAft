@@ -1,4 +1,5 @@
 accessWidener v2 named
 
 accessible field net/minecraft/client/MinecraftClient netProxy Ljava/net/Proxy;
+accessible class net/minecraft/client/MinecraftClient$WorldLoadAction
 
