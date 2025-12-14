@@ -31,6 +31,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.List;
 import java.util.function.Function;
 
@@ -78,12 +79,18 @@ public abstract class Worlds {
                 Difficulty.EASY,
                 false,
                 new GameRules(),
-                DataPackSettings.SAFE_MODE
+                new DataPackSettings(List.of("vanilla", "draaftpack"), List.of())
             );
 
-            var saveDir = FileNameUtil.getNextUniqueName(savesDir, levelInfo.getLevelName(), "");
+            var saveDirName = FileNameUtil.getNextUniqueName(savesDir, levelInfo.getLevelName(), "");
 
-            createDraaftWorld(saveDir, levelInfo, genOpts, draaftMetadata);
+            var datapacksDir = savesDir.resolve(saveDirName).resolve("datapacks");
+
+            Files.createDirectories(datapacksDir);
+
+            Files.copy(worldSpec.datapack(), datapacksDir.resolve("draaftpack.zip"));
+
+            createDraaftWorld(saveDirName, levelInfo, genOpts, draaftMetadata);
         } catch (WorldImporterException | IOException e) {
             // TODO(me-nx): unregister the client / signal failure to the draaft server?
             LOGGER.error("failed to create a draaft world", e);
