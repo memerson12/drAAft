@@ -8,9 +8,11 @@ import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.Objects;
 
 import static draaft.draaft.MOD_ID;
 
@@ -110,6 +112,27 @@ public class DraaftAuth {
             return false;
         } else {
             return true;
+        }
+    }
+
+    public static String getOTP(DraaftServices draaftServices, HttpClient http, String token)  {
+        var uri = draaftServices.apiBase().resolve("/otp");
+        var req = HttpRequest.newBuilder(uri)
+            .header("token", token)
+            .GET().build();
+
+        try {
+            var resp = http.send(req, HttpResponse.BodyHandlers.ofString());
+            var otp = resp.body();
+
+            if (Objects.equals(otp, "false")) {
+                LOGGER.error("drAAft server refused to generate OTP.");
+                return null;
+            }
+            return otp;
+        } catch (Throwable t) {
+            LOGGER.error("drAAft server could not be contacted to generate OTP / refused to generate OTP.");
+            return null;
         }
     }
 

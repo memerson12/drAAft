@@ -189,7 +189,7 @@ public class ServerClient {
     public static void login(DraaftServices draaftServices) {
         if (INSTANCE != null) {
             // If already logged in just open the browser link
-            INSTANCE.openWebLoginUri();
+            INSTANCE.openWebLoginUri(draaftServices);
 
             return;
         }
@@ -224,15 +224,18 @@ public class ServerClient {
 
         logger.info("Successfully authenticated with the server, received {} long client token", clientToken.length());
 
-        var authTokenServer = new AuthTokenServer(draaftServices, clientToken);
+        // See if we can log in through OTP first, which is more reliable due to chrome network permissions, if possible
+        var otp = DraaftAuth.getOTP(draaftServices, httpClient, clientToken);
+
+        var authTokenServer = new AuthTokenServer(draaftServices, clientToken, otp);
 
         INSTANCE = new ServerClient(authTokenServer, httpClient, clientToken, draaftServices);
 
-        INSTANCE.openWebLoginUri();
+        INSTANCE.openWebLoginUri(draaftServices);
     }
 
-    private void openWebLoginUri() {
-        var uri = this.authTokenServer.webLoginUri();
+    private void openWebLoginUri(DraaftServices draaftServices) {
+        var uri = this.authTokenServer.webLoginUri(draaftServices, httpClient, token);
 
         // TODO(me-nx): shift click tooltip?
 
