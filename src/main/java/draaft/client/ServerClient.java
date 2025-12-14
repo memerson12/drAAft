@@ -191,7 +191,7 @@ public class ServerClient {
     public static void login(DraaftServices draaftServices) {
         if (INSTANCE != null) {
             // If already logged in just open the browser link
-            INSTANCE.openWebLoginUri();
+            INSTANCE.openWebLoginUri(draaftServices);
 
             return;
         }
@@ -233,11 +233,11 @@ public class ServerClient {
 
         INSTANCE = new ServerClient(authTokenServer, httpClient, clientToken, draaftServices);
 
-        INSTANCE.openWebLoginUri();
+        INSTANCE.openWebLoginUri(draaftServices);
     }
 
-    private void openWebLoginUri() {
-        var uri = this.authTokenServer.webLoginUri();
+    private void openWebLoginUri(DraaftServices draaftServices) {
+        var uri = this.authTokenServer.webLoginUri(draaftServices, httpClient, token);
 
         // TODO(me-nx): shift click tooltip?
 

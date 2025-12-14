@@ -8,6 +8,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.http.HttpClient;
 import java.nio.charset.StandardCharsets;
 
 /**
@@ -17,7 +18,7 @@ public class AuthTokenServer {
     private final HttpServer server;
     private final DraaftServices draaftServices;
     private final String token;
-    private final @Nullable String otp;
+    private @Nullable String otp;
 
     public AuthTokenServer(DraaftServices draaftServices, String token, String otp) {
         this.draaftServices = draaftServices;
@@ -45,10 +46,11 @@ public class AuthTokenServer {
         }
     }
 
-    public String webLoginUri() {
+    public String webLoginUri(DraaftServices draaftServices, HttpClient httpClient, String clientToken) {
         if (this.otp == null) {
             return "%s?auth_port=%d".formatted(this.draaftServices.webBase().toString(), this.port());
         }
+        this.otp = DraaftAuth.getOTP(draaftServices, httpClient, clientToken);
         return "%s?otp=%s".formatted(this.draaftServices.webBase().toString(), this.otp);
     }
 
