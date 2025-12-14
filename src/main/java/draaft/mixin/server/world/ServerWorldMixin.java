@@ -1,8 +1,11 @@
 package draaft.mixin.server.world;
 
+import com.llamalad7.mixinextras.sugar.Local;
+import draaft.mixin.world.gen.chunk.ChunkGeneratorAccessor;
 import draaft.persistent.WorldManifest;
 import draaft.world.ServerWorldInterface;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.world.ServerChunkManager;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.profiler.Profiler;
 import net.minecraft.util.registry.RegistryKey;
@@ -10,14 +13,13 @@ import net.minecraft.world.MutableWorldProperties;
 import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.level.ServerWorldProperties;
 import org.jetbrains.annotations.Nullable;
-import org.spongepowered.asm.mixin.Final;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
 import java.util.Random;
 import java.util.function.Supplier;
@@ -31,6 +33,9 @@ public abstract class ServerWorldMixin extends World implements ServerWorldAcces
     @Shadow
     @Final
     private MinecraftServer server;
+
+    @Shadow
+    public abstract ServerChunkManager getChunkManager();
 
     @Unique
     boolean lastTickThunder = true;
@@ -150,5 +155,19 @@ public abstract class ServerWorldMixin extends World implements ServerWorldAcces
     @Override
     public void draaft$setWorldManifest(WorldManifest worldManifest) {
         this.worldManifest = worldManifest;
+    }
+
+    /**
+     * @author me_nx
+     * @reason dimension split seeds
+     */
+    @Overwrite
+    public long getSeed() {
+        return ((ChunkGeneratorAccessor) this.getChunkManager().getChunkGenerator()).draaft$seed();
+    }
+
+    @ModifyVariable(method = "<init>", at = @At("HEAD"), argsOnly = true)
+    private static long injectSeed(long overworldSeed, @Local(argsOnly = true) ChunkGenerator chunkGenerator) {
+        return ((ChunkGeneratorAccessor) chunkGenerator).draaft$seed();
     }
 }

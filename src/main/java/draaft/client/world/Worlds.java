@@ -7,6 +7,7 @@ import dev.menx.worldimporter.*;
 import dev.menx.worldimporter.net.WorldServerConnection;
 import draaft.client.ServerClient;
 import draaft.client.gui.DraaftToast;
+import draaft.draaft;
 import draaft.mixin.client.MinecraftClientAccessor;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.resource.DataPackSettings;
@@ -36,6 +37,7 @@ import java.util.function.Function;
 public abstract class Worlds {
     @SuppressWarnings("LoggerInitializedWithForeignClass")
     private final static Logger MC_LOGGER = LogManager.getLogger(MinecraftClient.class);
+    private final static Logger LOGGER = LogManager.getLogger(draaft.MOD_ID);
 
     public static void create(DraaftWorldSpec worldSpec, String roomCode, List<String> playerNames) {
         var client = MinecraftClient.getInstance();
@@ -84,6 +86,7 @@ public abstract class Worlds {
             createDraaftWorld(saveDir, levelInfo, genOpts, draaftMetadata);
         } catch (WorldImporterException | IOException e) {
             // TODO(me-nx): unregister the client / signal failure to the draaft server?
+            LOGGER.error("failed to create a draaft world", e);
             DraaftToast.showError(new TranslatableText("draaft.preparing.worldCreationError"), Text.of(e.toString()));
         }
     }
