@@ -16,7 +16,7 @@ public class SeedCommandMixin {
     @Unique
     private static final String SEND_FEEDBACK_TARGET = "Lnet/minecraft/server/command/ServerCommandSource;sendFeedback(Lnet/minecraft/text/Text;Z)V";
 
-    @ModifyArg(method = "method_13617", remap = false, at = @At(value = "INVOKE", target = SEND_FEEDBACK_TARGET))
+    @ModifyArg(method = "method_13617", at = @At(value = "INVOKE", target = SEND_FEEDBACK_TARGET))
     private static Text modifySeedText(Text original, @Local(argsOnly = true) CommandContext<ServerCommandSource> commandContext) {
         MutableText text = new TranslatableText("draaft.game.command.seeds.header");
 
