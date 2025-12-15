@@ -36,10 +36,11 @@ public abstract class LevelPropertiesMixin implements LevelPropertiesExt {
     }
 
     @Inject(method = "readProperties", at = @At("RETURN"))
-    private static void readMetadata(Dynamic<Tag> dynamic,
+    private static void readMetadata(
+        Dynamic<Tag> dynamic,
         DataFixer dataFixer,
         int i,
-        CompoundTag tag,
+        @Nullable CompoundTag tag,
         LevelInfo levelInfo,
         SaveVersionInfo saveVersionInfo,
         GeneratorOptions generatorOptions,
@@ -48,7 +49,7 @@ public abstract class LevelPropertiesMixin implements LevelPropertiesExt {
     ) {
         var res = cir.getReturnValue();
 
-        ((LevelPropertiesMixin) (Object) res).metadata = DraaftLevelMetadata.read(tag);
+        ((LevelPropertiesMixin) (Object) res).metadata = DraaftLevelMetadata.read((CompoundTag) dynamic.getValue());
     }
 
     @Inject(method = "updateProperties", at = @At("TAIL"))

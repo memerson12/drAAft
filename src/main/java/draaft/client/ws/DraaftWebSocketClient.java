@@ -86,7 +86,7 @@ public class DraaftWebSocketClient {
             .buildAsync(uri, listener)
             .whenComplete((ws, ex) -> {
                 if (ex != null) {
-                    LOGGER.warn("WS: connect failed: {}", ex.getMessage());
+                    LOGGER.warn("WS: connect failed", ex);
                     scheduleReconnect();
                 } else {
                     wsRef.set(ws);
