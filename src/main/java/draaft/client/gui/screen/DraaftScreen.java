@@ -8,6 +8,7 @@ import draaft.client.models.Room;
 import draaft.draaft;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.SaveLevelScreen;
 import net.minecraft.client.gui.screen.Screen;
@@ -27,6 +28,7 @@ import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.gen.GeneratorOptions;
 import net.minecraft.world.level.LevelInfo;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Random;
@@ -54,11 +56,9 @@ enum Stage {
 }
 
 /// TODO(s) (non-exhaustive):
-/// - Figure out how to get player usernames from UUIDs
 /// - Show room config setting somewhere
 ///   - Editable by admin?
-/// - Make clear which player is the admin
-///   - Some symbol next to their name/profile? Command Block?
+/// - Update the stages to mirror what actually happens (eg, download datapack instead of build, no download world step)
 /// - Make scaling work better
 ///   - Check GUI scale? MC might handle this for us already
 /// - Give admin power to remove player?
@@ -74,8 +74,8 @@ public class DraaftScreen extends Screen {
     private int scrollOffset = 0;
     private final DraaftState draaftState = DraaftState.getInstance();
     private static final int PLAYER_ENTRY_HEIGHT = 50;
-    private static final int PLAYER_FACE_SIZE = 32;
-    private static final double LEFT_PANEL_WIDTH_RATIO = 0.25; // 25% of screen width
+    private static final int PLAYER_FACE_SIZE = 16;
+    private static final double LEFT_PANEL_WIDTH_RATIO = 0.2; // 20% of screen width
 
     // Current game stage
     private Stage currentStage = Stage.DRAAFT;
@@ -168,7 +168,16 @@ public class DraaftScreen extends Screen {
             button -> {
                 // Cycle to next stage
                 Stage[] stages = Stage.values();
-                int nextIndex = (currentStage.ordinal() + 1) % stages.length;
+                int index = currentStage.ordinal();
+                int nextIndex = (index + 1) % stages.length;
+
+                if (stages[nextIndex] == Stage.PLAY) {
+                    for (DraaftPlayer player : draaftState.getRoom().members()) {
+                        if (!player.getReadyStatus().equals(ReadyStatus.READY)) {
+                            return;
+                        }
+                    }
+                }
                 currentStage = stages[nextIndex];
             }));
 
@@ -177,11 +186,32 @@ public class DraaftScreen extends Screen {
             this.width - 100, this.height - 30, 80, 20,
             new TranslatableText("draaft.draaftingScreen.button.ready"),
             button -> {
-                // For now, this button doesn't do anything
-                for (DraaftPlayer player : draaftState.getRoom().members()) {
-                    player.setReadyStatus(ReadyStatus.values()[(player.getReadyStatus().ordinal() + 1) % 3]);
+                // if we are still draafting, do nothing
+                // otherwise, toggle between ready / not ready
+                if (currentStage.equals(Stage.READY_UP)) {
+                    button.active = true;
+                } else {
+                    button.active = false;
+                    return;
                 }
+                DraaftPlayer self = getSelf();
+                if (self == null) {
+                    logger.error("idk how you did this but the client session doesn't have a player attached");
+                    return;
+                }
+                self.setReadyStatus(self.getReadyStatus().equals(ReadyStatus.READY) ? ReadyStatus.NOT_READY : ReadyStatus.READY);
             }));
+    }
+
+    @Nullable
+    private DraaftPlayer getSelf() {
+        String username = MinecraftClient.getInstance().getSession().getUsername();
+        for (DraaftPlayer player : draaftState.getRoom().members()) {
+            if (player.getUsername().equals(username)) {
+                return player;
+            }
+        }
+        return null;
     }
 
     @Override
@@ -202,7 +232,7 @@ public class DraaftScreen extends Screen {
         this.drawVerticalLine(matrices, leftPanelWidth, 0, this.height, 0xFFFFFFFF);
 
         // Draw player list
-        this.renderPlayerList(matrices);
+        this.renderPlayerList(matrices, mouseX, mouseY);
 
         // Draw room code field
         this.renderRoomCodeField(matrices, mouseX, mouseY);
@@ -210,11 +240,12 @@ public class DraaftScreen extends Screen {
         super.render(matrices, mouseX, mouseY, delta);
     }
 
-    private void renderPlayerList(MatrixStack matrices) {
+    private void renderPlayerList(MatrixStack matrices, int mouseX, int mouseY) {
         int startY = 20;
         int leftPanelWidth = getLeftPanelWidth();
         int visiblePlayers = (this.height - startY) / PLAYER_ENTRY_HEIGHT;
         List<DraaftPlayer> players = draaftState.getRoom().members();
+        DraaftPlayer admin = draaftState.getRoom().admin();
 
         for (int i = 0; i < Math.min(visiblePlayers, players.size() - scrollOffset); i++) {
             int playerIndex = i + scrollOffset;
@@ -247,6 +278,22 @@ public class DraaftScreen extends Screen {
                 (PLAYER_FACE_SIZE + this.textRenderer.getWidth("Status: ")) / 0.75f, (y + 22) / 0.75f,
                 statusColor);
             matrices.pop();
+
+            // Draw admin label if player is admin
+            if (player.getUuid().equals(admin.getUuid())) {
+                matrices.push();
+                matrices.scale(0.75f, 0.75f, 1.0f);
+                int textureX = (int) ((PLAYER_FACE_SIZE + 4) / 0.75 + (this.textRenderer.getWidth(player.getUsername() + 4) / 0.75));
+                int textureY = (int) ((y + 6) / 0.75);
+                this.client.getTextureManager().bindTexture(new Identifier("textures/block/command_block_front.png"));
+                drawTexture(matrices, textureX, textureY, 0, 0, 16, 16, 16, 64);
+                matrices.pop();
+                if (mouseX >= textureX * 0.75 && mouseX <= textureX * 0.75 + 16 * 0.75 && mouseY >= textureY * 0.75 && mouseY <= textureY * 0.75 + 16) {
+                    renderTooltip(matrices, new TranslatableText("draaft.draaftingScreen.admin"), (int) (textureX * 0.75), (int) (textureY * 0.75) - 2);
+                }
+            }
+
+
         }
 
         // Draw scrollbar if needed
@@ -340,7 +387,7 @@ public class DraaftScreen extends Screen {
         }
 
         // Start position to center the entire indicator
-        int currentX = (this.width - totalWidth) / 2;
+        int currentX = (int) (((this.width - (this.width * LEFT_PANEL_WIDTH_RATIO) - totalWidth) / 2) + (this.width * LEFT_PANEL_WIDTH_RATIO));
 
         for (int i = 0; i < stages.length; i++) {
             Stage stage = stages[i];

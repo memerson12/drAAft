@@ -1,11 +1,7 @@
 package draaft.client.gui;
 
 import draaft.client.DraaftServices;
-import draaft.client.DraaftState;
 import draaft.client.ServerClient;
-import draaft.client.gui.screen.DraaftScreen;
-import draaft.client.gui.screen.WaitingForRoomScreen;
-import draaft.client.models.Room;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -38,17 +34,17 @@ public class LoginButton extends ButtonWidget {
             }
 
             // TODO: remove when a room join event is sent through a websocket
-            MinecraftClient minecraftClient = MinecraftClient.getInstance();
-            DraaftState draaftState = DraaftState.getInstance();
-            draaftState.setCurrentState(DraaftState.STATE.WAITING_FOR_ROOM);
-
-            Room room = draaftState.getRoom();
-            if (room == null) {
-                minecraftClient.openScreen(new WaitingForRoomScreen(parent));
-            } else {
-                draaftState.setCurrentState(DraaftState.STATE.IN_ROOM);
-                minecraftClient.openScreen(new DraaftScreen(parent));
-            }
+//            MinecraftClient minecraftClient = MinecraftClient.getInstance();
+//            DraaftState draaftState = DraaftState.getInstance();
+//            draaftState.setCurrentState(DraaftState.STATE.WAITING_FOR_ROOM);
+//
+//            Room room = draaftState.getRoom();
+//            if (room == null) {
+//                minecraftClient.openScreen(new WaitingForRoomScreen(parent));
+//            } else {
+//                draaftState.setCurrentState(DraaftState.STATE.IN_ROOM);
+//                minecraftClient.openScreen(new DraaftScreen(parent));
+//            }
         }, tooltipSupplier);
 
         this.glintSupplier = glintSupplier;
