@@ -58,6 +58,7 @@ enum Stage {
 /// TODO(s) (non-exhaustive):
 /// - Show room config setting somewhere
 ///   - Editable by admin?
+/// - Update the stages to mirror what actually happens (eg, download datapack instead of build, no download world step)
 /// - Make scaling work better
 ///   - Check GUI scale? MC might handle this for us already
 /// - Give admin power to remove player?
