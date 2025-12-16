@@ -38,6 +38,8 @@ public class DraaftState {
     public HashMap<String, Integer> advancementCounts = new HashMap<String, Integer>();
 
     private DraaftState() {
+        logger.info("Initializing draft state & all event listeners.");
+
         serverClient.addGameStateEventListener(event -> {
             GameEvent.GameEventType eventType = event.type();
             logger.info("Draaft Game received event of type {}: ", eventType);
@@ -54,6 +56,12 @@ public class DraaftState {
         serverClient.addRoomMemberEventListener(event -> {
             RoomMemberEvents.RoomEventType eventType = event.type();
             logger.info("DraaftScreen received event of type {}: ", eventType);
+
+            if (this.room == null) {
+                logger.info("this.room is null, re-fetching");
+                this.room = getRoom();
+            }
+
             ArrayList<DraaftPlayer> players = this.room.members();
             switch (eventType) {
                 // Add new player
@@ -67,12 +75,22 @@ public class DraaftState {
                 // Remove player
                 case LEFT -> {
                     RoomMemberEvents.PlayerLeft playerLeft = (RoomMemberEvents.PlayerLeft) event;
+                    if (DraaftPlayer.isSelf(playerLeft.playerUuid())) {
+                        logger.info("We left the room we were in.");
+                        this.room = null;
+                        return;
+                    }
                     players.removeIf(player -> player.getUuid().equals(playerLeft.playerUuid()));
                 }
 
                 // Remove kicked player
                 case KICK -> {
                     RoomMemberEvents.PlayerKick playerKick = (RoomMemberEvents.PlayerKick) event;
+                    if (DraaftPlayer.isSelf(playerKick.playerUuid())) {
+                        logger.info("We were kicked from the room we were in.");
+                        this.room = null;
+                        return;
+                    }
                     players.removeIf(player -> player.getUuid().equals(playerKick.playerUuid()));
                 }
                 default -> logger.warn("Unhandled event type in DraaftScreen: {}", event.type());
@@ -89,8 +107,13 @@ public class DraaftState {
 
         serverClient.addRoomStateEventListener(event -> {
             switch (event.type()) {
-                case CLOSED, COMMENCED, CONFIG -> {
+                case COMMENCED, CONFIG -> {
                     // TODO?
+                }
+                case CLOSED -> {
+                    // need to delete the room we're in
+                    logger.info("Our room was closed.");
+                    this.room = null;
                 }
                 case DRAFT_COMPLETE -> createWorld();
             }
