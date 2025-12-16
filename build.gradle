@@ -83,6 +83,10 @@ jar {
 	}
 }
 
+remapJar {
+    archiveFileName = "${archives_base_name}.jar"
+}
+
 loom {
 	accessWidenerPath = file("src/main/resources/draaft.accesswidener")
 }
