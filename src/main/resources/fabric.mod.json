@@ -27,10 +27,14 @@
   ],
   "accessWidener": "draaft.accesswidener",
   "depends": {
-    "fabricloader": ">=0.16.13",
+    "fabricloader": ">=0.16.14",
     "minecraft": "~1.16.1",
     "java": ">=16",
     "speedrunapi": ">=2.0+1.16.1"
+  },
+  "breaks": {
+    "mcsrfairplay": "*",
+    "seedqueue": "*"
   },
   "custom": {
     "speedrunapi": {
