@@ -1,6 +1,7 @@
 package draaft.client.gui;
 
 import draaft.client.DraaftServices;
+import draaft.client.DraaftState;
 import draaft.client.ServerClient;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
@@ -34,11 +35,11 @@ public class LoginButton extends ButtonWidget {
             }
 
             // TODO: remove when a room join event is sent through a websocket
-//            MinecraftClient minecraftClient = MinecraftClient.getInstance();
-//            DraaftState draaftState = DraaftState.getInstance();
-//            draaftState.setCurrentState(DraaftState.STATE.WAITING_FOR_ROOM);
-//
-//            Room room = draaftState.getRoom();
+            MinecraftClient minecraftClient = MinecraftClient.getInstance();
+            DraaftState draaftState = DraaftState.getInstance();
+            draaftState.setCurrentState(DraaftState.STATE.WAITING_FOR_ROOM);
+
+            draaftState.getRoom();
 //            if (room == null) {
 //                minecraftClient.openScreen(new WaitingForRoomScreen(parent));
 //            } else {
