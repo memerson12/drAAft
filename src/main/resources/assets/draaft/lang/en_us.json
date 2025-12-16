@@ -28,6 +28,8 @@
   "draaft.game.reducedDebugInfo.C": "C: nuh uh",
   "draaft.game.reducedDebugInfo.E": "E: nuh uh",
   "draaft.game.reducedDebugInfo.PT": "P: nuh. T: uh",
+  "draaft.game.reducedDebugInfo.biome": "Biome: %s",
+  "draaft.game.reducedDebugInfo.waitingForChunk": "Waiting for chunk...",
   "draaft.game.reducedDebugInfo.debugOpts.0": "Remember when you could e-ray? I remember.",
   "draaft.game.reducedDebugInfo.debugOpts.1": "pepperidge farm remembers",
   "draaft.game.reducedDebugInfo.debugOpts.2": "Stop trying. It won’t work.",

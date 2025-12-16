@@ -12,6 +12,7 @@ import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.hud.DebugHud;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.WorldChunk;
@@ -87,6 +88,22 @@ public abstract class DebugHudMixin extends DrawableHelper {
             }
 
             lines.add(String.format(Locale.ROOT, "Y: %.5f%s", client.getCameraEntity().getY(), o));
+
+            if (
+                client.world.isChunkLoaded(this.pos.x, this.pos.z)
+                    && !client.world.getChunk(this.pos.x, this.pos.z).isEmpty()
+                    && blockPos.getY() >= 0
+                    && blockPos.getY() < 256
+            ) {
+                lines.add(I18n.translate(
+                    "draaft.game.reducedDebugInfo.biome",
+                    Registry.BIOME.getId(client.world.getBiome(blockPos))
+                ));
+            } else {
+                lines.add(I18n.translate("draaft.game.reducedDebugInfo.waitingForChunk"));
+            }
+
+            lines.add("");
         }
 
         if (worldClientInfo.showCoords() && client.world.getRegistryKey().equals(World.OVERWORLD)) {
