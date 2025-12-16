@@ -116,7 +116,7 @@ public abstract class DebugHudMixin extends DrawableHelper {
 
 
         if (client.hasReducedDebugInfo()) {
-            return lines.add(I18n.translate("draaft.game.reducedDebugInfo.debugOpts." + draaft.currentF3Taunt % 6));
+            return lines.add(I18n.translate("draaft.game.reducedDebugInfo.debugOpts." + draaft.currentF3Taunt % 12));
         } else {
             return lines.add((String) e);
         }
