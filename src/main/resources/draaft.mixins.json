@@ -51,6 +51,7 @@
     "screen.slot.SlotMixin",
     "screen.slot.TradeOutputSlotMixin",
     "server.MinecraftServerAccessor",
+    "server.MinecraftServerMixin",
     "server.PlayerManagerMixin",
     "server.command.CommandManagerMixin",
     "server.command.SeedCommandMixin",

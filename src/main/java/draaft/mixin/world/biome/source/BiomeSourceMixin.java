@@ -14,7 +14,7 @@ import java.util.List;
 public abstract class BiomeSourceMixin {
     @Shadow
     @Final
-    private static List<Biome> SPAWN_BIOMES = Lists.<Biome>newArrayList(
+    private final static List<Biome> SPAWN_BIOMES = Lists.<Biome>newArrayList(
         Biomes.FOREST, Biomes.DESERT, Biomes.PLAINS, Biomes.TAIGA, Biomes.TAIGA_HILLS, Biomes.WOODED_HILLS, Biomes.JUNGLE, Biomes.JUNGLE_HILLS
     );
 }
