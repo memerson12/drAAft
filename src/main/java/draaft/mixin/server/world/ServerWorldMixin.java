@@ -1,9 +1,13 @@
 package draaft.mixin.server.world;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import draaft.mixin.world.gen.chunk.ChunkGeneratorAccessor;
 import draaft.persistent.WorldManifest;
 import draaft.world.ServerWorldInterface;
+import net.minecraft.entity.boss.dragon.EnderDragonFight;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.world.ServerChunkManager;
 import net.minecraft.server.world.ServerWorld;
@@ -169,5 +173,10 @@ public abstract class ServerWorldMixin extends World implements ServerWorldAcces
     @ModifyVariable(method = "<init>", at = @At("HEAD"), argsOnly = true)
     private static long injectSeed(long overworldSeed, @Local(argsOnly = true) ChunkGenerator chunkGenerator) {
         return ((ChunkGeneratorAccessor) chunkGenerator).draaft$seed();
+    }
+
+    @WrapOperation(method = "<init>", at = @At(value = "NEW", target = "Lnet/minecraft/entity/boss/dragon/EnderDragonFight;"))
+    private static EnderDragonFight injectDragonFightSeed(ServerWorld world, long _s, CompoundTag tag, Operation<EnderDragonFight> op) {
+        return op.call(world, world.getSeed(), tag);
     }
 }
