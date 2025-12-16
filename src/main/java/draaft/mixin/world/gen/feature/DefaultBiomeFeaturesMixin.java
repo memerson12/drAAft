@@ -21,8 +21,6 @@ public class DefaultBiomeFeaturesMixin {
     @Unique
     private static final BlockState IRON_ORE = Blocks.IRON_ORE.getDefaultState();
     @Unique
-    private static final BlockState GOLD_ORE = Blocks.GOLD_ORE.getDefaultState();
-    @Unique
     private static final BlockState REDSTONE_ORE = Blocks.REDSTONE_ORE.getDefaultState();
     @Unique
     private static final BlockState DIAMOND_ORE = Blocks.DIAMOND_ORE.getDefaultState();
@@ -58,7 +56,7 @@ public class DefaultBiomeFeaturesMixin {
         biome.addFeature(
             GenerationStep.Feature.UNDERGROUND_ORES,
             Feature.ORE
-                .configure(new OreFeatureConfig(OreFeatureConfig.Target.NATURAL_STONE, GOLD_ORE, 9))
+                .configure(new OreFeatureConfig(OreFeatureConfig.Target.NATURAL_STONE, DIAMOND_ORE, 9))
                 .createDecoratedFeature(Decorator.COUNT_RANGE.configure(new RangeDecoratorConfig(2, 0, 0, 32)))
         );
         biome.addFeature(
@@ -76,7 +74,7 @@ public class DefaultBiomeFeaturesMixin {
         biome.addFeature(
             GenerationStep.Feature.UNDERGROUND_ORES,
             Feature.ORE
-                .configure(new OreFeatureConfig(OreFeatureConfig.Target.NATURAL_STONE, LAPIS_ORE, 9))
+                .configure(new OreFeatureConfig(OreFeatureConfig.Target.NATURAL_STONE, LAPIS_ORE, 7))
                 .createDecoratedFeature(Decorator.COUNT_DEPTH_AVERAGE.configure(new CountDepthDecoratorConfig(4, 16, 16)))
         );
     }
