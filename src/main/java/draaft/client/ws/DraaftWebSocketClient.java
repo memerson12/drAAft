@@ -78,7 +78,15 @@ public class DraaftWebSocketClient {
     private void connect() {
         String listenUrl = Utils.buildListenUri(services.apiBase().toString(), token);
         URI uri = URI.create(listenUrl);
-        LOGGER.info("WS: connecting to {}", uri);
+        var uriString = uri.toString();
+
+        var queryStart = uriString.indexOf('?');
+
+        if (queryStart != -1) {
+            uriString = uriString.substring(0, queryStart);
+        }
+
+        LOGGER.info("WS: connecting to {}", uriString);
 
         DraaftWebSocketListener listener = new DraaftWebSocketListener(eventBus, gson, this::scheduleReconnect);
         httpClient.newWebSocketBuilder()
