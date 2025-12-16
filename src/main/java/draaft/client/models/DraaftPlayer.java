@@ -1,6 +1,7 @@
 package draaft.client.models;
 
 import com.mojang.authlib.GameProfile;
+import com.mojang.util.UUIDTypeAdapter;
 import draaft.client.ServerClient;
 import draaft.client.gui.skin.SkinManager;
 import draaft.draaft;
@@ -24,6 +25,15 @@ public class DraaftPlayer {
         this.uuid = uuid;
         this.readyStatus = ReadyStatus.DRAAFTING; // Default to Draafting
         loadPlayerData(); // Automatically start loading skin on instantiation
+    }
+
+    public static boolean isSelf(UUID uuid) {
+        var ownUuid = UUIDTypeAdapter.fromString(MinecraftClient.getInstance().getSession().getUuid());
+        return uuid.equals(ownUuid);
+    }
+
+    public boolean isSelf() {
+        return isSelf(this.uuid);
     }
 
     public UUID getUuid() {
