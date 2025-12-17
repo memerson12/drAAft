@@ -20,6 +20,9 @@
   "entrypoints": {
     "main": [
       "draaft.draaft"
+    ],
+    "speedrunigt": [
+      "draaft.compat.speedrunigt.Entrypoint"
     ]
   },
   "mixins": [
@@ -34,7 +37,8 @@
   },
   "breaks": {
     "mcsrfairplay": "*",
-    "seedqueue": "*"
+    "seedqueue": "*",
+    "speedrunigt": "<7.0"
   },
   "custom": {
     "speedrunapi": {

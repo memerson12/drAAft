@@ -43,6 +43,8 @@
   "draaft.game.reducedDebugInfo.debugOpts.10": "Coordinates: Around like, -477 67 1009, I think?",
   "draaft.game.reducedDebugInfo.debugOpts.11": "https://youtu.be/GcLgM0bNU5M",
 
+  "draaft.compat.speedrunigt.category": "drAAft",
+
   "speedrunapi.config.draaft.option.disablePeaceful": "Disable Peaceful",
   "speedrunapi.config.draaft.option.disablePeaceful.description": "Prevents accidentally switching to peaceful in game options."
 }
