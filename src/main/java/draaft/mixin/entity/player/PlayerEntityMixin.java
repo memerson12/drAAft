@@ -22,7 +22,7 @@ public abstract class PlayerEntityMixin extends LivingEntity {
     @Unique
     private static int currentTickCount = 0;
     @Unique
-    private static final float UPDATE_FREQUENCY_SECONDS = 0.5f;
+    private static final float UPDATE_FREQUENCY_SECONDS = 5.0f;
     @Unique
     private static final float TOTAL_TICKS_TO_WAIT = UPDATE_FREQUENCY_SECONDS * 20;
 
