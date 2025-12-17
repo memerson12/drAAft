@@ -55,6 +55,7 @@
     "server.PlayerManagerMixin",
     "server.command.CommandManagerMixin",
     "server.command.SeedCommandMixin",
+    "server.network.ServerPlayerEntityMixin",
     "server.world.ServerWorldMixin",
     "structure.IglooGeneratorMixin",
     "structure.StructurePieceMixin",
