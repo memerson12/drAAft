@@ -9,6 +9,7 @@ import net.minecraft.enchantment.Enchantments;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemConvertible;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
@@ -100,6 +101,9 @@ public abstract class ItemStackMixin {
         if (item != null && !item.asItem().getTranslationKey().contains("bowl")) {
             for (String id : enchantmentMap.get().keySet()) {
                 if (item.asItem().getTranslationKey().contains(id)) {
+                    if (id.equals("bow") && item.asItem().equals(Items.CROSSBOW)) {
+                        continue;
+                    }
                     ListTag listTag = new ListTag();
                     for (Enchantment enchantment : enchantmentMap.get().get(id)) {
                         CompoundTag compoundTag = new CompoundTag();
@@ -124,6 +128,9 @@ public abstract class ItemStackMixin {
         if (item != null && !item.asItem().getTranslationKey().contains("bowl")) {
             for (String id : enchantmentMap.get().keySet()) {
                 if (item.asItem().getTranslationKey().contains(id)) {
+                    if (id.equals("bow") && item.asItem().equals(Items.CROSSBOW)) {
+                        continue;
+                    }
                     ListTag listTag = new ListTag();
                     for (Enchantment enchantment : enchantmentMap.get().get(id)) {
                         CompoundTag compoundTag = new CompoundTag();
