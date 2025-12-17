@@ -7,6 +7,8 @@ import dev.menx.worldimporter.*;
 import dev.menx.worldimporter.net.WorldServerConnection;
 import draaft.client.ServerClient;
 import draaft.client.gui.DraaftToast;
+import draaft.compat.ModCompat;
+import draaft.compat.speedrunigt.SpeedrunIGTCompat;
 import draaft.draaft;
 import draaft.mixin.client.MinecraftClientAccessor;
 import net.minecraft.client.MinecraftClient;
@@ -105,6 +107,15 @@ public abstract class Worlds {
         DraaftLevelMetadata draaftLevelMetadata
     ) {
         var registryTracker = RegistryTracker.create();
+
+        if (ModCompat.hasSpeedrunIGT()) {
+            SpeedrunIGTCompat.initializeTimer(
+                saveDir,
+                levelInfo.getGameMode(),
+                levelInfo.areCommandsAllowed(),
+                levelInfo.getDifficulty()
+            );
+        }
 
         startIntegratedServer(
             saveDir,

@@ -89,6 +89,7 @@
     "client.gui.hud.PlayerListHudMixin",
     "client.gui.screen.options.OptionsScreenAccessor",
     "client.gui.screen.options.OptionsScreenMixin",
+    "client.network.ClientAdvancementManagerMixin",
     "client.network.ClientPlayNetworkHandlerMixin",
     "client.render.debug.DebugRendererMixin",
     "client.render.entity.EntityRenderDispatcherMixin",
