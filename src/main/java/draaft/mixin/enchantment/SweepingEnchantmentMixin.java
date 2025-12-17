@@ -1,6 +1,5 @@
 package draaft.mixin.enchantment;
 
-import draaft.draaft;
 import draaft.world.EnchantUtils;
 import net.minecraft.enchantment.SweepingEnchantment;
 import org.spongepowered.asm.mixin.Mixin;
@@ -13,7 +12,7 @@ public abstract class SweepingEnchantmentMixin {
     @Inject(method = "getMaxLevel", at = @At("HEAD"), cancellable = true)
     void getMaxLevel(CallbackInfoReturnable<Integer> cir) {
         if (EnchantUtils.levelOneEnchants()) {
-            cir.setReturnValue(1);
+            cir.setReturnValue(2);
         }
     }
 }

@@ -12,7 +12,7 @@ public abstract class PowerEnchantmentMixin {
     @Inject(method = "getMaxLevel", at = @At("HEAD"), cancellable = true)
     void getMaxLevel(CallbackInfoReturnable<Integer> cir) {
         if (EnchantUtils.levelOneEnchants()) {
-            cir.setReturnValue(1);
+            cir.setReturnValue(3);
         }
     }
 }

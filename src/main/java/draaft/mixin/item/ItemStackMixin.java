@@ -6,7 +6,6 @@ import com.llamalad7.mixinextras.sugar.Local;
 import draaft.world.EnchantUtils;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.Enchantments;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemConvertible;
 import net.minecraft.item.ItemStack;
@@ -15,7 +14,6 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.util.Lazy;
 import net.minecraft.util.registry.Registry;
-import net.minecraft.world.World;
 import org.apache.logging.log4j.Logger;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -23,7 +21,6 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.List;
@@ -33,7 +30,7 @@ import java.util.Map;
 public abstract class ItemStackMixin {
     @Unique private final static Lazy<List<Enchantment>> pickaxeshovelEnchants = new Lazy<>(() -> List.of(Enchantments.EFFICIENCY, Enchantments.FORTUNE, Enchantments.MENDING, Enchantments.UNBREAKING));
     @Unique private final static Lazy<List<Enchantment>> axehoeEnchants = new Lazy<>(() -> List.of(Enchantments.EFFICIENCY, Enchantments.MENDING, Enchantments.SILK_TOUCH, Enchantments.UNBREAKING));
-    @Unique private final static Lazy<List<Enchantment>> swordEnchants = new Lazy<>(() -> List.of(Enchantments.FIRE_ASPECT, Enchantments.KNOCKBACK, Enchantments.LOOTING, Enchantments.MENDING, Enchantments.SMITE, Enchantments.SWEEPING, Enchantments.UNBREAKING));
+    @Unique private final static Lazy<List<Enchantment>> swordEnchants = new Lazy<>(() -> List.of(Enchantments.FIRE_ASPECT, Enchantments.KNOCKBACK, Enchantments.LOOTING, Enchantments.MENDING, Enchantments.SHARPNESS, Enchantments.SWEEPING, Enchantments.UNBREAKING));
     @Unique private final static Lazy<List<Enchantment>> helmetEnchants = new Lazy<>(() -> List.of(Enchantments.AQUA_AFFINITY, Enchantments.MENDING, Enchantments.PROTECTION, Enchantments.RESPIRATION, Enchantments.UNBREAKING));
     @Unique private final static Lazy<List<Enchantment>> chestplateleggingsEnchants = new Lazy<>(() -> List.of(Enchantments.MENDING, Enchantments.PROTECTION, Enchantments.UNBREAKING));
     @Unique private final static Lazy<List<Enchantment>> bootsEnchants = new Lazy<>(() -> List.of(Enchantments.DEPTH_STRIDER, Enchantments.FEATHER_FALLING, Enchantments.MENDING, Enchantments.PROTECTION, Enchantments.SOUL_SPEED, Enchantments.UNBREAKING));
@@ -80,6 +77,7 @@ public abstract class ItemStackMixin {
     @Shadow
     private CompoundTag tag;
 
+    @Unique
     private static boolean isDraftedItemTag(CompoundTag tag) {
         if (tag.contains("_d2i")) {
             return true;
@@ -106,7 +104,7 @@ public abstract class ItemStackMixin {
                     for (Enchantment enchantment : enchantmentMap.get().get(id)) {
                         CompoundTag compoundTag = new CompoundTag();
                         compoundTag.putString("id", String.valueOf(Registry.ENCHANTMENT.getId(enchantment)));
-                        compoundTag.putShort("lvl", (short) 1);
+                        compoundTag.putShort("lvl", (short) enchantment.getMaxLevel());
                         listTag.add(compoundTag);
                     }
                     this.putSubTag("Enchantments", listTag);
@@ -130,7 +128,7 @@ public abstract class ItemStackMixin {
                     for (Enchantment enchantment : enchantmentMap.get().get(id)) {
                         CompoundTag compoundTag = new CompoundTag();
                         compoundTag.putString("id", String.valueOf(Registry.ENCHANTMENT.getId(enchantment)));
-                        compoundTag.putShort("lvl", (short) 1);
+                        compoundTag.putShort("lvl", (short) enchantment.getMaxLevel());
                         listTag.add(compoundTag);
                     }
                     this.putSubTag("Enchantments", listTag);
