@@ -31,7 +31,7 @@ public abstract class MinecraftServerMixin {
                 if (biomes.contains(instance.getBiomeForNoiseGen(offsetX, startY >> 2, offsetZ))) {
                     int distanceFactor = ((offsetX >> 2) * (offsetX >> 2)) + ((offsetZ >> 2) * (offsetZ >> 2));
                     if (blockPos == null || ((random.nextInt(distanceFactor + 1) == 0) && (random.nextInt(matches + 1) == 0))) {
-                        if (inVillage((offsetX << 2), (offsetZ << 2), serverWorld)) {
+                        if (inVillage((offsetX >> 2), (offsetZ >> 2), serverWorld)) {
                             break;
                         }
                         blockPos = new BlockPos(offsetX << 2, startY, offsetZ << 2);
