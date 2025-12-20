@@ -12,6 +12,7 @@ import draaft.compat.speedrunigt.SpeedrunIGTCompat;
 import draaft.draaft;
 import draaft.mixin.client.MinecraftClientAccessor;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.SaveLevelScreen;
 import net.minecraft.resource.DataPackSettings;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.text.Text;
@@ -68,6 +69,12 @@ public abstract class Worlds {
             var currentWorld = client.world;
             if (currentWorld != null) {
                 currentWorld.disconnect();
+            }
+
+            if (client.isInSingleplayer()) {
+                client.disconnect(new SaveLevelScreen(new TranslatableText("menu.savingLevel")));
+            } else {
+                client.disconnect();
             }
 
             var genOpts = wsc.generatorOptions(new RegionManager(wsc, regionOrder, regionServer));
