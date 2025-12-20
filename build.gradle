@@ -35,6 +35,7 @@ dependencies {
 	// modImplementation "com.github.KingContaria:SpeedrunAPI:a3e3998294"
 	// modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 	modCompileOnly "com.github.RedLime:SpeedRunIGT:15.1"
+    modCompileOnly "com.github.contariaa:FastReset:b91145a52d"
 }
 
 // Task to generate config.properties from gradle.properties

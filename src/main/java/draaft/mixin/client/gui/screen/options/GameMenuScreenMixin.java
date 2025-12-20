@@ -3,6 +3,9 @@ package draaft.mixin.client.gui.screen.options;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import draaft.client.DraaftState;
+import draaft.compat.ModCompat;
+import draaft.compat.fastreset.FastResetCompat;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.GameMenuScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -22,7 +25,7 @@ public abstract class GameMenuScreenMixin extends Screen {
     private ButtonWidget reset;
 
     @Unique
-    private long resetHoverStartTimeMS = -1;
+    private long resetHoverStartTimeMS;
 
     @Unique
     private final TranslatableText resetText = new TranslatableText("draaft.game.menu.reset");
@@ -51,12 +54,22 @@ public abstract class GameMenuScreenMixin extends Screen {
 
         this.reset = this.addButton(new ButtonWidget(
             this.width / 2 - 102,
-            this.height / 4 + 124,
+            this.height / 4 + 120,
             204,
             20,
             Text.of(""),
-            btn -> DraaftState.with(DraaftState::createWorld)
+            btn -> DraaftState.with(state -> {
+                var client = MinecraftClient.getInstance();
+
+                if (ModCompat.hasFastReset() && client.getServer() != null) {
+                    FastResetCompat.preventSaving(client.getServer());
+                }
+
+                state.createWorld();
+            })
         ));
+
+        this.resetHoverStartTimeMS = System.nanoTime() / 1_000_000;
     }
 
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/GameMenuScreen;renderBackground(Lnet/minecraft/client/util/math/MatrixStack;)V"))
