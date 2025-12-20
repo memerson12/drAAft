@@ -10,4 +10,8 @@ public abstract class ModCompat {
     public static boolean hasFastReset() {
         return FabricLoader.getInstance().isModLoaded("fast_reset");
     }
+
+    public static boolean hasAtum() {
+        return FabricLoader.getInstance().isModLoaded("atum");
+    }
 }

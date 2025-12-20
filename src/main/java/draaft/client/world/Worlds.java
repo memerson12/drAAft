@@ -8,6 +8,7 @@ import dev.menx.worldimporter.net.WorldServerConnection;
 import draaft.client.ServerClient;
 import draaft.client.gui.DraaftToast;
 import draaft.compat.ModCompat;
+import draaft.compat.atum.AtumCompat;
 import draaft.compat.speedrunigt.SpeedrunIGTCompat;
 import draaft.draaft;
 import draaft.mixin.client.MinecraftClientAccessor;
@@ -65,6 +66,10 @@ public abstract class Worlds {
             var regionServer = new DraaftRegionServer();
 
             var regionOrder = new RegionOrder(worldSpec.regions());
+
+            if (ModCompat.hasAtum()) {
+                AtumCompat.stopResetting();
+            }
 
             var currentWorld = client.world;
             if (currentWorld != null) {
