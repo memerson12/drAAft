@@ -81,7 +81,8 @@ public abstract class DrownedEntityMixin extends ZombieEntity implements RangedA
         super.dropEquipment(source, lootingMultiplier, false);
         ServerWorld world = (ServerWorld) this.getEntityWorld();
         WorldState state = WorldState.getServerState(world);
-        Random draaftTridentRng = state.getOrCreateRng(WorldState.RngType.TRIDENT, world).getRandom();
+        WorldState.RandomState draaftTridentState = state.getOrCreateRng(WorldState.RngType.TRIDENT, world);
+        Random draaftTridentRng = draaftTridentState.getRandom();
 
         for (EquipmentSlot equipmentSlot : EquipmentSlot.values()) {
             ItemStack itemStack = this.getEquippedStack(equipmentSlot);
@@ -91,13 +92,15 @@ public abstract class DrownedEntityMixin extends ZombieEntity implements RangedA
             }
             if (itemStack.getItem().equals(Items.TRIDENT)) {
                 float f = 0.125F;
+                int tridents = draaftTridentState.incrementUses();
                 if (!itemStack.isEmpty()
                     && !EnchantmentHelper.hasVanishingCurse(itemStack)
                     && (allowDrops)
-                    && Math.max(draaftTridentRng.nextFloat() - (float) lootingMultiplier * 0.02F, 0.0F) < f) {
+                    && ((Math.max(draaftTridentRng.nextFloat() - (float) lootingMultiplier * 0.02F, 0.0F) < f) || (tridents % 10 == 0))) {
                     if (itemStack.isDamageable()) {
                         itemStack.setDamage(Math.min(itemStack.getMaxDamage() - draaftTridentRng.nextInt(1 + draaftTridentRng.nextInt(Math.max(itemStack.getMaxDamage() - 3, 1))), itemStack.getMaxDamage() - 2));
                     }
+                    draaftTridentState.resetUses();
                     this.dropStack(itemStack);
                 }
             } else {
