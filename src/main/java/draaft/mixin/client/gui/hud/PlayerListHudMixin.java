@@ -29,7 +29,7 @@ public class PlayerListHudMixin extends DrawableHelper {
     private void renderOverride(MatrixStack matrices, int scaleWidth, Scoreboard scoreboard, ScoreboardObjective scoreboardObjective, Operation<Void> original) {
         if (!DraaftState.isAccessible()) return;
         final DraaftState draaftState = DraaftState.getInstance();
-        if (!draaftState.inDraaftWorld()) return; // does nothing at present
+        if (!draaftState.inActiveDraaftWorld()) return; // does nothing at present
 
         ArrayList<DraaftPlayer> players = draaftState.getRoom().members();
 

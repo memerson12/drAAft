@@ -41,7 +41,7 @@ public abstract class PlayerEntityMixin extends LivingEntity {
     @Inject(method = "tick", at = @At("HEAD"))
     public void tick(CallbackInfo ci) {
         if (!DraaftState.isAccessible() ||
-            !DraaftState.getInstance().inDraaftWorld() ||
+            !DraaftState.inActiveDraaftWorld() ||
             !DraaftState.getInstance().isTournament()
         ) return;
 

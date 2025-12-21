@@ -87,6 +87,7 @@
     "client.gui.TitleScreenMixin",
     "client.gui.hud.InGameHudMixin",
     "client.gui.hud.PlayerListHudMixin",
+    "client.gui.screen.options.GameMenuScreenMixin",
     "client.gui.screen.options.OptionsScreenAccessor",
     "client.gui.screen.options.OptionsScreenMixin",
     "client.network.ClientAdvancementManagerMixin",

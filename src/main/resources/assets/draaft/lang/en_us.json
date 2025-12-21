@@ -22,6 +22,7 @@
   "draaft.preparing.worldGenLoadError": "Failed to fetch world data",
   "draaft.preparing.datapackDownloadError": "Failed to download the datapack",
   "draaft.preparing.worldCreationError": "Failed to create a world",
+  "draaft.game.menu.reset": "Reset World",
   "draaft.game.options.pseudoPeaceful": "Peaceless",
   "draaft.game.command.seeds.header": "Seeds:",
   "draaft.game.command.seeds.seed": "%s: %s",
