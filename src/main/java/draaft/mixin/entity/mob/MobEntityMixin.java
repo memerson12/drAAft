@@ -42,9 +42,9 @@ public abstract class MobEntityMixin extends LivingEntity {
             WorldState state = WorldState.getServerState(world);
             WorldState.RandomState draaftSkullState = state.getOrCreateRng(WorldState.RngType.SKULL, world);
             int killed = draaftSkullState.incrementUses();
-            int timer = 20;
+            int timer = 40;
             while (looting > 0) {
-                timer -= (6 / looting);
+                timer -= (12 / looting);
                 looting--;
             }
             if ((killed % timer) == 0) {
