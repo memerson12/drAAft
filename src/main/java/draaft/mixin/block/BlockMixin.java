@@ -39,7 +39,7 @@ public abstract class BlockMixin extends AbstractBlock {
         }
         if (this.is(Blocks.NETHERRACK) || this.is(Blocks.NETHER_GOLD_ORE) || this.is(Blocks.NETHER_QUARTZ_ORE) || this.is(Blocks.MAGMA_BLOCK) || this.is(Blocks.GRAVEL) || this.is(Blocks.SOUL_SAND) || this.is(Blocks.SOUL_SOIL) || this.is(Blocks.BLACKSTONE)) {
             WorldState worldState = WorldState.getServerState((ServerWorld) world);
-            WorldState.RandomState draaftMinedState = worldState.getOrCreateRng(WorldState.RngType.MINED, (ServerWorld) world);
+            WorldState.RandomState draaftMinedState = worldState.getOrCreateRng(WorldState.RngType.NETHERITE_MINED, (ServerWorld) world);
             int mined = draaftMinedState.incrementUses();
 
             if (draaftMinedState.getRandom().nextFloat() < DEBRIS_CHANCE || (mined % 100) == 0) {

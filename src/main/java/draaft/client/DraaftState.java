@@ -120,12 +120,12 @@ public class DraaftState {
         });
     }
 
-    public boolean inDraaftWorld() {
-        return true; // TODO - We need to know if the world we're in is a draaft world
+    public static boolean inActiveDraaftWorld() {
+        return DraaftState.isAccessible(); // TODO - We need to know if the world we're in is an active (ongoing) draaft world
     }
 
     public boolean isTournament() {
-        return true; // TODO - We need to know if the world we're in is a tournament'
+        return false; // TODO - We need to know if the world we're in is a tournament'
     }
 
     public enum STATE {
@@ -185,7 +185,7 @@ public class DraaftState {
         this.room = room;
     }
 
-    private void createWorld() {
+    public void createWorld() {
         HttpResponse<JsonElement> worldGen;
 
         try {

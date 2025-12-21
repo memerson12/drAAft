@@ -3,11 +3,14 @@ package draaft.persistent;
 import draaft.draaft;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.PersistentState;
+import net.minecraft.world.World;
 
 import java.io.*;
 import java.util.EnumMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Random;
 
 public class WorldState extends PersistentState {
@@ -16,25 +19,27 @@ public class WorldState extends PersistentState {
      * Enum defining the different types of Random Number Generators managed by WorldState.
      */
     public enum RngType {
-        PEARL("pearl"),
-        BARTER("barter"),
-        TRIDENT("trident"),
-        SKULL("skull"),
-        CAT("cat"),
-        PHANTOM("phantom"),
-        BLAZE("blaze"),
-        SHULKER("shulker"),
-        RABBIT("rabbit"),
-        TEMPLE("temple"),
-        TNT("tnt"),
-        MINED("mined"),
-        JUNK("junk"),
-        EXPLODING_SHELLS("exploding_shells");
+        PEARL("pearl", World.OVERWORLD),
+        BARTER("barter", World.NETHER),
+        TRIDENT("trident", World.OVERWORLD),
+        SKULL("skull", World.NETHER),
+        CAT("cat", World.OVERWORLD),
+        PHANTOM("phantom", World.OVERWORLD),
+        BLAZE("blaze", World.NETHER),
+        SHULKER("shulker", World.END),
+        RABBIT("rabbit", World.OVERWORLD),
+        TEMPLE("temple", World.OVERWORLD),
+        NETHERITE_TNT("netherite_tnt", World.NETHER),
+        NETHERITE_MINED("netherite_mined", World.NETHER),
+        JUNK("junk", World.OVERWORLD),
+        EXPLODING_SHELLS("exploding_shells", World.OVERWORLD);
 
         private final String keyName; // The base name used for NBT keys
+        private final RegistryKey<World> seedSourceWorld;
 
-        RngType(String keyName) {
+        RngType(String keyName, RegistryKey<World> seedSourceWorld) {
             this.keyName = keyName;
+            this.seedSourceWorld = seedSourceWorld;
         }
 
         public String getKeyName() {
@@ -127,8 +132,8 @@ public class WorldState extends PersistentState {
         RandomState randomState = randomStates.get(type);
 
         if (randomState.getRandom() == null) {
-            draaft.LOGGER.info("Initializing '{}' RNG state. Is Client: {}", type.name(), world.isClient);
-            long seed = world.getSeed();
+            draaft.LOGGER.info("Initializing '{}' RNG state.", type.name());
+            long seed = Objects.requireNonNull(world.getServer().getWorld(type.seedSourceWorld)).getSeed();
             randomState.setRandom(new Random(seed));
         }
 
