@@ -109,6 +109,9 @@ public class WorldManifest {
 
         @SerializedName("NoInventory")
         NO_INVENTORY,
+
+        @SerializedName("DoubleDrops")
+        DOUBLE_DROPS,
     }
 
     public static class Annotations {
