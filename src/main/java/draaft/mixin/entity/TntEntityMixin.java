@@ -32,7 +32,7 @@ public abstract class TntEntityMixin extends Entity {
         if (this.world.getDimension().isUltrawarm() && (this.getBlockPos().getY() >= 5 && this.getBlockPos().getY() <= 25)) {
             ServerWorld world = (ServerWorld) this.getEntityWorld();
             WorldState state = WorldState.getServerState(world);
-            WorldState.RandomState draaftTntState = state.getOrCreateRng(WorldState.RngType.TNT, world);
+            WorldState.RandomState draaftTntState = state.getOrCreateRng(WorldState.RngType.NETHERITE_TNT, world);
             int tnt = draaftTntState.incrementUses();
             float chance = Math.abs(this.getBlockPos().getY() - 15) < 3 ? DEBRIS_CHANCE : 0.1F; // y13-17 12% otherwise 10%, to incentivize mining at correct y-height
             float timer = Math.abs(this.getBlockPos().getY() - 15) < 3 ? 6 : 8;
