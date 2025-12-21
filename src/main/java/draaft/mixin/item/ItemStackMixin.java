@@ -39,7 +39,7 @@ public abstract class ItemStackMixin {
     @Unique private final static Lazy<List<Enchantment>> fnsoasEnchants = new Lazy<>(() -> List.of(Enchantments.MENDING, Enchantments.UNBREAKING));
     @Unique private final static Lazy<List<Enchantment>> rodEnchants = new Lazy<>(() -> List.of(Enchantments.LUCK_OF_THE_SEA, Enchantments.LURE, Enchantments.MENDING, Enchantments.UNBREAKING));
     @Unique private final static Lazy<List<Enchantment>> bowEnchants = new Lazy<>(() -> List.of(Enchantments.FLAME, Enchantments.INFINITY, Enchantments.POWER, Enchantments.PUNCH, Enchantments.UNBREAKING));
-    @Unique private final static Lazy<List<Enchantment>> tridentEnchants = new Lazy<>(() -> List.of(Enchantments.CHANNELING, Enchantments.IMPALING, Enchantments.LOYALTY, Enchantments.PUNCH, Enchantments.UNBREAKING));
+    @Unique private final static Lazy<List<Enchantment>> tridentEnchants = new Lazy<>(() -> List.of(Enchantments.CHANNELING, Enchantments.IMPALING, Enchantments.UNBREAKING));
     @Unique private final static Lazy<List<Enchantment>> crossbowEnchants = new Lazy<>(() -> List.of(Enchantments.PIERCING, Enchantments.MENDING, Enchantments.QUICK_CHARGE, Enchantments.UNBREAKING));
 
     @Unique
