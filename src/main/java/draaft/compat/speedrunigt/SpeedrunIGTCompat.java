@@ -17,7 +17,7 @@ public abstract class SpeedrunIGTCompat {
     private static final int ADVANCEMENT_COUNT = 80;
 
     public static void initializeTimer(String worldName, GameMode gameMode, boolean cheatsAllowed, Difficulty difficulty) {
-        InGameTimer.start(worldName, RunType.SET_SEED);
+        InGameTimer.start(worldName, RunType.RANDOM_SEED);
 
         var timer = InGameTimer.getInstance();
         timer.setCategory(DraaftCategory.INSTANCE, false);

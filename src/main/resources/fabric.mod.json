@@ -26,7 +26,8 @@
     ]
   },
   "mixins": [
-    "draaft.mixins.json"
+    "draaft.mixins.json",
+    "draaft-compat.mixins.json"
   ],
   "accessWidener": "draaft.accesswidener",
   "depends": {

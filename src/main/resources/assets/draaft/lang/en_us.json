@@ -45,6 +45,7 @@
   "draaft.game.reducedDebugInfo.debugOpts.11": "https://youtu.be/GcLgM0bNU5M",
 
   "draaft.compat.speedrunigt.category": "drAAft",
+  "draaft.compat.speedrunigt.legacyIGTAlwaysOn": "Legacy IGT is always enabled with the drAAft category.\nSwitch to a different timer category to disable.",
 
   "speedrunapi.config.draaft.option.disablePeaceful": "Disable Peaceful",
   "speedrunapi.config.draaft.option.disablePeaceful.description": "Prevents accidentally switching to peaceful in game options."
