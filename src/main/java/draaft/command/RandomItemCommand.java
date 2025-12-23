@@ -55,7 +55,7 @@ public class RandomItemCommand {
             new ItemStack(Items.REPEATER),
             new ItemStack(Items.DAYLIGHT_DETECTOR),
             new ItemStack(Items.BARRIER),
-            new ItemStack(Items.BARRIER, 10),
+            new ItemStack(Items.BARRIER, 5),
             new ItemStack(Items.LIGHT_GRAY_STAINED_GLASS_PANE)
         );
     }
