@@ -96,7 +96,6 @@
     "client.render.debug.DebugRendererMixin",
     "client.render.entity.EntityRenderDispatcherMixin",
     "client.resource.SplashTextResourceSupplierMixin",
-    "compat.InGameTimerMixin",
     "item.ItemClientMixin"
   ]
 }
