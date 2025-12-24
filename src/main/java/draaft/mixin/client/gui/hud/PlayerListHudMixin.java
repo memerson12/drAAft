@@ -44,7 +44,7 @@ public class PlayerListHudMixin extends DrawableHelper {
 
         int boxWidth = (int) (screenWidth * 0.20);
 
-        double boxHeightPercentage = Math.min(0.90, players.size() * 0.15);
+        double boxHeightPercentage = Math.min(0.90, Math.max(players.size() * 0.15, 0.20));
 
         int boxHeight = (int) (screenHeight * boxHeightPercentage);
         int boxY = (screenHeight / 2) - (boxHeight / 2);
