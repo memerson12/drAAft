@@ -112,6 +112,9 @@ public class WorldManifest {
 
         @SerializedName("DoubleDrops")
         DOUBLE_DROPS,
+
+        @SerializedName("SplodeyGhasts")
+        SPLODEY_GHASTS,
     }
 
     public static class Annotations {

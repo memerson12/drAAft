@@ -38,6 +38,7 @@
     "entity.mob.DrownedEntityMixin",
     "entity.mob.MobEntityMixin",
     "entity.mob.PiglinBrainMixin",
+    "entity.mob.ShootFireballGoalMixin",
     "entity.mob.ShulkerEntityMixin",
     "entity.mob.WitherSkeletonEntityMixin",
     "entity.passive.AnimalEntityMixin",
