@@ -277,6 +277,8 @@ public class DraaftScreen extends Screen {
             this.textRenderer.draw(matrices, player.getReadyStatus().getDisplayName(),
                 (PLAYER_FACE_SIZE + this.textRenderer.getWidth("Status: ")) / 0.75f, (y + 22) / 0.75f,
                 statusColor);
+            this.textRenderer.draw(matrices, player.isSpectator() ? "Spectator" : "Player",
+                (PLAYER_FACE_SIZE + 8) / 0.75f, (y + 30) / 0.75f, 0x80808080);
             matrices.pop();
 
             // Draw admin label if player is admin

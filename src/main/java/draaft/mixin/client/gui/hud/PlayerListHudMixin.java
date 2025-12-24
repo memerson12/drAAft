@@ -29,9 +29,9 @@ public class PlayerListHudMixin extends DrawableHelper {
     private void renderOverride(MatrixStack matrices, int scaleWidth, Scoreboard scoreboard, ScoreboardObjective scoreboardObjective, Operation<Void> original) {
         if (!DraaftState.isAccessible()) return;
         final DraaftState draaftState = DraaftState.getInstance();
-        if (!draaftState.inActiveDraaftWorld()) return; // does nothing at present
+        if (!DraaftState.inActiveDraaftWorld()) return; // does nothing at present
 
-        ArrayList<DraaftPlayer> players = draaftState.getRoom().members();
+        ArrayList<DraaftPlayer> players = draaftState.getRoom().getNonSpectatorPlayers();
 
         int screenHeight = this.client.getWindow().getScaledHeight();
         int screenWidth = this.client.getWindow().getScaledWidth();
@@ -44,7 +44,7 @@ public class PlayerListHudMixin extends DrawableHelper {
 
         int boxWidth = (int) (screenWidth * 0.20);
 
-        double boxHeightPercentage = Math.min(0.90, draaftState.getRoom().members().size() * 0.15);
+        double boxHeightPercentage = Math.min(0.90, Math.max(players.size() * 0.15, 0.20));
 
         int boxHeight = (int) (screenHeight * boxHeightPercentage);
         int boxY = (screenHeight / 2) - (boxHeight / 2);

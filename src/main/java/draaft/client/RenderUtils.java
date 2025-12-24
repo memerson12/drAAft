@@ -76,7 +76,7 @@ public class RenderUtils {
         MinecraftClient client = MinecraftClient.getInstance();
         assert client.getServer() != null;
 
-        Identifier skinTexture = SkinManager.getSkin(player.getUuid());
+        Identifier skinTexture = player.getFaceTexture();
         client.getTextureManager().bindTexture(skinTexture);
 
         // Enable blending for proper transparency
