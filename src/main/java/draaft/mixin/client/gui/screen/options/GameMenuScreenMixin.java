@@ -38,7 +38,7 @@ public abstract class GameMenuScreenMixin extends Screen {
     ButtonWidget shiftButtons(int x, int y, int width, int height, Text message, ButtonWidget.PressAction onPress, Operation<ButtonWidget> original) {
         return original.call(
             x,
-            DraaftState.inActiveDraaftWorld() ? y - 12 : y,
+            false && DraaftState.inActiveDraaftWorld() ? y - 12 : y,
             width,
             height,
             message,
@@ -48,7 +48,7 @@ public abstract class GameMenuScreenMixin extends Screen {
 
     @Inject(method = "initWidgets", at = @At("RETURN"))
     void addDraaftButtons(CallbackInfo ci) {
-        if (!DraaftState.inActiveDraaftWorld()) {
+        if (true || !DraaftState.inActiveDraaftWorld()) {
             return;
         }
 
@@ -74,7 +74,7 @@ public abstract class GameMenuScreenMixin extends Screen {
 
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/GameMenuScreen;renderBackground(Lnet/minecraft/client/util/math/MatrixStack;)V"))
     void render(MatrixStack matrices, int mouseX, int mouseY, float delta, CallbackInfo ci) {
-        if (!DraaftState.inActiveDraaftWorld()) {
+        if (true || !DraaftState.inActiveDraaftWorld()) {
             return;
         }
 
