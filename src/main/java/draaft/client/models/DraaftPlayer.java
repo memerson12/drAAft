@@ -16,10 +16,13 @@ public class DraaftPlayer {
 
     private final UUID uuid;
     private String username;
+    private boolean isSpectator = false;
+
+    private ReadyStatus readyStatus;
+
     private Identifier faceTexture;
     private boolean skinLoaded = false;
     private boolean skinLoading = false;
-    private ReadyStatus readyStatus;
 
     public DraaftPlayer(UUID uuid) {
         this.uuid = uuid;
@@ -81,5 +84,13 @@ public class DraaftPlayer {
                 return null;
             });
         }
+    }
+
+    public boolean isSpectator() {
+        return isSpectator;
+    }
+
+    public void setSpectator(boolean spectator) {
+        isSpectator = spectator;
     }
 }

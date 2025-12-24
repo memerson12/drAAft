@@ -64,7 +64,7 @@ public class DraaftWebSocketListener implements WebSocket.Listener {
                                 case "joined" -> eventBus.post(new RoomMemberEvents.PlayerJoined(uuid));
                                 case "leave" -> eventBus.post(new RoomMemberEvents.PlayerLeft(uuid));
                                 case "kick" -> eventBus.post(new RoomMemberEvents.PlayerKick(uuid));
-                                case "spectator" -> eventBus.post(new RoomMemberEvents.PlayerBecomeSpectator(uuid));
+                                case "spectate" -> eventBus.post(new RoomMemberEvents.PlayerBecomeSpectator(uuid));
                                 case "player" -> eventBus.post(new RoomMemberEvents.PlayerBecomePlayer(uuid));
                                 default -> {
                                     logger.warn("WS: unknown playerupdate action: {}", action);

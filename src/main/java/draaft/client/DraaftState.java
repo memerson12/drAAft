@@ -93,6 +93,23 @@ public class DraaftState {
                     }
                     players.removeIf(player -> player.getUuid().equals(playerKick.playerUuid()));
                 }
+
+                // Player becomes a spectator
+                case SPECTATOR -> {
+                    RoomMemberEvents.PlayerBecomeSpectator playerBecomeSpectator = (RoomMemberEvents.PlayerBecomeSpectator) event;
+                    players.stream()
+                        .filter(draaftPlayer -> draaftPlayer.getUuid().equals(playerBecomeSpectator.playerUuid()))
+                        .forEach(draaftPlayer -> draaftPlayer.setSpectator(true));
+                }
+
+                // Spectator becomes a player
+                case PLAYER -> {
+                    RoomMemberEvents.PlayerBecomePlayer playerBecomePlayer = (RoomMemberEvents.PlayerBecomePlayer) event;
+                    players.stream()
+                        .filter(draaftPlayer -> draaftPlayer.getUuid().equals(playerBecomePlayer.playerUuid()))
+                        .forEach(draaftPlayer -> draaftPlayer.setSpectator(false));
+                }
+
                 default -> logger.warn("Unhandled event type in DraaftScreen: {}", event.type());
             }
 
