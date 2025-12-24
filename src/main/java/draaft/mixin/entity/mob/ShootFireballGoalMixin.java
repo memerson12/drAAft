@@ -14,7 +14,7 @@ public abstract class ShootFireballGoalMixin extends Goal {
     int getFireballStrength(GhastEntity instance) {
         if (!instance.world.isClient()) {
             if (WorldManifest.get((ServerWorld) instance.world).on(WorldManifest.Feature.SPLODEY_GHASTS)) {
-                return 5;
+                return 7;
             }
         }
         return 1;
