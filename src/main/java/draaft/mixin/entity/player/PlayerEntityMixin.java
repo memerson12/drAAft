@@ -4,6 +4,7 @@ import draaft.client.DraaftState;
 import draaft.client.ServerClient;
 import draaft.client.ws.outgoing.PositionUpdate;
 import draaft.persistent.WorldManifest;
+import draaft.player.PlayerData;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -60,5 +61,10 @@ public abstract class PlayerEntityMixin extends LivingEntity {
             currentTickCount++;
         }
 
+    }
+
+    @Inject(method = "initDataTracker", at = @At("RETURN"))
+    void initDataTracker(CallbackInfo ci) {
+        this.dataTracker.startTracking(PlayerData.TRACKED, PlayerData.DEFAULT);
     }
 }
