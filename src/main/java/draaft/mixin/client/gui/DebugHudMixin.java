@@ -25,8 +25,6 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 
 import java.util.*;
 
-import static draaft.draaft.getDraaftVersion;
-
 @Mixin(DebugHud.class)
 public abstract class DebugHudMixin extends DrawableHelper {
     @Shadow
@@ -39,7 +37,7 @@ public abstract class DebugHudMixin extends DrawableHelper {
     @ModifyReturnValue(method = "getRightText", at = @At("RETURN"))
     private List<String> modifyRightText(List<String> original) {
         original.add("");
-        original.add("drAAft v" + getDraaftVersion());
+        original.add("drAAft v" + draaft.DRAAFT_VERSION);
         return original;
     }
 

@@ -32,7 +32,7 @@ public class draaft implements ModInitializer {
         PyramidChest.registerPoi();
     }
 
-    public static String getDraaftVersion() {
+    private static String getDraaftVersion() {
         try (InputStream input = draaft.class.getClassLoader().getResourceAsStream("config.properties")) {
             Properties prop = new Properties();
             prop.load(input);
