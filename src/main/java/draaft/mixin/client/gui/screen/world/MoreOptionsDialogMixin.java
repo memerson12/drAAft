@@ -3,6 +3,8 @@ package draaft.mixin.client.gui.screen.world;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import draaft.client.gui.screen.DraaftWorldOptionsScreen;
+import draaft.compat.ModCompat;
+import draaft.compat.atum.AtumCompat;
 import draaft.mixin.client.gui.screen.ScreenAccessor;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
@@ -75,19 +77,23 @@ public abstract class MoreOptionsDialogMixin implements TickableElement, Drawabl
             target = "Lnet/minecraft/world/gen/GeneratorOptions;withHardcore(ZLjava/util/OptionalLong;)Lnet/minecraft/world/gen/GeneratorOptions;"
         )
     )
-    GeneratorOptions getGeneratorOptions(GeneratorOptions instance, boolean hardcore, OptionalLong optSeed) {
-        var dimOptsMap = instance.getDimensionMap();
+    GeneratorOptions getGeneratorOptions(GeneratorOptions original, boolean hardcore, OptionalLong optSeed) {
+        var dimOptsMap = original.getDimensionMap();
 
-        long seed = optSeed.orElse(instance.getSeed());
+        long seed = optSeed.orElse(original.getSeed());
 
         var genOpts = new GeneratorOptions(
             seed,
-            instance.shouldGenerateStructures(),
-            instance.hasBonusChest() && !hardcore,
+            original.shouldGenerateStructures(),
+            original.hasBonusChest() && !hardcore,
             dimOptsMap
         );
 
         DraaftWorldOptionsScreen.changeSeed(genOpts, DimensionOptions.OVERWORLD, seed);
+
+        if (ModCompat.hasAtum()) {
+            AtumCompat.restoreSeedString(genOpts, original);
+        }
 
         return genOpts;
     }
