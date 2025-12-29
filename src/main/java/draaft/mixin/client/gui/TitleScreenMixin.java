@@ -1,8 +1,12 @@
 package draaft.mixin.client.gui;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import draaft.client.DraaftServices;
 import draaft.client.ServerClient;
 import draaft.client.gui.LoginButton;
+import draaft.draaft;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -61,5 +65,30 @@ public abstract class TitleScreenMixin extends Screen {
                 this
             ));
         }
+    }
+
+    @WrapOperation(
+        method = "render",
+        at = @At(
+            value = "INVOKE",
+            ordinal = 0,
+            target = "Lnet/minecraft/client/gui/screen/TitleScreen;drawStringWithShadow(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/font/TextRenderer;Ljava/lang/String;III)V"
+        )
+    )
+    void drawDraaftVersionString(
+        TitleScreen instance,
+        MatrixStack matrixStack,
+        TextRenderer textRenderer,
+        String string,
+        int x,
+        int y,
+        int color,
+        Operation<Void> original
+    ) {
+        String draaftInfo = "drAAft v." + draaft.DRAAFT_VERSION + (draaft.IS_DEBUG ? " (dev)" : "");
+
+        this.drawStringWithShadow(matrixStack, textRenderer, draaftInfo, x, y - 10, color);
+
+        original.call(instance, matrixStack, textRenderer, string, x, y, color);
     }
 }
