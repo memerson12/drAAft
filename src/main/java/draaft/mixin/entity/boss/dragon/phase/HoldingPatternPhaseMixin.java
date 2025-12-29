@@ -22,8 +22,7 @@ public abstract class HoldingPatternPhaseMixin extends AbstractPhase {
 
     @Inject(method = "beginPhase", at = @At("RETURN"))
     private void onInit(CallbackInfo ci) {
-        if (this.dragon instanceof EnderDragonEntityAccessor) {
-            EnderDragonEntityAccessor dragonAccessor = (EnderDragonEntityAccessor) this.dragon;
+        if (this.dragon instanceof EnderDragonEntityAccessor dragonAccessor) {
             this.random = dragonAccessor.draaft$getRandom();
         }
     }

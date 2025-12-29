@@ -19,20 +19,22 @@ public class WorldState extends PersistentState {
      * Enum defining the different types of Random Number Generators managed by WorldState.
      */
     public enum RngType {
+        TEMPLE("temple", World.OVERWORLD),
+        DEAD_BUSH("dead_bush", World.OVERWORLD),
+        LAPIS("lapis", World.OVERWORLD),
         PEARL("pearl", World.OVERWORLD),
-        BARTER("barter", World.NETHER),
         TRIDENT("trident", World.OVERWORLD),
-        SKULL("skull", World.NETHER),
         CAT("cat", World.OVERWORLD),
         PHANTOM("phantom", World.OVERWORLD),
-        BLAZE("blaze", World.NETHER),
-        SHULKER("shulker", World.END),
         RABBIT("rabbit", World.OVERWORLD),
-        TEMPLE("temple", World.OVERWORLD),
+        JUNK("junk", World.OVERWORLD),
+        EXPLODING_SHELLS("exploding_shells", World.OVERWORLD),
+        BLAZE("blaze", World.NETHER),
+        BARTER("barter", World.NETHER),
+        SKULL("skull", World.NETHER),
         NETHERITE_TNT("netherite_tnt", World.NETHER),
         NETHERITE_MINED("netherite_mined", World.NETHER),
-        JUNK("junk", World.OVERWORLD),
-        EXPLODING_SHELLS("exploding_shells", World.OVERWORLD);
+        SHULKER("shulker", World.END);
 
         private final String keyName; // The base name used for NBT keys
         private final RegistryKey<World> seedSourceWorld;
