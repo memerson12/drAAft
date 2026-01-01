@@ -37,6 +37,7 @@ dependencies {
 	modCompileOnly "com.github.RedLime:SpeedRunIGT:15.1"
     modCompileOnly "com.github.contariaa:FastReset:b91145a52d"
     modCompileOnly "com.github.contariaa:atum:beaf9f58c1"
+    modCompileOnly "com.github.contariaa:StandardSettings:baf5d22dca"
 }
 
 // Task to generate config.properties from gradle.properties
