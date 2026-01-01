@@ -10,6 +10,7 @@ import draaft.client.gui.DraaftToast;
 import draaft.compat.ModCompat;
 import draaft.compat.atum.AtumCompat;
 import draaft.compat.speedrunigt.SpeedrunIGTCompat;
+import draaft.compat.standardsettings.StandardSettingsCompat;
 import draaft.draaft;
 import draaft.mixin.client.MinecraftClientAccessor;
 import net.minecraft.client.MinecraftClient;
@@ -129,6 +130,10 @@ public abstract class Worlds {
             );
         }
 
+        if (ModCompat.hasStandardSettings()) {
+            StandardSettingsCompat.reset();
+        }
+
         startIntegratedServer(
             saveDir,
             registryTracker,
@@ -151,6 +156,10 @@ public abstract class Worlds {
             false,
             MinecraftClient.WorldLoadAction.CREATE
         );
+
+        if (ModCompat.hasStandardSettings()) {
+            StandardSettingsCompat.onWorldJoin(saveDir);
+        }
     }
 
     private static void startIntegratedServer(

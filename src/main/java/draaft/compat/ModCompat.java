@@ -14,4 +14,8 @@ public abstract class ModCompat {
     public static boolean hasAtum() {
         return FabricLoader.getInstance().isModLoaded("atum");
     }
+
+    public static boolean hasStandardSettings() {
+        return FabricLoader.getInstance().isModLoaded("standardsettings");
+    }
 }
