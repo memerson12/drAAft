@@ -27,15 +27,15 @@ public abstract class TntEntityMixin extends Entity {
     @Inject(method = "explode", at = @At("HEAD"))
     void explode(CallbackInfo ci) {
         //  TODO - does this crash? haha!
-        final float DEBRIS_CHANCE = WorldManifest.get((ServerWorld) world).on(WorldManifest.Feature.DEBRIS_RATES) ? 1F : 0.125F;
+        final float DEBRIS_CHANCE = WorldManifest.get((ServerWorld) world).on(WorldManifest.Feature.DEBRIS_RATES) ? 1F : 0.1F;
 
         if (this.world.getDimension().isUltrawarm() && (this.getBlockPos().getY() >= 5 && this.getBlockPos().getY() <= 25)) {
             ServerWorld world = (ServerWorld) this.getEntityWorld();
             WorldState state = WorldState.getServerState(world);
             WorldState.RandomState draaftTntState = state.getOrCreateRng(WorldState.RngType.NETHERITE_TNT, world);
             int tnt = draaftTntState.incrementUses();
-            float chance = Math.abs(this.getBlockPos().getY() - 15) < 3 ? DEBRIS_CHANCE : 0.1F; // y13-17 12% otherwise 10%, to incentivize mining at correct y-height
-            float timer = Math.abs(this.getBlockPos().getY() - 15) < 3 ? 6 : 8;
+            float chance = Math.abs(this.getBlockPos().getY() - 15) < 3 ? DEBRIS_CHANCE : 0.05F; // y13-17 12% otherwise 10%, to incentivize mining at correct y-height
+            float timer = Math.abs(this.getBlockPos().getY() - 15) < 3 ? 10 : 20;
 
             if (draaftTntState.getRandom().nextFloat() < chance || (tnt % timer) == 0) {
                 placeDebrisBlob(draaftTntState.getRandom(), this.getBlockPos(), 10);
