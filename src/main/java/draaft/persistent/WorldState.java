@@ -32,7 +32,7 @@ public class WorldState extends PersistentState {
         BLAZE("blaze", World.NETHER),
         BARTER("barter", World.NETHER),
         SKULL("skull", World.NETHER),
-        NETHERITE_TNT("netherite_tnt", World.NETHER),
+        NETHERITE_EXPLOSION("netherite_explosion", World.NETHER),
         NETHERITE_MINED("netherite_mined", World.NETHER),
         SHULKER("shulker", World.END);
 

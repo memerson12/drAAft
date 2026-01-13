@@ -1,7 +1,7 @@
 package draaft.mixin.world;
 
-import draaft.world.WorldInterface;
 import draaft.world.WorldClientInfo;
+import draaft.world.WorldInterface;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
@@ -11,7 +11,6 @@ import org.spongepowered.asm.mixin.Unique;
 public abstract class WorldMixin implements WorldInterface {
     @Unique
     private WorldClientInfo clientInfo = null;
-
 
     @Override
     public @Nullable WorldClientInfo draaft$clientInfo() {
