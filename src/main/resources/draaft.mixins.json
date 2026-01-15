@@ -30,6 +30,7 @@
     "enchantment.SweepingEnchantmentMixin",
     "enchantment.ThornsEnchantmentMixin",
     "enchantment.UnbreakingEnchantmentMixin",
+    "entity.EyeOfEnderEntityMixin",
     "entity.boss.WitherEntityMixin",
     "entity.boss.dragon.EnderDragonEntityMixin",
     "entity.boss.dragon.phase.HoldingPatternPhaseMixin",

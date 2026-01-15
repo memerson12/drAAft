@@ -23,6 +23,7 @@ public class WorldState extends PersistentState {
         DEAD_BUSH("dead_bush", World.OVERWORLD),
         LAPIS("lapis", World.OVERWORLD),
         PEARL("pearl", World.OVERWORLD),
+        EYE("eye", World.OVERWORLD),
         TRIDENT("trident", World.OVERWORLD),
         CAT("cat", World.OVERWORLD),
         PHANTOM("phantom", World.OVERWORLD),
