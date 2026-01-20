@@ -1,10 +1,14 @@
 package draaft.client;
 
+import com.google.gson.Gson;
+import org.jetbrains.annotations.Nullable;
+
 import java.net.URLEncoder;
 import java.net.http.HttpResponse;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.Flow;
 
@@ -26,30 +30,42 @@ public class Utils {
         return base + "/listen?token=" + q;
     }
 
-    public static <T> HttpResponse.BodyHandler<T> jsonBody(Class<T> t) {
-        return new JsonBodyHandler<>(t);
+    public static <T> HttpResponse.BodyHandler<@Nullable T> jsonBody(Class<T> t) {
+        return new JsonBodyHandler<>(t, ServerClient.GSON);
     }
 
-    private static class JsonBodyHandler<T> implements HttpResponse.BodyHandler<T> {
+    public static <T> HttpResponse.BodyHandler<@Nullable T> jsonBody(Class<T> t, Gson gson) {
+        return new JsonBodyHandler<>(t, gson);
+    }
+
+    private static class JsonBodyHandler<T> implements HttpResponse.BodyHandler<@Nullable T> {
         private final Class<T> t;
+        private final Gson gson;
         private final HttpResponse.BodyHandler<String> inner = HttpResponse.BodyHandlers.ofString();
 
-        public JsonBodyHandler(Class<T> t) {
+        public JsonBodyHandler(Class<T> t, Gson gson) {
             this.t = t;
+            this.gson = gson;
         }
 
         @Override
         public HttpResponse.BodySubscriber<T> apply(HttpResponse.ResponseInfo responseInfo) {
-            return new JsonBodySubscriber<>(inner.apply(responseInfo), t);
+            return new JsonBodySubscriber<>(inner.apply(responseInfo), responseInfo, t, gson);
         }
 
         private record JsonBodySubscriber<T>(
             HttpResponse.BodySubscriber<String> inner,
-            Class<T> t
-        ) implements HttpResponse.BodySubscriber<T> {
+            HttpResponse.ResponseInfo responseInfo,
+            Class<T> t,
+            Gson gson
+        ) implements HttpResponse.BodySubscriber<@Nullable T> {
             @Override
             public CompletionStage<T> getBody() {
-                return this.inner.getBody().thenApply(body -> ServerClient.GSON.fromJson(body, t));
+                int statusCode = this.responseInfo.statusCode();
+
+                return (statusCode >= 200 && statusCode < 300)
+                    ? this.inner.getBody().thenApply(body -> gson.fromJson(body, t))
+                    : CompletableFuture.completedStage(null);
             }
 
             @Override

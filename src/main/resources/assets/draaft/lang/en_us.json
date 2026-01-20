@@ -1,5 +1,12 @@
 {
   "draaft.login.tooltip": "drAAft Login",
+  "draaft.login.update.checking": "Checking for updates",
+  "draaft.login.update.checkFailed": "Failed to check for updates",
+  "draaft.login.update.updateFound": "drAAft update found!",
+  "draaft.login.update.button": "Update",
+  "draaft.login.update.updating": "Updating",
+  "draaft.login.update.failedToUpdate": "Failed to update drAAft",
+  "draaft.login.update.failedToUpdate.invalidUpdate": "Invalid update `%s`.",
   "draaft.login.success": "Logged in",
   "draaft.login.success.desc": "Continue in your browser.",
   "draaft.login.linkCopied": "Login link copied",
