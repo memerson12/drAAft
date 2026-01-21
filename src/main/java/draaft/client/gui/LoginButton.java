@@ -3,6 +3,7 @@ package draaft.client.gui;
 import draaft.client.DraaftServices;
 import draaft.client.DraaftState;
 import draaft.client.ServerClient;
+import draaft.client.gui.screen.AutoUpdateScreen;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -27,7 +28,7 @@ public class LoginButton extends ButtonWidget {
         DraaftServices draaftServices,
         Screen parent
     ) {
-        super(x, y, 20, 20, LiteralText.EMPTY, (btn) -> {
+        super(x, y, 20, 20, LiteralText.EMPTY, (btn) -> AutoUpdateScreen.tryUpdate(parent, draaftServices, () -> {
             ServerClient.login(draaftServices);
 
             if (ServerClient.getInstanceOrNull() == null) {
@@ -46,7 +47,7 @@ public class LoginButton extends ButtonWidget {
 //                draaftState.setCurrentState(DraaftState.STATE.IN_ROOM);
 //                minecraftClient.openScreen(new DraaftScreen(parent));
 //            }
-        }, tooltipSupplier);
+        }), tooltipSupplier);
 
         this.glintSupplier = glintSupplier;
 
