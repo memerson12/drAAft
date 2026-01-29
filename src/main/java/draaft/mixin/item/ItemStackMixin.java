@@ -56,7 +56,7 @@ public abstract class ItemStackMixin {
         Map.entry("boots", bootsEnchants.get()),
         Map.entry("compass", compassEnchants.get()),
         Map.entry("flint_and_steel", fnsoasEnchants.get()),
-        Map.entry("_on_a_stick", fnsoasEnchants.get()),
+        Map.entry("carrot_on_a_stick", fnsoasEnchants.get()),
         Map.entry("shield", fnsoasEnchants.get()),
         Map.entry("elytra", fnsoasEnchants.get()),
         Map.entry("fishing_rod", rodEnchants.get()),
