@@ -85,8 +85,8 @@ speedrun. Ideal for competitive events
 
 # drAAftpack
 
-The drAAft mod is meant to be used in combination with the drAAftpack datapack, which can be generated
-from https://disrespec.tech/draaft/
+The drAAft mod is meant to be used in combination with the drAAftpack datapack, which is automatically
+downloaded after logging in and completing a draaft at https://draaft.net
 
 ## Features
 
