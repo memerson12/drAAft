@@ -16,9 +16,9 @@ public record DraaftServices(
     public final static int API_VERSION = 1;
 
     public final static DraaftServices DEFAULT = new DraaftServices(
-        URI.create("https://api.disrespec.tech/"),
-        URI.create("https://disrespec.tech/draaft/"),
-        "https://disrespec.tech",
+        URI.create("https://api.draaft.net/"),
+        URI.create("https://draaft.net"),
+        "https://draaft.net",
         "memerson12/drAAft",
         false
     );
