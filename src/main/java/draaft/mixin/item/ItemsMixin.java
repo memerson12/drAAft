@@ -20,6 +20,6 @@ public class ItemsMixin {
         )
     )
     private static int elytra(int original) {
-        return 22824;
+        return 22359;
     }
 }
