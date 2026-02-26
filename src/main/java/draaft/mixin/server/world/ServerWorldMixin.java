@@ -1,34 +1,63 @@
 package draaft.mixin.server.world;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import com.llamalad7.mixinextras.sugar.Local;
+import draaft.mixin.world.gen.chunk.ChunkGeneratorAccessor;
+import draaft.persistent.WorldManifest;
+import draaft.persistent.WorldState;
+import draaft.world.ServerWorldInterface;
+import net.minecraft.block.Blocks;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.boss.dragon.EnderDragonFight;
+import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.world.ServerChunkManager;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.profiler.Profiler;
 import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.MutableWorldProperties;
 import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.explosion.Explosion;
+import net.minecraft.world.explosion.ExplosionBehavior;
+import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.level.ServerWorldProperties;
-import org.spongepowered.asm.mixin.Final;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
+import org.jetbrains.annotations.Nullable;
+import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.Random;
 import java.util.function.Supplier;
 
 @Mixin(ServerWorld.class)
-public abstract class ServerWorldMixin extends World implements ServerWorldAccess {
-    @Shadow @Final private ServerWorldProperties worldProperties;
+public abstract class ServerWorldMixin extends World implements ServerWorldAccess, ServerWorldInterface {
+    @Shadow
+    @Final
+    private ServerWorldProperties worldProperties;
 
-    @Shadow @Final private MinecraftServer server;
+    @Shadow
+    @Final
+    private MinecraftServer server;
+
+    @Shadow
+    public abstract ServerChunkManager getChunkManager();
 
     @Unique
     boolean lastTickThunder = true;
     @Unique
     boolean lastTickRain = true;
+
+    @Unique
+    private @Nullable WorldManifest worldManifest = null;
 
     @Unique
     private boolean isIllegalRain(int timer) {
@@ -46,7 +75,7 @@ public abstract class ServerWorldMixin extends World implements ServerWorldAcces
     }
 
     @ModifyArg(method = "tick",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/ServerWorldProperties;setThunderTime(I)V"))
+        at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/ServerWorldProperties;setThunderTime(I)V"))
     private int injectedThunder(int thunderTime) {
 
 
@@ -88,7 +117,7 @@ public abstract class ServerWorldMixin extends World implements ServerWorldAcces
     }
 
     @ModifyArg(method = "tick",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/ServerWorldProperties;setRainTime(I)V"))
+        at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/ServerWorldProperties;setRainTime(I)V"))
     private int injectedRain(int rainTime) {
         // if we are waiting for a 'valid' rain time, simply chillax. it'll come when it comes.
         if (this.isIllegalRain(rainTime)) {
@@ -130,5 +159,97 @@ public abstract class ServerWorldMixin extends World implements ServerWorldAcces
         }
 
         return rainTime;
+    }
+
+    @Inject(method = "createExplosion(Lnet/minecraft/entity/Entity;Lnet/minecraft/entity/damage/DamageSource;Lnet/minecraft/world/explosion/ExplosionBehavior;DDDFZLnet/minecraft/world/explosion/Explosion$DestructionType;)Lnet/minecraft/world/explosion/Explosion;", at = @At("HEAD"))
+    private void createExplosion(Entity entity, DamageSource damageSource, ExplosionBehavior behavior, double x, double y, double z, float power, boolean createFire, Explosion.DestructionType destructionType, CallbackInfoReturnable<Explosion> cir) {
+        final float DEBRIS_CHANCE = WorldManifest.get((ServerWorld) this.getWorld()).on(WorldManifest.Feature.DEBRIS_RATES) ? 1F : 0.1F;
+
+        if (this.getDimension().isUltrawarm() && (y >= 5 && y <= 25)) {
+            ServerWorld world = (ServerWorld) this.getWorld();
+            WorldState state = WorldState.getServerState(world);
+            WorldState.RandomState draaftTntState = state.getOrCreateRng(WorldState.RngType.NETHERITE_EXPLOSION, world);
+            int tnt = draaftTntState.incrementUses();
+            float chance = Math.abs(y - 15) < 3 ? DEBRIS_CHANCE : DEBRIS_CHANCE / 2; // y13-17 10% otherwise 5%, to incentivize mining at correct y-height
+            float timer = 1 / chance;
+
+            if (draaftTntState.getRandom().nextFloat() < chance || (tnt % timer) == 0) {
+                placeDebrisBlob(draaftTntState.getRandom(), new BlockPos(x, y, z), 10);
+                draaftTntState.resetUses();
+            }
+        }
+    }
+
+    @Unique
+    private void placeDebrisBlob(Random random, BlockPos pos, int depth) {
+        if (depth <= 0) {
+            return;
+        }
+        int count = 2 + random.nextInt(2);
+        int x = 0, y = 0, z = 0;
+
+        while ((x == 0 && z == 0) && (y == 0 || y == 1)) {
+            x = random.nextInt(6) - random.nextInt(6);
+            y = random.nextInt(6) - random.nextInt(6);
+            z = random.nextInt(6) - random.nextInt(6);
+        }
+        BlockPos start = new BlockPos(pos.getX() + x, pos.getY() + y, pos.getZ() + z);
+        if (placeDebrisBlock(start)) {
+            count--;
+            int fails = 0;
+
+            while (count > 0 && fails < 10) {
+                Direction direction = Direction.random(random);
+                start = start.offset(direction);
+                if (placeDebrisBlock(start)) {
+                    count--;
+                } else {
+                    fails++;
+                }
+            }
+        } else {
+            placeDebrisBlob(random, pos, depth - 1);
+        }
+    }
+
+    @Unique
+    private boolean placeDebrisBlock(BlockPos pos) {
+        if (this.getWorld().getBlockState(pos).equals(Blocks.ANCIENT_DEBRIS.getDefaultState())) {
+            return false;
+        }
+        if (!this.getWorld().getBlockState(pos).isAir() && this.getWorld().getBlockState(pos).getFluidState().isEmpty()) {
+            this.getWorld().setBlockState(pos, Blocks.ANCIENT_DEBRIS.getDefaultState());
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public WorldManifest draaft$getWorldManifest() {
+        return this.worldManifest;
+    }
+
+    @Override
+    public void draaft$setWorldManifest(WorldManifest worldManifest) {
+        this.worldManifest = worldManifest;
+    }
+
+    /**
+     * @author me_nx
+     * @reason dimension split seeds
+     */
+    @Overwrite
+    public long getSeed() {
+        return ((ChunkGeneratorAccessor) this.getChunkManager().getChunkGenerator()).draaft$seed();
+    }
+
+    @ModifyVariable(method = "<init>", at = @At("HEAD"), argsOnly = true)
+    private static long injectSeed(long overworldSeed, @Local(argsOnly = true) ChunkGenerator chunkGenerator) {
+        return ((ChunkGeneratorAccessor) chunkGenerator).draaft$seed();
+    }
+
+    @WrapOperation(method = "<init>", at = @At(value = "NEW", target = "Lnet/minecraft/entity/boss/dragon/EnderDragonFight;"))
+    private EnderDragonFight injectDragonFightSeed(ServerWorld world, long _s, CompoundTag tag, Operation<EnderDragonFight> op) {
+        return op.call(world, world.getSeed(), tag);
     }
 }

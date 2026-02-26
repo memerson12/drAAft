@@ -10,7 +10,7 @@ import java.util.Random;
 
 @Mixin(WanderingTraderManager.class)
 public abstract class WanderingTraderManagerMixin implements Spawner {
-    @Redirect(method = "method_18018", at = @At(value = "INVOKE", target = "Ljava/util/Random;nextInt(I)I"))
+    @Redirect(method = "trySpawn", at = @At(value = "INVOKE", target = "Ljava/util/Random;nextInt(I)I"))
     private int injected(Random instance, int i) {
         return 0;
     }

@@ -1,4 +1,4 @@
-package draaft.mixin.compat;
+package draaft.mixin.compat.speedrunigt;
 
 import com.redlimerl.speedrunigt.timer.InGameTimer;
 import org.spongepowered.asm.mixin.Mixin;

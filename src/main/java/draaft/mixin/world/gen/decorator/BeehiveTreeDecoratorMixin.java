@@ -2,7 +2,10 @@ package draaft.mixin.world.gen.decorator;
 
 import net.minecraft.world.gen.decorator.BeehiveTreeDecorator;
 import net.minecraft.world.gen.decorator.TreeDecorator;
-import org.spongepowered.asm.mixin.*;
+import org.spongepowered.asm.mixin.Final;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Mutable;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -10,7 +13,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(BeehiveTreeDecorator.class)
 public abstract class BeehiveTreeDecoratorMixin extends TreeDecorator {
     @Mutable
-    @Shadow @Final private float chance;
+    @Shadow
+    @Final
+    private float chance;
 
     @Inject(method = "<init>", at = @At("TAIL"))
     private void inject(float f, CallbackInfo ci) {

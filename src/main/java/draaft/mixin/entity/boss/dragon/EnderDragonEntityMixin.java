@@ -4,7 +4,7 @@ import draaft.api.EnderDragonEntityAccessor;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.boss.dragon.EnderDragonEntity;
 import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -35,9 +35,8 @@ public abstract class EnderDragonEntityMixin extends MobEntity implements EnderD
 
     @Inject(method = "<init>", at = @At("RETURN"))
     private void draaft_onInit(EntityType<EnderDragonEntity> entityType, World world, CallbackInfo ci) {
-        MinecraftServer server = world.getServer();
-        if (server == null) return;
-        long seed = server.getSaveProperties().getGeneratorOptions().getSeed();
-        this.draaft_persistentPhaseRng = new Random(seed);
+        if (world instanceof ServerWorld serverWorld) {
+            this.draaft_persistentPhaseRng = new Random(serverWorld.getSeed());
+        }
     }
 }

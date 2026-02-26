@@ -1,0 +1,16 @@
+{
+  "required": true,
+  "package": "draaft.mixin.compat",
+  "plugin": "draaft.compat.CompatMixinConfigPlugin",
+  "compatibilityLevel": "JAVA_16",
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "mixins": [
+    "speedrunigt.OptionButtonsImplMixin",
+    "speedrunigt.SpeedRunOptionMixin"
+  ],
+  "client": [
+    "speedrunigt.InGameTimerMixin"
+  ]
+}

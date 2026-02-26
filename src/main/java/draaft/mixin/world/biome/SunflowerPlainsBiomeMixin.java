@@ -3,7 +3,6 @@ package draaft.mixin.world.biome;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.PlainsBiome;
 import net.minecraft.world.biome.SunflowerPlainsBiome;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
