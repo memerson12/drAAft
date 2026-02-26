@@ -20,6 +20,7 @@
 
 ### Gameplay Changes
 
+- Nerf elytra durability to 22,359 (as Coosh PB'd) (@DesktopFolder)
 - Non-intrusively disable peaceful mode (@me-nx)
 - Disable mob spawning in pyramids (@me-nx)
 - Standardize temple loot (@MaximVancompernolle)
