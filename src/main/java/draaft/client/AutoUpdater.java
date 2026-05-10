@@ -149,9 +149,10 @@ public abstract class AutoUpdater {
         return FabricLoader.getInstance().getModContainer(draaft.MOD_ID).get().getOrigin();
     }
 
-    public record DraaftRelease(int id, int minor, int patch, String prerelease, String htmlUrl) implements Comparable<DraaftRelease> {
+    public record DraaftRelease(int id, int minor, int patch, @Nullable String prerelease, String htmlUrl) implements Comparable<DraaftRelease> {
         private static final Pattern TAG_NAME = Pattern.compile("^v?2\\.(?<minor>\\d+)\\.(?<patch>\\d+)(?<prerelease>-.+)?$");
 
+        @NotNull
         public static final DraaftRelease CURRENT = Objects.requireNonNull(
             DraaftRelease.tryFromGitHub(new GitHub.Release(
                 draaft.DRAAFT_VERSION,
@@ -173,7 +174,7 @@ public abstract class AutoUpdater {
                 release.id(),
                 Integer.parseInt(matcher.group("minor")),
                 Integer.parseInt(matcher.group("patch")),
-                Objects.requireNonNullElse(matcher.group("prerelease"), ""),
+                matcher.group("prerelease"),
                 release.htmlUrl()
             );
         }
@@ -183,7 +184,7 @@ public abstract class AutoUpdater {
         }
 
         @Override
-        public String toString() {
+        public @NotNull String toString() {
             return "v2.%d.%d%s".formatted(this.minor, this.patch, this.prerelease);
         }
 
@@ -195,7 +196,7 @@ public abstract class AutoUpdater {
                 () -> cmpOr(
                     this.patch,
                     o.patch,
-                    () -> this.prerelease.compareTo(o.prerelease)
+                    () -> cmpOpt(this.prerelease, o.prerelease)
                 )
             );
         }
@@ -206,6 +207,18 @@ public abstract class AutoUpdater {
             return cmp == 0
                 ? eqFallback.getAsInt()
                 : cmp;
+        }
+
+        private static <T extends Comparable<T>> int cmpOpt(@Nullable T a, @Nullable T b) {
+            if (a == null) {
+                return b == null
+                    ? 0
+                    : 1;
+            } else if (b == null) {
+                return -1;
+            }
+
+            return a.compareTo(b);
         }
     }
 }
